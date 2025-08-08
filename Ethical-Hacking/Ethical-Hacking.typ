@@ -338,3 +338,30 @@ Consider a network mask of $255.255.0.0$ applied on $10.5.0.20$. This divides th
 To further allow better utilization of available addresses we can use subnets of different sizes. This is called *Variable Length Subnet Mask*. Consider a Class C network $192.203.17.0$ to be divided into three subnets with 110, 45 and 50 hosts. Thus, we can use first use the mask $255.255.255.128$ to divide into two subnets with 128 hosts each, i.e. $192.203.17.0$ to $192.203.17.127$ and $192.203.17.128$ to $192.203.17.255$ , now subnet the second $.128$ using a mask of $255.255.255.192$ to creating $192.203.17.128$ to $192.203.17.191$ and $192.203.17.192$ to $192.203.17.255$.
 
 There is also another concept *Classless Internet Domain Routing (CIDR)* to manage IP addresses which has no concept of Class A, B or C networks and helps reduce sizes of routing tables. Here, an IP address is represented by a prefix, which is the IP address of the network. E.g. $144.16.192.57 slash 18$, this means the 18 leftmost continuous bits are to be used for the network mask. The number of addresses in each block must be a power of 2 and the beginning addresses in each block must be divisible by the number of addresses in the block. E.g. for a $slash 28$ block (16 addresses), valid starting addresses are $... slash 0$, $... slash 16$, $... slash 32$, etc. This is the method used today.
+
+= Week Three
+
+== Routing Protocols
+
+There are two ways in which data is delivered, i.e. the two connection options are:
+- *Connection Oriented:* Here, a logical connection is established between the sender and receiver before any data is transferred. The network layer protocol first makes a connection and all packets are delivered as per the connection.
+- *Connection-Less:* Here, no prior connection is established. Each packet is sent independently.
+
+There are two main packet delivery options:
+- *Direct Delivery:* The packet is delivered directly from the source to the destination without passing through any intermediate routers. It happens when both are on the same physical network or the sender can reach the destination using the local network.
+- *Indirect Delivery:* The packet is delivered via one or more intermediate routers (gateways). It occurs when both are on different networks (different subnets), thus, the sender forwards the packet to a router, which then forwards it toward the destination (possibly through multiple routers).
+
+The different routing methods are:
+- *Next-Hop Routing:* The routing table specifies only the next router (next hop) to which the packet should be sent (not the complete path). Each router makes its own decision about the next hop based on its routing table.
+- *Network-Specific Routing:* The routing table contains entries for entire networks, not individual hosts. If a packet's destination IP matches a network entry, it is forwarded to that entry.
+- *Host Specific Routing:* The routing table contains entries for specific host IP addresses. If a packet’s destination matches a host-specific entry, it is routed accordingly.
+- *Default Routing:* The routing table includes a default route which is used when no other entries match the destination. If a packet’s destination does not match any specific or network entry, it is forwarded to the default gateway (often 0.0.0.0/0).
+
+There are two types of routing tables#footnote[Data structures that determine how packets are forwarded in a network]:
+- *Static:* This contains information entered manually by a network administrator and does not change with time. It is simple, secure and predictable but not scalable and does not adapt to network failures or topology changes.
+- *Dynamic:* This contains entries that are automatically updated by using routing protocols like RIP, OSPF or BGP. These are scalable, adaptive and can automatically find alternate paths during failures but consume network resources and may be vulnerable to certain attacks if not secured.
+
+A routing table contains multiple fields which contain the subnet mask, the destination IP address, the next hop address, the interface and some important flags like U (router is up and running), G (destination is in another network), H (host-specific address), D (added by redirection) and M (modified by redirection).
+
+We can view the routing table on Unix using `netstat -r`
+
