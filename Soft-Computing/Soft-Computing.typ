@@ -180,3 +180,60 @@ $ mu(x) = e^(-(x-c)^2/(2 sigma^2)) $
 - A fuzzy set is *normal* if its core is non-empty or $exists x in X (mu_A (x) = 1)$
 - $"crossover"(A) = {x | mu_A (x) = 0.5}$
 - A fuzzy set if *convex* iff for any $x_1, x_2 in X$ and any $lambda in [0, 1]$, $mu_A (lambda x_1 + (1- lambda)x_2) >= min {mu_A (x_1), mu_A (x_2)}$
+
+#definition[$alpha$-Cuts][
+  It converts a fuzzy set to a crisp set by selecting only those elements that meet or exceed a specified confidence level.
+  $ A_alpha = {x in X | mu_A >= alpha} $
+]
+$alpha$-cuts are used to simplify fuzzy sets for analysis or computation by isolating parts of the set with stronger membership.
+
+== Set Operations
+
+The three basic set of operations are:
+- *Union (OR):* $mu_(A union B) (x) = "max"(mu_A (x), mu_B (x))$
+- *Intersection (AND):* $mu_(A inter B) (x) = "min"(mu_A (x), mu_B (x))$
+- *Complement (NOT):* $mu_(A^c) (x) = 1 - mu_A (x)$
+
+=== Triangular Norm
+
+The *T-Norm* is defined as,
+$
+T: [0, 1] times [0, 1] arrow [0, 1] = mu_(A inter B)(x)
+$
+It follows the following properties:
+- *Boundary Properties:* $T(0, 0) = 0$ and $T(a, 1) = T(1, a) = a$
+- *Monotonicity:* $a <= c and b <= d => T(a, b) <= T(c, d)$
+- *Commutativity:* $T(a, b) = T(b, a)$
+- *Associativity:* $T(a, T(b, c)) = T(T(a, b), c)$
+
+The types of T-Norms are:
+- *Minimum T-Norm:* $T(mu_A (x), mu_B (x)) = mu_(A inter B) (x)$
+- *Algebraic Product:* $T_("AP")(mu_A (x), mu_B (x)) = mu_A (x) mu_B (x)$
+- *Bounded Product:* $T_("BP")(mu_A (x), mu_B (x)) = "max"(0, mu_A (x), mu_B (x) - 1)$
+- *Drastic Product:* $T_("DP")(mu_A (x), mu_B (x)) = cases(
+  mu_A(x) "if" mu_B(x) = 1,
+  mu_B(x) "if" mu_A(x) = 1,
+  0 "if" "max"(mu_A (x), mu_B (x)) < 1
+)$
+
+=== Supremum Norm
+
+The *S-Norm* is defined as,
+$
+S: [0, 1] times [0, 1] arrow [0, 1] = mu_(A union B)(x)
+$
+It follows the following properties:
+- *Boundary Properties:* $S(1, 1) = 1$ and $S(a, 0) = S(0, a) = a$
+- *Non-Decreasing Property:* $b <= c => S(a, b) <= S(a, c)$
+- *Commutativity:* $S(a, b) = S(b, a)$
+- *Associativity:* $S(a, S(b, c)) = S(S(a, b), c)$
+
+The types of S-Norm are:
+- *Maximum S-Norm* $S(mu_A (x), mu_B (x)) = mu_(A union B) (x)$
+- *Algebraic Sum:* $S_("AS")(mu_A (x), mu_B (x)) = mu_A (x) + mu_B (x) - mu_A (x) mu_B (x)$
+- *Bounded Sum:* $S_("BC")(mu_A (x), mu_B (x)) = "min"(1, mu_A (x) + mu_B (x))$
+- *Drastic Sum:* $S_("DS")(mu_A (x), mu_B (x)) = cases(
+  mu_A (x) "if" mu_B (x),
+  mu_B (x) "if" mu_A (x),
+  1 "if" mu_A (x) mu_B (x) > 0
+)$
