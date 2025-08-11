@@ -15,6 +15,13 @@
   variant: "Algorithm",
 )
 
+#let theorem-counter = counter("theorem")
+#show: sectioned-counter(theorem-counter, level: 2)
+#let theorem = exercise.with(
+  variant: "Theorem",
+  counter: theorem-counter,
+)
+
 #show: ilm.with(
   title: [Operations Research],
   author: "Pooja Bansal",
@@ -184,4 +191,20 @@ Find the shortest distance and path from 1 to 7.
 ]
 #definition[Augmenting Path][
   It is a path from the source to the sink in a residual graph along which additional flow can be pushed.
+]
+
+#algorithm[Ford-Fulkerson's Algorithm][
+  + Start with all flows equal to 0
+  + While there exists an augmenting path from source to sink in the residual geaph:
+    + Find the minimum residual capacity (bottleneck) along that path
+    + Increase the flow along the path by the bottleneck value
+    + Update the residual graph (reduce forward capacities, increase backward capacities)
+]
+
+#definition[Cut][
+  It is a set of directed links which when deleted from the network will cause a complete disruption of flow between source and sink.
+]
+A cut helps us analyse the amount of flow disruption by cutting all the supplies midway.
+#theorem[Maximum Flow Minimum Cut Method][
+  For any network with a single source and sink, the maximum possible flow from the source to the sink is equal to the minimum cut capacity for all the cuts of the network.
 ]

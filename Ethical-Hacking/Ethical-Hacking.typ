@@ -297,7 +297,7 @@ Now, to describe a unique process-to-process connection a 5-tuple called *associ
 
 A TCP connection is established using a 3-way handshake.
 #figure(
-  image("imgs/TCP-Connection.png"),
+  image("imgs/TCP-Connection.png", height: 25%),
   caption: [TCP Connection Establishment]
 )
 However, a half-open (incomplete) connection can result in possible attack scenarios like:
@@ -307,12 +307,12 @@ However, a half-open (incomplete) connection can result in possible attack scena
 
 A TCP connection is terminated using a 4-way handshake.
 #figure(
-  image("imgs/TCP-Termination.png"),
+  image("imgs/TCP-Termination.png", height: 30%),
   caption: [TCP Connection Termination]
 )
 
 #figure(
-  image("imgs/Format-UDP-Datagram.png"),
+  image("imgs/Format-UDP-Datagram.png", height: 10%),
   caption: [Format of UDP Segment]
 )
 
@@ -365,3 +365,30 @@ A routing table contains multiple fields which contain the subnet mask, the dest
 
 We can view the routing table on Unix using `netstat -r`
 
+The two broad classes of protocols used in the internet are:
+- *Interior Protocols* manage routing within a single network boundary. E.g. Routing information Protocol (RIP), Open Shortest Path First (OSPF)
+- *Exterior Protocols* connect different networks. E.g. Border Gateway Protocol (BGP)
+The network boundary is called an autonomous system where each AS is assigned a unique AS number. These are a set of routers managed by a single organization. The routers within an AS use a common routing protocol.
+
+*Routing Information Protocol* is an interior routing protocol that uses distance vector routing to update routers within an autonomous system. It maintains timers to detect failed links. It was used in the first generation ARPANET. However, it has a slow convergence rate (long time for routers to update table after network change like failure), counting to infinity problem (if a route becomes unreachable, routers may keep increasing the hop count indefinitely, consuming bandwidth and delaying accurate updates) and has limited scalability (hop limit of 15 makes it unusable for large networks).
+
+*Open Shortest Path First* is a widely used interior routing protocol that finds the shortest path using link state information. It is more efficient and scalable than older protocols like RIP.
+- *Link State Routing:* Each router shares information about the state (status and cost) of its links with all other routers in the AS. This information is called a link state advertisement (LSA).
+- *Network Topology Database:* All routers build a complete map (database) of the network’s topology based on the LSAs they receive.
+- *Shortest Path Calculation:* Each router uses Dijkstra’s algorithm to compute the shortest path to every destination in the network.
+- *Next Hop Forwarding:* The routing table only stores the next hop for each destination, not the entire path.
+It has a fast convergence (can quickly adapt to network changes), is scalable and allows for a configurable cost metric (can be bandwidth, cost, delay) and supports authentication (to prevent malicious updates).
+
+In the steady state, _Hello_ packets are periodically (default 10s) to neighbours, the LSA is flooded initially from each router, the absence of _Hello_ packet for 40s indicates the failure of neighbour and causes the LSA to be flooded again. The LSA is re-flooded every 30 minutes anyways.
+
+#figure(
+  image("imgs/OSPF-Header-Format.png", height: 15%),
+  caption: [OSPF Header Format]
+)
+
+The different packet types are:
+- *Hello Packet* is used to check if the neighbour is up
+- *Database Description (DBD) Packet* is used during the initial exchange of OSPF database information between routers and Synchronizes the database at the beginning
+- *Link State Request (LSR) Packet* requests specific pieces of link-state information from a neighbor
+- *Link State Update (LSU) Packet* distributes new or updated link-state advertisements (LSAs) to other routers
+- *Link State Acknowledgement (LSAck) Packet* confirms receipt of LSUs
