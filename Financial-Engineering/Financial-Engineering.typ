@@ -151,3 +151,24 @@ P &= sum (c F)/(1+c)^i + F/(1 + c)^n \
 &= F
 $
 Thus, if $c = y$, then the bond price is the same as the face value.
+
+=== Price-Yield Curves
+
+==== Effect of Coupon Rates
+
+#figure(
+  image("imgs/Effect-Of-Coupon-Rate.png", height: 25%),
+  caption: [Effect of Coupon Rate on Price-Yield Curve]
+)
+
+==== Effect of Time of Maturity
+
+#figure(
+  image("imgs/Effect-Of-Maturity.png", height: 25%),
+  caption: [Effect of Time of Maturity on Price-Yield Curve]
+)
+
+Thus, we can draw the following conclusions:
+- Bond price is inversely proportional to the change in market interest rates
+- All else equal, longer maturity bonds are more sensitive to interest rates compared to shorter maturity bonds
+- All else equal, lower coupon bonds are more sensitive to interest rates compared to higher coupon bonds
