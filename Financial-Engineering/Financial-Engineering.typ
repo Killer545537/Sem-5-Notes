@@ -172,3 +172,38 @@ Thus, we can draw the following conclusions:
 - Bond price is inversely proportional to the change in market interest rates
 - All else equal, longer maturity bonds are more sensitive to interest rates compared to shorter maturity bonds
 - All else equal, lower coupon bonds are more sensitive to interest rates compared to higher coupon bonds
+
+=== Duration
+
+It is the measure of a bond's sensitivity to changes in interest rates (yield). Realistically, it tells us when we effectively get our money back, accounting for coupons we receive before maturity.
+
+Let the cash flow from a fixed income security be, $(x_0, x_1, dots.h, x_n)$ at times $(t_0, t_1, dots.h, t_n)$, thus we can define,
+$ "Present value of cash received at t" = P_t $
+thus the duration is given as,
+$ D = (sum P_t t)/(sum P_t) in [t_0, t_n] $
+If we find the present values $P_t$ via the yield (for bonds), then this duration is called the Macaulay Duration,
+$ D_M = (sum_(t=0)^n t (c_t)/(1+y')^t + (n F)/(1+ y')^t)/(sum c_t/(1+y')^t + F/(1+y')^n) quad (y'=y/n) $
+Obviously#footnote[Actually magic] this simplifies to,
+$ D_M = (1 + y)/(n y) - (1 + y + n ( c - y))/(m c[(1 + y)^n - 1] + m y) $
+
+==== Macaulay Duration & Sensitivity
+
+Let us try to find out the relation between the change of yield on the price of a bond using $D_M$.
+
+$
+P_t &= (c_t)/(1 + y)^t \
+=> dd(P)/dd(y) &= -t/(1+y) P_t
+$
+Using the definition of the Macaulay Duration,
+$
+D_M &= (sum t P_t)/(sum P_t) \
+sum t P_t &= D_M P quad (P = sum P_t) \
+1/P dd(P)/dd(y) &= -D_M/(1 + y) = -D_M '
+$
+
+=== Yield Curves
+
+#figure(
+  image("imgs/Yield-Maturity-Curves", height: 25%),
+  caption: [Yield vs Time of Maturity Curves]
+)
