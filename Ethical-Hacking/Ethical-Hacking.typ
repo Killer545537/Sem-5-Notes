@@ -392,3 +392,5 @@ The different packet types are:
 - *Link State Request (LSR) Packet* requests specific pieces of link-state information from a neighbor
 - *Link State Update (LSU) Packet* distributes new or updated link-state advertisements (LSAs) to other routers
 - *Link State Acknowledgement (LSAck) Packet* confirms receipt of LSUs
+
+*Border Gateway Protocol#footnote[The current version is 4. It uses port 179 to send routing messages]* is the most common external routing protocol used to exchange routing information between different autonomous systems on the internet. It is designed for inter-AS routing-connecting networks managed by different organizations. It is a distance vector protocol and can specify complete routes not just the next hop (like RIP).

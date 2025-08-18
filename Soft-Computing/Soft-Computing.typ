@@ -209,7 +209,7 @@ It follows the following properties:
 The types of T-Norms are:
 - *Minimum T-Norm:* $T(mu_A (x), mu_B (x)) = mu_(A inter B) (x)$
 - *Algebraic Product:* $T_("AP")(mu_A (x), mu_B (x)) = mu_A (x) mu_B (x)$
-- *Bounded Product:* $T_("BP")(mu_A (x), mu_B (x)) = "max"(0, mu_A (x), mu_B (x) - 1)$
+- *Bounded Product:* $T_("BP")(mu_A (x), mu_B (x)) = "max"(0, mu_A (x) + mu_B (x) - 1)$
 - *Drastic Product:* $T_("DP")(mu_A (x), mu_B (x)) = cases(
   mu_A(x) "if" mu_B(x) = 1,
   mu_B(x) "if" mu_A(x) = 1,
@@ -233,7 +233,7 @@ The types of S-Norm are:
 - *Algebraic Sum:* $S_("AS")(mu_A (x), mu_B (x)) = mu_A (x) + mu_B (x) - mu_A (x) mu_B (x)$
 - *Bounded Sum:* $S_("BC")(mu_A (x), mu_B (x)) = "min"(1, mu_A (x) + mu_B (x))$
 - *Drastic Sum:* $S_("DS")(mu_A (x), mu_B (x)) = cases(
-  mu_A (x) "if" mu_B (x),
-  mu_B (x) "if" mu_A (x),
+  mu_A (x) "if" mu_B (x) = 0,
+  mu_B (x) "if" mu_A (x) = 0,
   1 "if" mu_A (x) mu_B (x) > 0
 )$
