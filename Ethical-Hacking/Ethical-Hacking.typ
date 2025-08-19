@@ -447,3 +447,13 @@ There are three types of addresses:
 - *Anycast* refers to a set of computers with the same address prefix and the packet is delivered to exactly one of the computers in the set. It is required to support replication of services.
 
 Since an IPv6 address is too long, we use a colon-hexadecimal notation where each group of 16 bits (in hex) are separated by a colon (a sequence of 0s is written a 2 colons). E.g. `7BD6:0:0:0:0:0:0:B6` $=>$ `7BD6::B6`
+
+An Aggregate Global Unicast Address is the standard type of IPv6 address used for communication across the global internet. These addresses are designed to be unique worldwide and are structured to enable efficient routing and aggregation#footnote[much like how CIDR (Classless Inter-Domain Routing) works in IPv4].
+#figure(
+  image("imgs/Aggregate-Global-Unicast-Address-Format.png"),
+  caption: [Aggregate Global Unicast Address Format]
+)
+
+IPv4-compatible IPv6 addresses allow IPv6 nodes to communicate over IPv4 networks by embedding an IPv4 address within an IPv6 address. These addresses embed an IPv4 address into the lower 32 bits of an IPv6 address, with the upper 96 bits set to zero. The address is given by `::w.x.y.z` where `w.x.y.z` is the IPv4 address. To send IPv6 packets when the router does not support it, we use *Tunnelling* which is done automatically by the OS kernel IPv4‐compatible IPv6 addresses are used, it uses a IPv4 network for packet delivery.
+
+= Week Four
