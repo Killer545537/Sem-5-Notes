@@ -393,4 +393,57 @@ The different packet types are:
 - *Link State Update (LSU) Packet* distributes new or updated link-state advertisements (LSAs) to other routers
 - *Link State Acknowledgement (LSAck) Packet* confirms receipt of LSUs
 
-*Border Gateway Protocol#footnote[The current version is 4. It uses port 179 to send routing messages]* is the most common external routing protocol used to exchange routing information between different autonomous systems on the internet. It is designed for inter-AS routing-connecting networks managed by different organizations. It is a distance vector protocol and can specify complete routes not just the next hop (like RIP).
+*Border Gateway Protocol#footnote[The current version is 4. It uses port 179 to send routing messages]* is the most common#footnote[All modern day routers support it. However, organization networks in many cases do not run BGP as they rely on the ISP's routers to route to the outside world] external routing protocol used to exchange routing information between different autonomous systems on the internet. It is designed for inter-AS routing-connecting networks managed by different organizations. It is a distance vector protocol and can specify complete routes not just the next hop (like RIP).
+
+There are four message types in BGP:
+- *Open* is used to open a neighbor connection with another router
+- *Update* is used to transmit information about a single router, advertise new routes, withdraw infeasible paths
+- *Keepalive* is used to periodically confirm the neighbor connection
+- *Notification* is used to notify about some error condition
+Initially BGP peers#footnote[Two BGP routers exchanging information on a connection] exchange the entire BGP routing table, subsequently, only the incremental updates are sent as the routing tables change. Keepalive messages are sent to ensure the connection is alive and notifications are sent in response to errors/special conditions. (BGP can be used within the same AS called internal BGP)
+
+The types of errors reported are:
+- *Message Header Error:* authentication and syntax
+- *Open Message Error:* syntax errors and unrecognized options
+- *Update Message Error*
+- *Hold Timer Expired:* used to close connection if periodic messages are not received
+- *Cease:* used by a router to close connection in absence of any error
+
+The functional procedures in BGP are:
+- *Neighbor Acquisition:* Two routers agree to be neighbors by exchanging messages
+- *Neighbor Reachability:* Check if the neighbor is alive and maintaining the relationship
+- *Network Reachability:* Each router maintains a list of networks that it can reach and the preferred routes
+
+== IP Version 6
+
+IPv6 is also called the next generation of IP addressing (IPng). IPv4 has limited address space, no support for complex addressing and routing capacities and cannot provide real-time response. 
+
+Like IPv4, IPv6 is also connectionless, the header contains the maximum number of hops a datagram can make before being discarded and other general characteristics are retained, however, it now uses 128-bit addresses ($2^(128)$ total addresses meaning $6 times 10^(23)$ unique addresses per square meter of the Earth's surface), uses a series of fixed-length headers to handle optional information which includes a base header followed by 0 or more extension headers. It allows for real-time traffic (i.e. allows a pair of stations to establish a high quality path between them and all datagrams must pass through this path), increased flexibility#footnote[Addresses do not have defined classes. A prefix length is associated with each address] in addressing (by allowing the concept of `anycast` address where a packet is sent to one of a set of nodes and dynamic assignment of IP addresses).
+
+#figure(
+  image("imgs/IPv6-Datagram-Format.png"),
+  caption: [IPv6 Datagram Format]
+)
+- *Version:* contains the value 6 (4 bits)
+- *Priority:* specifies the routing priority class (8 bits)
+- *Flow Label:* used with applications that require performance guarantee (20 bits)
+- *Payload Length:* total length of the extension headers and the transport-level PDU (16 bits)
+- *Next Header:* identifies the type of information that intermediately follows the current header (IP extension, TCP or UDP) (8 bits)
+- *Hop Limit:* is decremented at each hop and discarded when it reaches 0
+- *Source/Destination Address:* 16 octets (128 bits each)
+
+The extension headers#footnote[All extension headers are chained in a linked list through `NextHdr` field] are:
+- *Routing Header* provides source routing
+- *Hop-by-Hop Options Header* defines special options that are processed at each hop
+- *Fragment Header* used for fragmentation and reassembly#footnote[IPv6 fragmentation is similar to IPv4 and the required information is contained in a separate fragment extension header. The presence of the fragment header identifies the datagram as a fragment and the base header is copied into all the fragments]
+- *Authentication Header* used for packet integrity and authentication
+
+There are three types of addresses:
+#columns(2)[
+  *Unicast*
+  #colbreak()
+  *Multicast*
+]
+- *Anycast* refers to a set of computers with the same address prefix and the packet is delivered to exactly one of the computers in the set. It is required to support replication of services.
+
+Since an IPv6 address is too long, we use a colon-hexadecimal notation where each group of 16 bits (in hex) are separated by a colon (a sequence of 0s is written a 2 colons). E.g. `7BD6:0:0:0:0:0:0:B6` $=>$ `7BD6::B6`

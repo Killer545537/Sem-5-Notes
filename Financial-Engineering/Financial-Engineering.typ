@@ -207,3 +207,10 @@ $
   image("imgs/Yield-Maturity-Curves", height: 25%),
   caption: [Yield vs Time of Maturity Curves]
 )
+
+= Derivatives
+
+#definition[Derivatives][
+  It is a financial instrument whose value is derived from some other valuable asset called the _underlying_ asset.
+]
+These are generally used for hedging purposes.

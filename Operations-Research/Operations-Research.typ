@@ -208,3 +208,11 @@ A cut helps us analyse the amount of flow disruption by cutting all the supplies
 #theorem[Maximum Flow Minimum Cut Method][
   For any network with a single source and sink, the maximum possible flow from the source to the sink is equal to the minimum cut capacity for all the cuts of the network.
 ]
+
+#definition[Critical Activity][
+  It is an activity in a network where delay in its start time will further delay the project completion time.
+]
+If the start time of the activity may be delayed within limits without effecting the completion time, it is said to be non-critical.
+#definition[Critical Path][
+  The critical activities of a network that constitute an uninterrupted path which spans the entire network from start to finish.
+]
