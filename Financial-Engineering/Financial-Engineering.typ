@@ -214,3 +214,42 @@ $
   It is a financial instrument whose value is derived from some other valuable asset called the _underlying_ asset.
 ]
 These are generally used for hedging purposes.
+
+== Forward Contract
+
+This is a type of derivative.
+
+#definition[Forward Contract][
+  It is an obligation between two investors to buy or sell an underlying asset of a specific price $F$ called the forward price at a specific time in the future called the delivery date.
+]
+The investor who agrees to sell the asset is said to enter into a short position and the one who agrees to buy the asset is said to enter into a long position.
+
+$F(0, T) = F$ is the forward price of the forward contract initiated at $t=0$ with delivery date $t=T$. $S(t)$ is the price of the underlying asset at $t$.
+
+#figure(
+  image("imgs/Pay-Off-VS-S.png"),
+  caption: [Pay-Off - Asset Price Relation for Long and Short Positions]
+)
+
+#theorem[No Arbitrage Principle][
+  There is no investment with initial value $V(0) = 0$ such that $V(1) >= 0$ with absolute certainty (probability 1) or $V(1) > 0$ with non-zero probability.
+]
+This means that no investor can lock in a profit without risk and no initial endowment. Situations where this principle is violated are short-lived or the gains are extremely small compared to the volume of transactions. Thus, realistically arbitrage opportunities are solved naturally in the market.
+
+We can easily see this with the following cases#footnote[We assume here that the delivery date is 1 year from now but the same shit applies],
+- If the futures are overpriced, i.e. $F(0, 1) > S(0)(1 + r)$. Here, we take the following steps to create an arbitrage opportunity, 
+  + Borrow $S(0)$ at the risk-free rate $r$
+  + Buy the asset in the spot market at $S(0)$
+  + Short a futures contract (agree to sell at $F(0, 1)$ in 1 year)
+  + At $t = 1$, deliver the asset into the futures contract, receiving $F(0, 1)$
+  + Repay the loan $S(0)(1 + r)$
+  + The profit is $F(0, 1) - S(0)(1 + r) > 0$
+- If the futures are under priced, i.e. $F(0, 1) < S(0)(1 + r)$. Here, we take the following steps to create an arbitrage opportunity,
+  + Short-sell#footnote[This means we borrow an asset toady from an investor and immediately sell it in the spot market at $S(0)$ though we will owe one unit of the asset to return later] the asset today, receiving $S(0)$
+  + Invest it at the risk-free rate $r$
+  + Long a futures contract (agree to buy at $F(0, 1)$)
+  + At $t = 1$, the futures mature and we buy the asset at $F(0, 1)$
+  + Return the asset to cover the short sale
+  + The profit is $S(0)(1 + r) - F(0, 1) > 0$
+
+Thus, with either of the cases we get an infinite money glitch#footnote[which is kinda crazy].
