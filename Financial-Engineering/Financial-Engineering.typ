@@ -254,25 +254,31 @@ We can easily see this with the following cases#footnote[We assume here that the
 
 Thus, with either of the cases we get an infinite money glitch#footnote[which is kinda crazy]. So, in order to avoid arbitrage opportunities, we can safely say that $F(0, T) = S(0)g(0, T)$.
 
-=== Forward price of Non-Dividend Paying Asset
+=== Forward Price of Non-Dividend Paying Asset
 
 Moreover, the forward price at some time $t$ can be given by,
 $ F(t, T) = S(0)g(t, T) = (S(0))/(d(t, T))  quad (d(t, T) " is the discount rate")$
 This is the most basic kind of asset.
 
-=== Forward price with Carrying Cost
+=== Forward Price with Carrying Cost
 
 Consider an asset for which we have to pay carrying cost#footnote[This could be storing cost or anything which forces the holder of the asset to pay] $c_i$ in period $i$ at the beginning of each period,
 $ F(0, T) = S(0)/d(0, T) + sum_0^(n - 1) c_t/(d(t, T)) $
 Since the discount rate is a more common metric, we use that in contrast to the growth rate.
 
-=== Forward price of Dividend Paying Asset
+=== Forward Price of Dividend Paying Asset
 
 Consider an asset which pays a dividend $d$ at some time in $tau in [0, T]$, then it will be discounted from the forward price,
 $ F(0, T) = S(0)/d(0, T) - d/d(tau, T) $
 
-=== Forward price of Continuously Dividend Paying Asset
+=== Forward Price of Continuously Dividend Paying Asset
 
 Consider an asset which pays a continuous dividend at some rate $r_d$, this _rate_ will be discounted,
 $ F(0, T) = S(0)e^((r - r_d)T) $
 If an asset continuously requires paying a carrying cost, the rate will be added#footnote[Kinda obvious].
+
+=== Forward Contract on a Foreign Currency
+
+Consider an importer in country $A$ with currency $A$ who aims to buy an asset from another country $B$ with currency $B$ at some future date. To hedge the $A->B$ currency exchange risk, he would prefer to long a future. Consider the forward contract to be written on currency $B$,
+$ F(0, T) = P(0)e^((-r_B + r_A)T) $
+where $P(0)$ is the exchange rate, i.e. $1 space A = P(0) space B$, $r_B$ is the interest rate in $B$ and $r_A$ is the interest rate in $A$.
