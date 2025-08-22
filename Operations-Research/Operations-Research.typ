@@ -209,6 +209,29 @@ A cut helps us analyse the amount of flow disruption by cutting all the supplies
   For any network with a single source and sink, the maximum possible flow from the source to the sink is equal to the minimum cut capacity for all the cuts of the network.
 ]
 
+#definition[Merge Event][
+  It is an event which represents the joint completion of more than one activity. 
+]
+
+#definition[Burst Event][
+  It is an event which represents the joint initiation of more than one activity. 
+]
+
+The different types of activities are:
+#definition[Predecessor Activity][
+  An activity which is completed immediately before one or more activities start.
+]
+#definition[Successor Activity][
+  An activity which is completed after before one or more activities start.
+]
+#definition[Dummy Activity][
+  An activity which does not consume any resource/time. It implies the dependency of one activity on another.
+]
+
+We can create a network with activities and events where we either have the activity on the arrow or the event on the arrow. Both are inter-convertible and represent the same situations.
+
+To number the events, we follow *Fukerson's Rule*, which states that if there is an activity $A$ from $i$ to $j$, then $i < j$.
+
 #definition[Critical Activity][
   It is an activity in a network where delay in its start time will further delay the project completion time.
 ]
@@ -216,3 +239,13 @@ If the start time of the activity may be delayed within limits without effecting
 #definition[Critical Path][
   The critical activities of a network that constitute an uninterrupted path which spans the entire network from start to finish.
 ]
+
+To find the critical activities, we find#footnote[$E_i$ is found on the forward pass as the max of the time taken to reach it from all paths]#footnote[$L_i$ is found on the backward pass as the minimum time to reach it (in reverse) from all paths] $"Earliest Start Time" = E_i$ and $"Latest Finish Time" = L_i$ for each node, and mark all nodes with $E_i = L_i$ as critical.
+
+The critical path is the path with only critical nodes such that for two adjacent nodes $L_j - L_i = E_j - E_i = "Path Length/Resources"$. This is the *Critical Path Method*.
+
+However, realistically, we do not have the exact time to complete for some projects, which is when we use *Project Evaluation Review Technique (PERT)*. This is used when we have the optimistic time estimate ($t_o$)#footnote[Shortest possible time to complete the activity if everything goes well], pessimistic time estimate ($t_p$) and most likely time estimate ($t_m$). Here, we can find the time estimate and variance with,
+$ t_e = (t_o + 4t_m + t_p)/6 quad sigma^2 = ((t_p - t_o)/2)^2 $
+Using the mean and the variance, we can use Critical Path Method to find $T_e$ which on using the standard normal variate, we can get the probability to complete a task with,
+$ Z_e = (T_s - T_e)/sigma_e $
+where, $sigma_e^2 = sum sigma^2_c$ and then finding $P(Z < Z_e)$.
