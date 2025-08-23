@@ -149,3 +149,89 @@ We analyse a topology on the basis of its _degree_, _diameter_, _redundancy_, _s
   image("imgs/Types-Of-Topologies.png", height: 25%),
   caption: [Types of Topologies]
 )
+
+The different types of networks based on geographical location are:
+#columns(2)[
+  - *Personal Area Network (PAN)* Few meters
+  - *Local Area Network (LAN)* Few kilometers
+  - *Metropolitan Area Network (MAN)* 5-50 km
+  - *Wide Area Network (WAN)* $10^3-10^4$ km
+  #colbreak()
+  - *Wireless LAN (WLAN)*
+  - *Campus Area Network (CAN)*
+  - *Storage Area Network (SAN)*
+]
+
+#definition[Protocol][
+  A protocol is a set of rules that govern data communications. A protocol defines what is communicated, how it is communicated and when it is communicated.
+]
+The key elements of a protocol are:
+- *Syntax* refers to the structure of the data
+- *Semantics* refers to the meanings of each section of bits
+- *Timing* refers to when data should be sent and how fast they can be sent
+
+#definition[Standards][
+  Standards provide guidelines to manufacturers, vendors, government agencies, and other service providers to ensure the kind of interconnectivity necessary in today's marketplace and in international communications.
+]
+
+== Open Systems Interconnection Model
+
+It is a conceptual framework#footnote[It is not a protocol, just a model for understanding and designing a network architecture that is flexible, robust, and interoperable] developed by the International Organization for Standardization (ISO) in 1984 to standardize how different networking systems communicate with each other. It serves the following purposes:
+- Standardizes communication functions across hardware/software vendors
+- Ensures interoperability between devices (e.g., computers, routers, switches)
+- Breaks down complex networking into manageable parts
+- Provides clear separation of responsibilities
+- Serves as a reference model#footnote[This shit model (actually better than TCP) is not really even used]
+
+#figure(
+  image("imgs/OSI-Layers.png", height: 40%),
+  caption: [Layers and Communication]
+)
+
+The layers which do not specifically have a unit but need introduction are:
+- *Session Layer:* It acts as the network dialog controller – manages, maintains, and synchronizes communication between two systems. Performs *dialog control*, i.e. allows communication in half-duplex or full-duplex and *synchronization*, i.e. adds checkpoints to long data streams (e.g., after every 100 pages of a file transfer). Thus, if a crash happens, only the data after the last checkpoint needs to be resent, not the entire stream.
+- *Presentation Layer:* It handles the syntax and semantics of data – makes sure information is understandable by both systems. Performs *translation*, i.e. converts data from sender’s format → common format → receiver’s format (ensures interoperability between different encoding systems), *encryption/decryption*, i.e. provides privacy and security by transforming sensitive data before transmission and *compression/decompression*, i.e. reduces data size to optimize transmission, especially for multimedia (text, audio, video).
+
+= Physical Layer
+
+It is responsible for the movement of raw bits (0s and 1s) over a physical medium from one node to another. The main functions are:
+- *Physical Characteristics of Interfaces & Medium:* Defines hardware specifications (cables, connectors, voltages, frequencies, etc.) and specifies the type of transmission medium (copper, fiber, wireless)
+- *Representation of Bits:* Converts bits into signals (electrical, optical, or radio) and defines encoding schemes (e.g., NRZ, Manchester encoding)
+- *Data Rate:* Defines bit rate (number of bits transmitted per second) and determines bit duration (time per bit)
+- *Synchronization of Bits:* Ensures sender and receiver clocks are synchronized at the bit level
+- *Line Configuration:* Defines connection setup (either _point-to-point_#footnote[Dedicated link between two devices] or _multipoint_#footnote[Multiple devices share the same link])
+- *Physical Topology:* Defines network layout (bus, star, mesh)
+- *Transmission Mode:* Defines direction of communication (simplex, half-duplex, full-duplex)
+
+= Data-Link Layer
+
+It transforms the raw, unreliable _Physical Layer_ into a reliable link for the _Network Layer_ by ensuring error-free hop-to-hop delivery of frames. The main functions are:
+- *Framing:* Converts bit streams from the Network Layer into frames (manageable data units)
+- *Physical Addressing:* Adds source and destination addresses in the frame header
+- *Flow Control:* Prevents sender from overwhelming receiver by controlling transmission rate
+- *Error Control:* Detects and retransmits damaged/lost frames, identifies duplicate frames and uses trailers for error detection (e.g., CRC)
+- *Access Control:* Determines which device gets to use the shared link when multiple devices are connected
+It ensures node-to-node delivery (not end-to-end). This is called *hop-to-hop delivery*. E.g. To send data from $A -> F$, via the links $A -> B -> E -> F$, each hop has a new frame with its own header/trailer.
+
+= Network Layer
+
+It ensures source-to-destination delivery of packets, possibly across multiple networks (not just one link). The _Data Link Layer_ only ensures hop-to-hop delivery between two directly connected devices but this ensures end-to-end delivery across routers/networks. The main functions are:
+- *Logical Addressing:* Provides logical addresses (IP addresses) to uniquely identify sender and receiver across networks (since _Data Link Layer_ (MAC) addresses work locally only)
+- *Routing:* Determines the best path for packet delivery across networks and uses routers (or L3 switches) and routing tables to forward packets toward their final destination
+
+= Transport Layer
+
+It ensures process-to-process delivery of the entire message (not just host-to-host). The main functions are:
+- *Service-Point Addressing (Port Addressing):* Delivers data to the correct process (application) on that host using port numbers (while _Network Layer_ delivers data to correct host)
+- *Segmentation & Reassembly:* Breaks message into segments with sequence numbers and reassembles segments at the destination in the correct order. Detects and replaces missing segments
+- *Connection Control:* Connectionless (UDP) or Connection-Oriented (TCP)
+- *Flow Control:* Prevents sender from overwhelming receiver and does this end-to-end (between processes not just one link)
+- *Error Control:* Ensures entire message arrives without loss, duplication, or corruption, this is achieved using acknowledgments and retransmissions.
+
+= Application Layer
+
+It provides network services directly to the user (human or software). It acts as the interface between the user and the network. The main functions are:
+- *Network Virtual Terminal:* Allows remote login by simulating a terminal on the remote host
+- *File Transfer, Access, and Management (FTAM):* Enables remote file operations (read, write, retrieve, manage)
+- *Mail Services:* Supports e-mail forwarding, storage, and access
+- *Directory Services:* Provides global, distributed database information about users, resources, and services
