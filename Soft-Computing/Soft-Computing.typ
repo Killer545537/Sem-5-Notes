@@ -198,7 +198,7 @@ The three basic set of operations are:
 
 The *T-Norm* is defined as,
 $
-T: [0, 1] times [0, 1] arrow [0, 1] = mu_(A inter B)(x)
+T: [0, 1] times [0, 1] arrow [0, 1] = mu_(A inter B)(x) = mu_A (x) tilde(*) mu_B (x)
 $
 It follows the following properties:
 - *Boundary Properties:* $T(0, 0) = 0$ and $T(a, 1) = T(1, a) = a$
@@ -209,7 +209,7 @@ It follows the following properties:
 The types of T-Norms are:
 - *Minimum T-Norm:* $T(mu_A (x), mu_B (x)) = mu_(A inter B) (x)$
 - *Algebraic Product:* $T_("AP")(mu_A (x), mu_B (x)) = mu_A (x) mu_B (x)$
-- *Bounded Product:* $T_("BP")(mu_A (x), mu_B (x)) = "max"(0, mu_A (x) + mu_B (x) - 1)$
+- *Bounded Difference:* $T_("BP")(mu_A (x), mu_B (x)) = "max"(0, mu_A (x) - mu_B (x))$
 - *Drastic Product:* $T_("DP")(mu_A (x), mu_B (x)) = cases(
   mu_A(x) "if" mu_B(x) = 1,
   mu_B(x) "if" mu_A(x) = 1,
@@ -232,8 +232,60 @@ The types of S-Norm are:
 - *Maximum S-Norm* $S(mu_A (x), mu_B (x)) = mu_(A union B) (x)$
 - *Algebraic Sum:* $S_("AS")(mu_A (x), mu_B (x)) = mu_A (x) + mu_B (x) - mu_A (x) mu_B (x)$
 - *Bounded Sum:* $S_("BC")(mu_A (x), mu_B (x)) = "min"(1, mu_A (x) + mu_B (x))$
-- *Drastic Sum:* $S_("DS")(mu_A (x), mu_B (x)) = cases(
+- *Drastic Sum:* $S_("DS")(mu_A (x), mu_B (x)) = display( cases(
   mu_A (x) "if" mu_B (x) = 0,
   mu_B (x) "if" mu_A (x) = 0,
   1 "if" mu_A (x) mu_B (x) > 0
-)$
+))$
+
+#theorem[Extension Principle][
+  Let $X$ be a universe of discourse, $Y$ be the output space, $A$ be a fuzzy set and $f: X -> X$ be a function, then, the image of $A$ under $f$, denoted by $B = f(A)$ is,
+  $ mu_B (y) = sup_(x in X, f(x) = y) mu_A (x) $
+]
+This is a fundamental concept that allows us to extend a crisp function to work with fuzzy sets.
+
+#definition[Fuzzy Numbers][
+  It is a special type of fuzzy set defined on $bb(R)$, which satisfy:
+  - *Convexity:* The membership value does not decrease between any two points
+  - *Normality:* At least one element has full membership value
+  - *Continuity:* The membership function changes smoothly
+]
+The *Triangular Fuzzy Number* is the simplest and most common fuzzy number, defined by,
+$ (a, b, c) $
+where $a$ is the lower bound, $b$ is the peak and $c$ is the upper bound. It forms a triangle. The values near $a$ and $c$ are barely a part of the fuzzy set, while $b$ is fully included. These can be added and subtracted like vectors and multiplication is just multiplying individual components.
+
+== Fuzzy Relations
+
+#definition[Fuzzy Relation][
+  If $X$ and $Y$ are universes, a fuzzy relation $R$ is a fuzzy set in $X times Y$,
+  $ mu_R (x, y) in [0, 1] $
+]
+It is a fuzzy set defined on a Cartesian product of two or more universes. It represents the degree of relationship between two elements.
+
+=== Relation Operations 
+
+The basic binary relation operations are:
+- *Union:* $mu_(R_1 union R_2) (x, y) = max {mu_R_1 (x,y), mu_R_2 (x, y)}$
+- *Intersection:* $mu_(R_1 inter R_2) = min {mu_R_1, mu_R_2}$
+- *Composition:* $mu_(R_1 circle R_2)(x, z) = display(sup_y) min {mu_R_1 (x, y), mu_R_2 (y, z)} $
+
+We also define another operation called *Min-Max Composition* which is defined as,
+$ T(x, z) = max_(y in Y) min {R(x, y), S(y, z)} $
+Another one is *Max-Product Composition*,
+$ T(x, z) = max_(y in Y) R(x, y)S(y, z) $
+
+Every fuzzy relation is _reflexive_ ($mu_R (x, x) = 1$), _symmetric_ ($mu_R (x, y) = mu_R (y, x)$) and _transitive_ ($mu_R (x, z) >= min {mu_R (x,y), mu_R (y, z)}$), meaning it is an equivalence relation.
+
+== Rule Evaluation?
+
+#definition[Linguistic Variables][
+  It is a variable whose values are words/sentences in natural language rather than numbers. E.g. *temperature* as a variable and ${"Low", "Medium", "High"}$ as its values.
+]
+
+Thus, membership functions for linguistic variables is pretty similar, $mu_"Low" (20 degree C) = 0.8$.
+
+The rules are of the form `IF x is A THEN y is B`, here, the `IF` part is the antecedent (condition) and the `THEN` part is the consequent (result). There are two main types of rules, *Sugeno* (the output is as a function) and *Mamdami* (the output is as a fuzzy set). To use a rule, we must first fuzzify our crisp inputs, then evaluate the antecedent (take the `AND` or `OR`), find the rule firing strength (result of antecedent evaluation) and then apply it to the consequent.
+
+However, it is not as simple as that, there are generally conflicting rules#footnote[rules which fire simultaneously]. We use _aggregation_#footnote[combine outputs of all fired rules into single fuzzy output set] and then _defuzzification_.
+
+To convert fuzzy output back to a crisp value, we use methods like *Centroid* method, *Mean of Maximum (MoM)* and *Bisector*. 
