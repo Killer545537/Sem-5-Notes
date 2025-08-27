@@ -282,3 +282,15 @@ If an asset continuously requires paying a carrying cost, the rate will be added
 Consider an importer in country $A$ with currency $A$ who aims to buy an asset from another country $B$ with currency $B$ at some future date. To hedge the $A->B$ currency exchange risk, he would prefer to long a future. Consider the forward contract to be written on currency $B$,
 $ F(0, T) = P(0)e^((-r_B + r_A)T) $
 where $P(0)$ is the exchange rate, i.e. $1 space A = P(0) space B$, $r_B$ is the interest rate in $B$ and $r_A$ is the interest rate in $A$.
+
+=== Value of a Forward Contract
+
+The value of a forward contract at some $tau in [0, T]$ is,
+$ f(tau) = [F(tau, T) - F(0, T)] d(tau, T) $
+
+To prove this, we can use the *No Arbitrage Principle*. Take a scenario, where at $tau$, we borrow $f(t)$ from the bank, long a forward with price $F(0, T)$ and short a forward with the same underlying asset at $F(tau, T)$. Closing the positions at $T$, our portfolio is,
+$
+V(T) &= F(tau, T) - F(0, T) - f(tau)g(tau, T) \
+0 &= F(tau, T) - F(0, T) - f(tau)g(tau, T) \
+therefore f(tau) &= [F(tau, T) - F(0, T)] d(tau, T) 
+$
