@@ -95,7 +95,7 @@ If a tree has $n$ nodes, then it will have $n-1$ links.
   A tree with the minimum possible total edge weights.
 ]
 #definition[Link Capacity][
-  It is the maximum amount of flow that can pass through a directed link. The link capacity function is 
+  It is the maximum amount of flow that can pass through a directed link. The link capacity function is
   $ u: L arrow bb(R)_(>= 0) $
 ]
 
@@ -210,11 +210,11 @@ A cut helps us analyse the amount of flow disruption by cutting all the supplies
 ]
 
 #definition[Merge Event][
-  It is an event which represents the joint completion of more than one activity. 
+  It is an event which represents the joint completion of more than one activity.
 ]
 
 #definition[Burst Event][
-  It is an event which represents the joint initiation of more than one activity. 
+  It is an event which represents the joint initiation of more than one activity.
 ]
 
 The different types of activities are:
@@ -249,3 +249,38 @@ $ t_e = (t_o + 4t_m + t_p)/6 quad sigma^2 = ((t_p - t_o)/2)^2 $
 Using the mean and the variance, we can use Critical Path Method to find $T_e$ which on using the standard normal variate, we can get the probability to complete a task with,
 $ Z_e = (T_s - T_e)/sigma_e $
 where, $sigma_e^2 = sum sigma^2_c$ and then finding $P(Z < Z_e)$.
+
+= Multi-Objective Optimization
+
+== Goal Programming
+
+It is an approach for solving a multi-objective optimization problem that balances a trade-off in conflicting objectives. Since we cannot find the true optimal solution, we try to find a satisficing solution that meets the goals to an acceptable level.
+
+It can be thought of as an extension or generalization of linear programming that allows for multiple, often conflicting objectives to be addressed simultaneously. Each of these objectives is associated with a goal, and the aim is to minimize the deviations from these goals.
+
+#definition[Decision Maker][
+  The individual or group responsible for making choices in the context of the optimization problem.
+]
+#definition[Decision Variables][
+  It is a factor over which the decision maker has control and can adjust to influence the outcome of the optimization problem.
+]
+#definition[Criterion][
+  It is a single measure by which the goodness of any solution to a decision problem can be evaluated.
+]
+#definition[Aspiration Level][
+  The value specified by the decision maker the reflects their desire/satisfactory level for each criterion.
+]
+An objective function along with its aspiration level is called a goal.
+#definition[Goal Deviation][
+  It is the amount by which the actual performance of a solution deviates from the aspiration level for a particular goal. The deviation can be positive (overachievement) or negative (underachievement).
+
+  - *Positive Deviation:* $f(x) >= a => f(x) - d^+ = a$
+  - *Negative Deviation:* $f(x) <= a => f(x) + d^- = a$
+  - *Both Deviations:* $f(x) = a => f(x) + d^- - d^+ = a$
+]
+
+In a Goal Programming Problem, our goal is to minimize the (weighted sum of) deviations from the aspiration levels for each criterion while satisfying any constraints imposed by the problem.
+
+The two main types of Goal Programming are:
+- *Non Pre-emptive Goal Programming:* All goals are treated equally, and the objective is to minimize the total weighted sum of all undesirable deviation from all goals simultaneously.
+- *Pre-emptive Goal Programming:* Goals are prioritized, and the objective is to minimize the deviations from the highest priority goal first, then the next highest, and so on. Lower priority goals are only considered after higher priority goals have been satisfied to the extent possible.
