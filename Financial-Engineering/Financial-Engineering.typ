@@ -1,12 +1,12 @@
 #import "@preview/ilm:1.4.1": *
 #import "@preview/physica:0.9.5": *
 #import "@preview/thmbox:0.2.0": *
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge, shapes
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node, shapes
 
 #set page(margin: (
   top: 0.5in,
   bottom: 0.5in,
-  x: 0.5in
+  x: 0.5in,
 ))
 
 #show: thmbox-init(counter-level: 2)
@@ -16,6 +16,13 @@
 #let definition-counter = counter("definition")
 #show: sectioned-counter(definition-counter, level: 2)
 #let definition = definition.with(counter: definition-counter)
+
+#let solution(body) = {
+  v(-1.5em)
+  example(variant: "Solution")[
+    #body
+  ]
+}
 
 #show: ilm.with(
   title: [Financial Engineering],
@@ -28,11 +35,11 @@
 #definition[Financial Systems][
   It refers to the system that enables the exchange of funds between lenders, investors and borrowers. It comprises of financial institutions, financial markets, financial instruments and financial services. It serves the following purposes:
   #columns(2)[
-  - Channel savings into investments
-  - Provide risk management through insurance and hedging
-  #colbreak()
-  - Enable liquidity and price discovery
-  - Facilitate efficient allocation of resources
+    - Channel savings into investments
+    - Provide risk management through insurance and hedging
+    #colbreak()
+    - Enable liquidity and price discovery
+    - Facilitate efficient allocation of resources
   ]
 ]
 
@@ -55,15 +62,17 @@ The different types of financial instruments are:
 Let the principal amount at $t=0$ be $P$ and the future value at time $t=t_n$ be $V$. Let the interest rate be $r%$ given annually.
 === Simple Interest
 
-Here, 
+Here,
 $ V_n = P(1 + n r) $
 Thus, the growth rate#footnote[We can also define a discount factor $1/gamma$ which can be used to go back from $V$ to $P$] is $gamma = (1 + n r)$ which is linear.
 
 === Compound Interest
 
 Here,
-$ V_n &= V_(n-1)(1 + r) \
-V_n/V_(n-1)&= 1 + r $
+$
+          V_n & = V_(n-1)(1 + r) \
+  V_n/V_(n-1) & = 1 + r
+$
 Thus, this forms a geometric progression such that $V_0=P$,
 $ therefore V_n = P(1 + r)^n $
 The growth rate is $gamma = (1 + r)^n$ which is exponential.
@@ -76,8 +85,10 @@ $ lim_(m arrow infinity) V_n = P e^(r n) $
 
 #definition[Effective Rate][
   This is used to check which compounding method is more beneficial.
-  $ (1 + r/m)^m &= (1 + r_("eff")) \
-  therefore r_("eff") &= (1 + r/m)^m - 1 $
+  $
+            (1 + r/m)^m & = (1 + r_("eff")) \
+    therefore r_("eff") & = (1 + r/m)^m - 1
+  $
 ]
 
 #definition[Inflation Rate][
@@ -109,7 +120,7 @@ A bond is an obligation by the issuer to pay the money to the holder according t
 ]
 
 If a bond is priced $P$ at a coupon rate of $c$ and has a face value of $F$ for some time interval $n$, then the total cash inflow is,
-$ V = c  n + F $
+$ V = c n + F $
 
 The *bid price* is the highest price a buyer is willing to pay for a bond and the *ask price* is the lowest a seller is willing to accept for a bond. The difference is called a *spread* which reflects market liquidity and risk. Only once the prices meet, is a bond sold and bought.
 
@@ -138,8 +149,9 @@ The ratings#footnote[These ranks have no relation with the coupon rate] start fr
 === Bond Price Formula
 
 Consider a standard bonus with face value $F$, $m$ coupon payments per year for $n$ years and $y$ TTM, then the price of the bond is,
-$ P &= sum_1^(m n) (c/ m)/ (1 + y/m)^i + F/(1 + y/m)^(m n) \ 
-  &= F/(1 + y/m)^(m n) + c/ y [ 1- 1 / (1 + y/m)^(m n) ]
+$
+  P & = sum_1^(m n) (c/ m)/ (1 + y/m)^i + F/(1 + y/m)^(m n) \
+    & = F/(1 + y/m)^(m n) + c/ y [ 1- 1 / (1 + y/m)^(m n) ]
 $
 
 Now, if we consider the yield to be compounded continuously, we get,
@@ -147,8 +159,8 @@ $ P_t = F e^(-y(T- t)) + c((1-e^(-y(T-t)))/(e^((T-t)/n))) $
 
 When the coupon rate is less than the yield, i.e. the price is less than the face value, we say that the bond is issued at a discount. When the price is more than the face value, the bond is issued at a premium. We can see this with the following,
 $
-P &= sum (c F)/(1+c)^i + F/(1 + c)^n \
-&= F
+  P & = sum (c F)/(1+c)^i + F/(1 + c)^n \
+    & = F
 $
 Thus, if $c = y$, then the bond price is the same as the face value.
 
@@ -158,14 +170,14 @@ Thus, if $c = y$, then the bond price is the same as the face value.
 
 #figure(
   image("imgs/Effect-Of-Coupon-Rate.png", height: 25%),
-  caption: [Effect of Coupon Rate on Price-Yield Curve]
+  caption: [Effect of Coupon Rate on Price-Yield Curve],
 )
 
 ==== Effect of Time of Maturity
 
 #figure(
   image("imgs/Effect-Of-Maturity.png", height: 25%),
-  caption: [Effect of Time of Maturity on Price-Yield Curve]
+  caption: [Effect of Time of Maturity on Price-Yield Curve],
 )
 
 Thus, we can draw the following conclusions:
@@ -191,21 +203,21 @@ $ D_M = (1 + y)/(n y) - (1 + y + n ( c - y))/(m c[(1 + y)^n - 1] + m y) $
 Let us try to find out the relation between the change of yield on the price of a bond using $D_M$.
 
 $
-P_t &= (c_t)/(1 + y)^t \
-=> dd(P)/dd(y) &= -t/(1+y) P_t
+             P_t & = (c_t)/(1 + y)^t \
+  => dd(P)/dd(y) & = -t/(1+y) P_t
 $
 Using the definition of the Macaulay Duration,
 $
-D_M &= (sum t P_t)/(sum P_t) \
-sum t P_t &= D_M P quad (P = sum P_t) \
-1/P dd(P)/dd(y) &= -D_M/(1 + y) = -D_M '
+              D_M & = (sum t P_t)/(sum P_t) \
+        sum t P_t & = D_M P quad (P = sum P_t) \
+  1/P dd(P)/dd(y) & = -D_M/(1 + y) = -D_M '
 $
 
 === Yield Curves
 
 #figure(
   image("imgs/Yield-Maturity-Curves", height: 25%),
-  caption: [Yield vs Time of Maturity Curves]
+  caption: [Yield vs Time of Maturity Curves],
 )
 
 = Derivatives
@@ -228,7 +240,7 @@ $F(0, T) = F$ is the forward price of the forward contract initiated at $t=0$ wi
 
 #figure(
   image("imgs/Pay-Off-VS-S.png"),
-  caption: [Pay-Off - Asset Price Relation for Long and Short Positions]
+  caption: [Pay-Off - Asset Price Relation for Long and Short Positions],
 )
 
 #theorem[No Arbitrage Principle][
@@ -237,7 +249,7 @@ $F(0, T) = F$ is the forward price of the forward contract initiated at $t=0$ wi
 This means that no investor can lock in a profit without risk and no initial endowment. Situations where this principle is violated are short-lived or the gains are extremely small compared to the volume of transactions. Thus, realistically arbitrage opportunities are solved naturally in the market.
 
 We can easily see this with the following cases#footnote[We assume here that the delivery date is 1 year from now but the same shit applies],
-- If the futures are overpriced, i.e. $F(0, 1) > S(0)(1 + r)$. Here, we take the following steps to create an arbitrage opportunity, 
+- If the futures are overpriced, i.e. $F(0, 1) > S(0)(1 + r)$. Here, we take the following steps to create an arbitrage opportunity,
   + Borrow $S(0)$ at the risk-free rate $r$
   + Buy the asset in the spot market at $S(0)$
   + Short a futures contract (agree to sell at $F(0, 1)$ in 1 year)
@@ -257,7 +269,7 @@ Thus, with either of the cases we get an infinite money glitch#footnote[which is
 === Forward Price of Non-Dividend Paying Asset
 
 Moreover, the forward price at some time $t$ can be given by,
-$ F(t, T) = S(0)g(t, T) = (S(0))/(d(t, T))  quad (d(t, T) " is the discount rate")$
+$F(t, T) = S(0)g(t, T) = (S(0))/(d(t, T)) quad (d(t, T) " is the discount rate")$
 This is the most basic kind of asset.
 
 === Forward Price with Carrying Cost
@@ -290,7 +302,66 @@ $ f(tau) = [F(tau, T) - F(0, T)] d(tau, T) $
 
 To prove this, we can use the *No Arbitrage Principle*. Take a scenario, where at $tau$, we borrow $f(t)$ from the bank, long a forward with price $F(0, T)$ and short a forward with the same underlying asset at $F(tau, T)$. Closing the positions at $T$, our portfolio is,
 $
-V(T) &= F(tau, T) - F(0, T) - f(tau)g(tau, T) \
-0 &= F(tau, T) - F(0, T) - f(tau)g(tau, T) \
-therefore f(tau) &= [F(tau, T) - F(0, T)] d(tau, T) 
+              V(T) & = F(tau, T) - F(0, T) - f(tau)g(tau, T) \
+                 0 & = F(tau, T) - F(0, T) - f(tau)g(tau, T) \
+  therefore f(tau) & = [F(tau, T) - F(0, T)] d(tau, T)
 $
+
+== Futures Contract
+
+#definition[Futures Contract][
+  It is a standardized forward contract traded on an exchange, obligating the buyer to purchase (or the seller to sell) an asset at a predetermined price at a specified time in the future.
+]
+
+The main difference between a forward and a future is that the former is an OTC (over-the-counter) contract while the latter is exchange-traded. Thus, futures are more liquid and have lower counterparty risk#footnote[The risk that the other party will default on the contract]. However, futures require a margin account#footnote[An account where a trader deposits money as collateral to cover potential losses] and are marked to market daily#footnote[The process of adjusting the margin account to reflect gains/losses].
+
+The standardized features of a futures contract are:
+- Contract Size: The amount of the underlying asset covered by one futures contract.
+- Expiration Date: The date when the contract expires and the asset must be delivered or settled.
+- Mark to Market
+
+If $f(n, T)$ is the futures price at time $n$ for delivery at time $T$, then for each day,
+$
+  "Day 1": f(1, T) - f(0, T) \
+  "Day 2": f(2, T) - f(1, T) \
+  dots.h \
+  "Day n": f(T, T) - f(T-1, T) \
+  "Total": f(T, T) - f(0, T) = S(T) - f(0, T)
+$
+Thus, the futures price at time $n$ is the same as the forward price at time $n$ for delivery at time $T$, i.e. $f(n, T) = F(n, T)$. This is because of the daily settlement which eliminates the interest on the gains/losses.
+
+#definition[Initial Margin][
+  It is the amount of money that must be deposited in a margin account to open a futures position.
+]
+#definition[Maintenance Margin][
+  It is the minimum amount of equity that must be maintained in a margin account.
+]
+#definition[Marking to Market][
+  It is the daily adjustment of the margin account to reflect gains or losses based on the settlement price.
+]
+
+#example[
+  Suppose that the inital margin is set at $10 percent$ of the future value and maintenance of $5 percent$ of the future value. Suppose $n = 0, 1, 2, 3, 4$, the future prices are 140, 138, 130, 140 and 150 respectively. Show the working of of marking to market.
+]
+#solution[
+  #figure[
+    #table(
+      columns: 6,
+      table.header(
+        [$n$],
+        [$f(n, T)$],
+        [*Cash Flow*],
+        [*Margin - 1\
+          (Beginning of Day)*],
+        [*Payment*],
+        [*Margin - 2\
+          (End of Day)*],
+      ),
+      [0], [140], [], [], [-14], [14],
+      [1], [138], [-2], [12], [0], [12],
+      [2], [130], [-8], [4], [-2.5], [6.5],
+      [3], [140], [10], [16.5], [9.5], [7],
+      [4], [150], [10], [17], [9.5], [7.5],
+    )
+  ]
+]
