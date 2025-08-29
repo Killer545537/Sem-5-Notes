@@ -365,3 +365,47 @@ Thus, the futures price at time $n$ is the same as the forward price at time $n$
     )
   ]
 ]
+
+== Options
+
+#definition[Option][
+  It is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an underlying asset at a specified price on or before a specified date.
+]
+Options are used for hedging, speculation, and income strategies. The two main types are:
+- *Call Option*: Right to buy the underlying asset.
+- *Put Option*: Right to sell the underlying asset.
+The buyer pays a premium for this right. If the option is not exercised, it expires worthless.
+
+#definition[Premium][
+  It is the price paid by the buyer to the seller for the rights conveyed by the option. This payment is made upfront and is non-refundable.
+]
+#definition[Strike/Exercise Price][
+  It is the predetermined price at which the underlying asset can be bought or sold if the option is exercised.
+]
+#definition[Expiration/Delivery/Exercise Date][
+  It is the date on which the option expires and can no longer be exercised.
+]
+
+=== Call Option
+
+The buyer has the right to buy the underlying asset at the strike price on or before the expiration date#footnote[The on or before part is different for different types of options]. The buyer pays a premium for this right.
+
+The seller has an obligation to sell the underlying asset at the strike price ($k$) if the buyer exercises the option.
+
+Thus, at $T$, if $S(T) > k$, the buyer will execute his call option to lock the payoff of $S(T) - k - P$, where $P$ is the premium paid for the option.
+$
+  "Call Option Value" &= max(S(T) - K, 0) equiv (S(T) - K)^+ \
+  "Call Option Payoff" &= (S(T) - K)^+ - C e^(r T)
+$
+
+=== Put Option
+
+The buyer has the right to sell the underlying asset at the strike price on or before the expiration date. The buyer pays a premium for this right.
+
+The seller has an obligation to buy the underlying asset at the strike price ($k$) if the buyer exercises the option.
+
+Thus, at $T$, if $S(T) < k$, the buyer will execute his put option to lock the payoff of $k - S(T) - P$, where $P$ is the premium paid for the option.
+$
+  "Put Option Value" &= max(K - S(T), 0) equiv (K - S(T))^+ \
+  "Put Option Payoff" &= (K - S(T))^+ - P e^{r T}
+$
