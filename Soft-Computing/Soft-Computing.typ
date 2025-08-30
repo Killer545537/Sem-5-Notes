@@ -1,7 +1,7 @@
 #import "@preview/ilm:1.4.1": *
 #import "@preview/physica:0.9.5": *
 #import "@preview/thmbox:0.2.0": *
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge, shapes
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node, shapes
 
 #show: thmbox-init(counter-level: 2)
 #set text(lang: "en")
@@ -28,8 +28,11 @@ Soft computing#footnote[Hard computing on the other hand uses precise, determini
   [*Logic*], [Binary], [Fuzzy],
   [*Input Data*], [Precise], [Inexact],
   [*Problem Type*], [Structured], [Complex],
-  [*Tolerance to \ 
-  Uncertainty*], [Low], [High],
+  [*Tolerance to \
+    Uncertainty*],
+  [Low],
+  [High],
+
   [*Adaptability*], [Rigid Algorithms], [Adaptive],
 )
 
@@ -54,10 +57,10 @@ The main components of soft computing are:
 
 A *Fuzzy Inference System (FIS)* is the core framework in fuzzy logic that uses fuzzy set theory to map inputs to outputs using fuzzy rules. The components of a FIS are:
 #columns(3)[
-  - Fuzzification 
-  #colbreak() 
-  - Rule Evaluation 
-  #colbreak() 
+  - Fuzzification
+  #colbreak()
+  - Rule Evaluation
+  #colbreak()
   - Defuzzification
 ]
 
@@ -66,7 +69,7 @@ A *Fuzzy Inference System (FIS)* is the core framework in fuzzy logic that uses 
   spacing: (1cm, 2cm),
   edge-stroke: 1pt,
   crossing-thickness: 5,
-	mark-scale: 70%,
+  mark-scale: 70%,
   node-fill: luma(97%),
 
   node((0, 0), "Crisp Input"),
@@ -79,7 +82,7 @@ A *Fuzzy Inference System (FIS)* is the core framework in fuzzy logic that uses 
   edge((2, 0), "r", "-|>"),
   node((3, 0), "Defuzzifier"),
   edge((3, 0), "r", "-|>"),
-  node((4, 0), "Crisp Output")
+  node((4, 0), "Crisp Output"),
 )
 
 #definition[Fuzzification][
@@ -163,12 +166,14 @@ Some common membership functions are:
 - *Triangular Membership Function:* It is defined by a triplet $(a, b, c)$ where $a$ is the lower limit, $b$ is the peak point and $c$ is the upper limit. It is defined as,
 $ mu(x) = max(0, min((x-a)/(b-a), (c-x)/(c-b))) $
 - *Trapezoidal Membership Function:* It is defined by a four-tuple $(a, b, c, d)$ such that,
-$ mu(x) = cases(
-  0 "if" x <= a or x >= d,
-  (x- a)/(x- b) "if" a < x < b,
-  1 "if" b <= x < c,
-  (d-x)/(d-c) "if" c < x < d
-) $
+$
+  mu(x) = cases(
+    0 "if" x <= a or x >= d,
+    (x- a)/(x- b) "if" a < x < b,
+    1 "if" b <= x < c,
+    (d-x)/(d-c) "if" c < x < d
+  )
+$
 - *Gaussian Membership Function:* This has a bell shaped curve,
 $ mu(x) = e^(-(x-c)^2/(2 sigma^2)) $
 
@@ -198,7 +203,7 @@ The three basic set of operations are:
 
 The *T-Norm* is defined as,
 $
-T: [0, 1] times [0, 1] arrow [0, 1] = mu_(A inter B)(x) = mu_A (x) tilde(*) mu_B (x)
+  T: [0, 1] times [0, 1] arrow [0, 1] = mu_(A inter B)(x) = mu_A (x) tilde(*) mu_B (x)
 $
 It follows the following properties:
 - *Boundary Properties:* $T(0, 0) = 0$ and $T(a, 1) = T(1, a) = a$
@@ -211,16 +216,16 @@ The types of T-Norms are:
 - *Algebraic Product:* $T_("AP")(mu_A (x), mu_B (x)) = mu_A (x) mu_B (x)$
 - *Bounded Difference:* $T_("BP")(mu_A (x), mu_B (x)) = "max"(0, mu_A (x) - mu_B (x))$
 - *Drastic Product:* $T_("DP")(mu_A (x), mu_B (x)) = cases(
-  mu_A(x) "if" mu_B(x) = 1,
-  mu_B(x) "if" mu_A(x) = 1,
-  0 "if" "max"(mu_A (x), mu_B (x)) < 1
-)$
+    mu_A(x) "if" mu_B(x) = 1,
+    mu_B(x) "if" mu_A(x) = 1,
+    0 "if" "max"(mu_A (x), mu_B (x)) < 1
+  )$
 
 === Supremum Norm
 
 The *S-Norm* is defined as,
 $
-S: [0, 1] times [0, 1] arrow [0, 1] = mu_(A union B)(x)
+  S: [0, 1] times [0, 1] arrow [0, 1] = mu_(A union B)(x)
 $
 It follows the following properties:
 - *Boundary Properties:* $S(1, 1) = 1$ and $S(a, 0) = S(0, a) = a$
@@ -232,11 +237,13 @@ The types of S-Norm are:
 - *Maximum S-Norm* $S(mu_A (x), mu_B (x)) = mu_(A union B) (x)$
 - *Algebraic Sum:* $S_("AS")(mu_A (x), mu_B (x)) = mu_A (x) + mu_B (x) - mu_A (x) mu_B (x)$
 - *Bounded Sum:* $S_("BC")(mu_A (x), mu_B (x)) = "min"(1, mu_A (x) + mu_B (x))$
-- *Drastic Sum:* $S_("DS")(mu_A (x), mu_B (x)) = display( cases(
-  mu_A (x) "if" mu_B (x) = 0,
-  mu_B (x) "if" mu_A (x) = 0,
-  1 "if" mu_A (x) mu_B (x) > 0
-))$
+- *Drastic Sum:* $S_("DS")(mu_A (x), mu_B (x)) = display(
+    cases(
+      mu_A (x) "if" mu_B (x) = 0,
+      mu_B (x) "if" mu_A (x) = 0,
+      1 "if" mu_A (x) mu_B (x) > 0
+    )
+  )$
 
 #theorem[Extension Principle][
   Let $X$ be a universe of discourse, $Y$ be the output space, $A$ be a fuzzy set and $f: X -> X$ be a function, then, the image of $A$ under $f$, denoted by $B = f(A)$ is,
@@ -262,12 +269,12 @@ where $a$ is the lower bound, $b$ is the peak and $c$ is the upper bound. It for
 ]
 It is a fuzzy set defined on a Cartesian product of two or more universes. It represents the degree of relationship between two elements.
 
-=== Relation Operations 
+=== Relation Operations
 
 The basic binary relation operations are:
 - *Union:* $mu_(R_1 union R_2) (x, y) = max {mu_R_1 (x,y), mu_R_2 (x, y)}$
 - *Intersection:* $mu_(R_1 inter R_2) = min {mu_R_1, mu_R_2}$
-- *Composition:* $mu_(R_1 circle R_2)(x, z) = display(sup_y) min {mu_R_1 (x, y), mu_R_2 (y, z)} $
+- *Composition:* $mu_(R_1 circle R_2)(x, z) = display(sup_y) min {mu_R_1 (x, y), mu_R_2 (y, z)}$
 
 We also define another operation called *Min-Max Composition* which is defined as,
 $ T(x, z) = max_(y in Y) min {R(x, y), S(y, z)} $
@@ -284,8 +291,28 @@ Every fuzzy relation is _reflexive_ ($mu_R (x, x) = 1$), _symmetric_ ($mu_R (x, 
 
 Thus, membership functions for linguistic variables is pretty similar, $mu_"Low" (20 degree C) = 0.8$.
 
-The rules are of the form `IF x is A THEN y is B`, here, the `IF` part is the antecedent (condition) and the `THEN` part is the consequent (result). There are two main types of rules, *Sugeno* (the output is as a function) and *Mamdami* (the output is as a fuzzy set). To use a rule, we must first fuzzify our crisp inputs, then evaluate the antecedent (take the `AND` or `OR`), find the rule firing strength (result of antecedent evaluation) and then apply it to the consequent.
+The rules are of the form `IF x is A THEN y is B`, here, the `IF` part is the antecedent (condition) and the `THEN` part is the consequent (result). There are two main types of rules, *Sugeno* (the output is as a function) and *Mamdani* (the output is as a fuzzy set). To use a rule, we must first fuzzify our crisp inputs, then evaluate the antecedent (take the `AND` or `OR`), find the rule firing strength (result of antecedent evaluation) and then apply it to the consequent.
 
 However, it is not as simple as that, there are generally conflicting rules#footnote[rules which fire simultaneously]. We use _aggregation_#footnote[combine outputs of all fired rules into single fuzzy output set] and then _defuzzification_.
 
-To convert fuzzy output back to a crisp value, we use methods like *Centroid* method, *Mean of Maximum (MoM)* and *Bisector*. 
+To convert fuzzy output back to a crisp value, we use methods like *Centroid* method, *Mean of Maximum (MoM)* and *Bisector*.
+
+== Mamdani-Type Fuzzy Inference System
+
+Here, fuzzy sets are used for both the antecedent and consequent. The steps are:
++ *Fuzzification:* Convert crisp inputs into fuzzy sets.
++ *Rule Evaluation:* Evaluate the fuzzy rules using the fuzzified inputs. The rules are of the form `IF Temperature is High THEN FanSpeed is Fast`.
++ *Aggregation:* Combine the outputs of all fired rules into a single fuzzy output set.
++ *Defuzzification:* Convert the fuzzy output back into a crisp value.
+
+This is great for systems where interpretability is important, as the rules are easy to understand and explain.
+
+== Sugeno-Type Fuzzy Inference System
+
+Here, fuzzy sets are used for the antecedent, but the consequent is a crisp function. The steps are:
++ *Fuzzification:* Convert crisp inputs into fuzzy sets.
++ *Rule Evaluation:* Evaluate the fuzzy rules using the fuzzified inputs. The rules are of the form `IF Temperature is High AND Humidity is High THEN FanSpeed = 0.5 * TEMP + 0.2 * Humidity + 5`.
++ *Aggregation:* Combine the outputs of all fired rules into a single fuzzy output set.
++ *Defuzzification* is not needed as the output is already a crisp number.
+
+This is great for systems where interpretability is important, as the rules are easy to understand and explain.
