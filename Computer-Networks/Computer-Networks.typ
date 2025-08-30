@@ -1,13 +1,13 @@
 #import "@preview/ilm:1.4.1": *
 #import "@preview/physica:0.9.5": *
 #import "@preview/thmbox:0.2.0": *
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge, shapes
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node, shapes
 #import "@preview/xarrow:0.3.1": xarrow, xarrowLeftRight
 
 #set page(margin: (
   top: 0.5in,
   bottom: 0.5in,
-  x: 0.5in
+  x: 0.5in,
 ))
 
 #show: thmbox-init(counter-level: 2)
@@ -85,7 +85,13 @@ We analyse a topology on the basis of its _degree_, _diameter_, _redundancy_, _s
     inset: 8pt,
     align: horizon,
     table.header(
-      [*Topology*], [*Structure*], [*Advantages*], [*Disadvantages*], [*Example*], [*Number of Links*], [*Number of Ports*],
+      [*Topology*],
+      [*Structure*],
+      [*Advantages*],
+      [*Disadvantages*],
+      [*Example*],
+      [*Number of Links*],
+      [*Number of Ports*],
     ),
 
     // Bus
@@ -94,8 +100,10 @@ We analyse a topology on the basis of its _degree_, _diameter_, _redundancy_, _s
     [Easy to implement, low cost],
     [Entire network fails if main cable breaks, collisions],
     [Early Ethernet],
-    [$n - 1$],                 // Links
-    [$n$],                     // Ports
+    [$n - 1$],
+    // Links
+    [$n$],
+    // Ports
 
     // Star
     [*Star*],
@@ -126,7 +134,7 @@ We analyse a topology on the basis of its _degree_, _diameter_, _redundancy_, _s
 
     // Tree
     [*Tree\
-    (Hierarchical)*],
+      (Hierarchical)*],
     [Star networks arranged in hierarchy],
     [Scalable],
     [Failure of root affects large part],
@@ -147,7 +155,7 @@ We analyse a topology on the basis of its _degree_, _diameter_, _redundancy_, _s
 
 #figure(
   image("imgs/Types-Of-Topologies.png", height: 25%),
-  caption: [Types of Topologies]
+  caption: [Types of Topologies],
 )
 
 The different types of networks based on geographical location are:
@@ -185,7 +193,7 @@ It is a conceptual framework#footnote[It is not a protocol, just a model for und
 
 #figure(
   image("imgs/OSI-Layers.png", height: 40%),
-  caption: [Layers and Communication]
+  caption: [Layers and Communication],
 )
 
 The layers which do not specifically have a unit but need introduction are:
@@ -202,6 +210,57 @@ It is responsible for the movement of raw bits (0s and 1s) over a physical mediu
 - *Line Configuration:* Defines connection setup (either _point-to-point_#footnote[Dedicated link between two devices] or _multipoint_#footnote[Multiple devices share the same link])
 - *Physical Topology:* Defines network layout (bus, star, mesh)
 - *Transmission Mode:* Defines direction of communication (simplex, half-duplex, full-duplex)
+
+The data usable to a person/application must first be transformed into electromagnetic signals to be transmitted over the physical medium.
+
+== Analog Signals
+#definition[Analog Data#footnote[Not very important in our syllabus]][
+  It refers to information that is continuous and can take on any value within a given range. It is defined as $x(t) in bb(R)$ for continuous $t$.
+]
+Mathematically, a periodic analog signal is represented by a _sine_ wave,
+$
+  s(t) = "Amplitude" dot sin(2 pi "Frequency" t + "Phase") = A dot sin(2 pi f + phi)
+$
+$2 pi f t$ is called the _angular frequency_.
+
+Some important properties of a sine wave are:
+- *Wavelength:* Physical distance a wave occupies in one cycle. $lambda = display(v / f)$
+- *Period and Frequency:* Period is the time taken to complete one cycle.  $T = display(1 / f)$
+- *Phase:* How far along a cycle a wave is at $t = 0$
+- *Time Domain:* $A(t) "vs" t$
+- *Frequency Domain:* $A(f) "vs" f$. This is found using the Fourier Transform#footnote[ECE PTSD].
+- *Composite Signals:* A signal with multiple sine wave components. $sum s_i (t)$
+- *Bandwidth:* Range of frequencies it contains. $B = f_"max" - f_"min"$
+
+== Digital Signals
+
+#definition[Digital Data][
+  It refers to information that is discrete and can take on only specific values within a given range. It is defined as $x[n] in bb(Z)$ for discrete $n$.
+]
+
+Since most digital signals#footnote[A digital signal is essentially a composite analog signal] are non-periodic, thus, period and frequency are not appropriate terms to describe it, we use *bit rate*.
+#definition[Bit Rate][
+  It is the number of bits transmitted per second (bps). $R_b = 1 / T_b$ where $N$ is the number of bits and $T$ is the time in seconds.
+]
+Moreover, $T_b = "propogation speed" times "bit duration"$ is the *bit interval/length* which is the time duration of a single bit.
+
+=== Transmission of Digital Signals
+
+There are two main methods to transmit digital signals, baseband transmission and broadband tranmission#footnote[This requires modulation].
+
+==== Baseband Transmission
+
+It means sending a digital signal directly over a channel as is, without converting it to multiple frequency bands. Here, the entire bandwidth of the channel is used to transmit a single digital signal. The signal occupies frequencies from $0 "Hz"$#footnote[This means that a DC component is present] to a maximum frequency determined by the signal. It is used in point-to-point links and has a shorter range due to attenuation and noise.
+
+==== Broadband Transmission (with Modulation)
+
+It means modulating digital signals onto carrier waves and transmitting them as analog signals over multiple frequency bands. Here, the available bandwidth of the channel is divided into multiple frequency bands, each capable of carrying a separate signal. The signal does not start  It is used in cable TV and long-distance communication and has a longer range due to better noise immunity.
+
+== Data Rate Limits
+
+#definition[Data Rate][
+  It is the maximum number of bits that can be transmitted over a communication channel in a given time period, usually measured in bits per second (bps). It is dependent on the physical properties of the channel like bandwidth, signal-quality and encoding/modulation techniques.
+]
 
 = Data-Link Layer
 
