@@ -262,6 +262,33 @@ It means modulating digital signals onto carrier waves and transmitting them as 
   It is the maximum number of bits that can be transmitted over a communication channel in a given time period, usually measured in bits per second (bps). It is dependent on the physical properties of the channel like bandwidth, signal-quality and encoding/modulation techniques.
 ]
 
+There are two fundamental mathematical limits for data rate:
+- *Nyquist Bit Rate Formula:* It was proposed by Harry Nyquist for a noiseless channel and states that the maximum data rate (in bps) is given by $2B log_2(M)$, where $B$ is the bandwidth of the channel (in Hz) and $M$ is the number of discrete signal levels.
+- *Shannon Capacity Formula:* It was proposed by Claude Shannon for a noisy channel and states that the maximum data rate (in bps) is given by $B log_2(1 + S/N)$, where $B$ is the bandwidth of the channel (in Hz), $S$ is the average signal power and $N$ is the average noise power. $S/N$ is called the signal-to-noise ratio (SNR).
+
+Thus, Shannon Capacity is the theoretical upper limit on the data rate for a given channel bandwidth and noise level.
+
+== Performance Analysis
+
+- *Throughput:* It is the actual data rate achieved in a network, measured in bits per second (bps). Throughput can be affected by various factors such as network congestion, latency, and packet loss.
+- *Latency/Delay:* It is the time taken for a packet to travel from the source to the destination, measured in milliseconds (ms). Latency can be affected by factors such as propagation delay, transmission delay, and queuing delay. $"Latency" = "Propagation" + "Transmission" + "Queuing" + "Processing"$.
+  - *Propagation Time:* It is the time taken for a signal to propagate from sender to receiver, given by $"Propagation Delay" = "Distance"/"Propagation Speed"$.
+  - *Transmission Time:* It is the time taken to push all the packet's bits into the wire, given by $"Transmission Time" = "Message Size (bits)"/"Data Rate (bps)"$.
+  - *Queuing Time:* It is the time a packet spends waiting in a queue before being transmitted, which can vary based on network congestion.
+  - *Processing Time:* It is the time taken to process the packet at the sender and receiver, including any necessary encryption, decryption, or other application-level processing.
+- *Bandwidth-Delay Product:* It is the product of a data link's capacity (bandwidth) and the round-trip time (RTT) delay of the link. It represents the amount of data that can be "in flight" in the network at any given time.
+- *Jitter:* It is the variation in packet delay at the receiver of the data. High jitter can cause problems for real-time applications like voice and video.
+
+== Line Coding
+
+It is the process of converting digital data (bits) into a digital signal (voltage levels) suitable for transmission over a physical medium. The main objectives of line coding are to ensure reliable data transmission, minimize errors, and optimize bandwidth usage.
+
+The relation between the data rate and the signal rate is,
+$
+  S = "case factor" times "data rate" times 1/r
+$
+where, $r$ is the number of bits per signal element (also known as the "line code rate").
+
 = Data-Link Layer
 
 It transforms the raw, unreliable _Physical Layer_ into a reliable link for the _Network Layer_ by ensuring error-free hop-to-hop delivery of frames. The main functions are:
