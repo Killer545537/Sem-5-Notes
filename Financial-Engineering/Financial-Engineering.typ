@@ -409,3 +409,31 @@ $
   "Put Option Value" &= max(K - S(T), 0) equiv (K - S(T))^+ \
   "Put Option Payoff" &= (K - S(T))^+ - P e^{r T}
 $
+
+#definition[Convex Function][
+  If the secant lies above the tangent for any pair of points.
+]
+
+There are two types of options:
+- *European Options*: These can only be exercised at expiration.
+- *American Options*: These can be exercised at any time before expiration.
+
+#lemma(numbering: none)[Put-Call Parity][
+  Let $C^E (0)$ and $P^E (0)$ be the prices of European call and put options, respectively, with the same strike price $K$ and expiration date $T$. Then the put-call parity relationship is given by:
+  $ C^E (0) - P^E (0) = S(0) - K e^(-r T) $
+]
+
+#proof[
+  At $t = 0$, buy 1 call option at $C^E (0)$, sell 1 put option at $P^E (0)$ and deposit $K e^(-r T)$ at an interest rate $r$. Thus, our portfolio at $t = 0$ is,
+  $
+    V(0) = C^E (0) - P^E (0) + K e^(-r T)
+  $
+  At $t = T$, if $S(T) > K$, exercise the call option to buy the stock at $K$ making $V(T) = S(T)$, however, if $S(T) < K$, the other person exercises the put option to sell the stock at $K$ making $V(T) = K$.
+
+  Moreover, we can see that simply holding the asset $S(0)$ makes our portfolio $S(T)$. Since, two different investments have the same value at $t = T$ (with absolute certainty), then the present values must also be equal:
+  $
+    V(0) &= S(0) \
+    therefore C^E (0) - P^E (0) &= S(0) - K e^(-r T)
+  $
+]
+
