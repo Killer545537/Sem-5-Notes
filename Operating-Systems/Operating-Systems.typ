@@ -42,6 +42,8 @@ The CPU preserves its state by saving the program counter and other registers on
   caption: [Interrupt-Driven I/O Cycle]
 )
 
+There is also a hardware device, *timer*, built into the CPU that generates interrupts at fixed or programmable intervals. It lets the OS regain control of the CPU after a set period, preventing any single process from monopolizing the CPU.
+
 #definition[System/Monitor Call][
   A system call is a request made by a program to the operating system to perform a specific task or service that the program does not have permission to execute directly. System calls provide a controlled interface for user programs to access hardware resources and services provided by the operating system.
 ]
@@ -118,6 +120,11 @@ Operating systems provide an environment for the execution of programs and thus,
 - *Error Detection:* It monitors the system for errors and provides mechanisms for detecting and handling them. This includes checking for hardware failures, memory leaks, and other issues that may affect system stability and performance.
 - *Resource Allocation:* It is responsible for managing and allocating system resources, such as CPU time, memory, and I/O devices, to ensure that all processes have the resources they need to execute efficiently. This includes implementing scheduling algorithms, memory management techniques, and I/O management strategies.
 
+#figure(
+  image("imgs/Operating-System-Services.png"),
+  caption: [Operating System Services]
+)
+
 *File Management System* is a crucial component of an operating system that provides a way to store, organize, and manage data on storage devices. It offers a hierarchical structure for organizing files and directories, allowing users to easily access and manipulate their data. The file management system is responsible for tasks such as file creation, deletion, reading, writing, and permissions management. It also abstracts the details of the underlying storage hardware, providing a consistent interface for applications to work with files.
 
 *Protection and Security* are essential aspects of an operating system that ensure the integrity, confidentiality, and availability of data and resources. This includes implementing user authentication, access control mechanisms, and encryption to protect sensitive information from unauthorized access and attacks. *Protection* is any mechanism for controlling access of processes or user resources defined by the OS. *Security* is the defence of the system against internal and external attacks.
@@ -129,6 +136,13 @@ Operating systems provide an environment for the execution of programs and thus,
   A process is an instance of a program in execution. It includes the program code, its current activity, and the resources allocated to it, such as memory and file handles. The operating system manages processes to ensure that they have the necessary resources and can execute concurrently without interfering with each other.
 ]
 Thus, a program is a passive entity while a process is an active entity that is being executed by the CPU. A single program can have multiple processes running simultaneously, each with its own state and resources.
+
+== User Operating System Interface
+
+There are two approaches to user operating system interfaces:
+- *Command Line Interface:* A command line interface (CLI) allows users to interact with the operating system by typing commands into a text-based terminal. Users can execute programs, manage files, and perform system tasks by entering specific commands and parameters. While CLIs can be powerful and flexible, they often require users to remember command syntax and options.
+- *Graphical User Interface:* A graphical user interface (GUI) allows users to interact with the operating system through graphical elements such as windows, icons, and menus. GUIs are generally more user-friendly and intuitive than CLIs, making them accessible to a broader range of users. However, they may require more system resources and can be less efficient for advanced users who prefer keyboard shortcuts and command-line tools.
+Now-a-days, we also have *touchscreen interfaces* which are based on actions and selections and do not require the mouse.
 
 == Dual Mode Operation
 
@@ -145,9 +159,30 @@ The *mode bit* in the CPU indicates the current mode, $0$ for kernel mode and $1
 #definition[System Call][
   It is a mechanism that allows user programs to request services from the operating system's kernel. System calls provide a controlled interface for accessing hardware and system resources, ensuring that user programs operate within the constraints of the operating system's security and protection mechanisms.
 ]
+These are typically written in a high-level programming language like `C`, `C++` and are accessed by programs via a high-level _Application Programming Interface (API)_. We have `Win32` for Windows and `POSIX` for Unix-like systems.
+
 There are essentially 5 groups of system calls:
 - *Process Control:* These system calls manage processes, including creating, terminating, and synchronizing processes.
 - *File Management:* These system calls handle file operations, such as creating, deleting, reading, and writing files.
 - *Device Management:* These system calls manage device operations, including requesting and releasing device access.
 - *Information Maintenance:* These system calls provide information about the system, such as system time and process status.
 - *Communication:* These system calls facilitate communication between processes, including message passing and shared memory.
+
+These system calls are assigned a number which is used by the kernel to identify the specific service being requested. When a user program makes a system call, it provides this number along with any necessary parameters, allowing the kernel to execute the appropriate service.
+There are three main methods of passing arguments to the OS:
+- The simplest is to pass the parameters in a register
+- The parameters can be stored in a block/table/in memory and the address of the block is passed in a register
+- The parameters can be pushed on the stack and popped off by the OS
+
+== Virtualization
+
+#definition[Virtualization][
+  It is a technology that allows you to run multiple isolated operating systems (OSes) or applications on the same physical hardware simultaneously. It works by creating virtual machines (VMs), each of which acts like a separate computer, but they share the same underlying hardware resources.
+]
+A *hypervisor* (or virtual machine monitor VMM) sits between the hardware and the OS which allocates CPU, memory, storage and I/O resources to each VM as needed, creating the illusion that each VM has its own dedicated hardware.
+#figure(
+  image("imgs/Virtualization.png", height: 25%),
+  caption: [Virtualization Architecture]
+)
+
+*Emulation* is related but instead of sharing the host CPU instruction set, emulation mimics different hardware or architectures in software. E.g. running a Nintendo console game on a PC.
