@@ -394,8 +394,8 @@ The seller has an obligation to sell the underlying asset at the strike price ($
 
 Thus, at $T$, if $S(T) > k$, the buyer will execute his call option to lock the payoff of $S(T) - k - P$, where $P$ is the premium paid for the option.
 $
-  "Call Option Value" &= max(S(T) - K, 0) equiv (S(T) - K)^+ \
-  "Call Option Payoff" &= (S(T) - K)^+ - C e^(r T)
+   "Call Option Value" & = max(S(T) - K, 0) equiv (S(T) - K)^+ \
+  "Call Option Payoff" & = (S(T) - K)^+ - C e^(r T)
 $
 
 === Put Option
@@ -406,9 +406,23 @@ The seller has an obligation to buy the underlying asset at the strike price ($k
 
 Thus, at $T$, if $S(T) < k$, the buyer will execute his put option to lock the payoff of $k - S(T) - P$, where $P$ is the premium paid for the option.
 $
-  "Put Option Value" &= max(K - S(T), 0) equiv (K - S(T))^+ \
-  "Put Option Payoff" &= (K - S(T))^+ - P e^{r T}
+   "Put Option Value" & = max(K - S(T), 0) equiv (K - S(T))^+ \
+  "Put Option Payoff" & = (K - S(T))^+ - P e^{r T}
 $
+
+#align(center)[
+  #grid(
+    columns: 2,
+    figure(
+      image("imgs/Long-Call-Option.png"),
+      caption: [Call Option Pay-Off Curve],
+    ),
+    figure(
+      image("imgs/Long-Put-Option.png"),
+      caption: [Put Option Pay-Off Curve],
+    ),
+  )
+]
 
 #definition[Convex Function][
   If the secant lies above the tangent for any pair of points.
@@ -432,8 +446,39 @@ There are two types of options:
 
   Moreover, we can see that simply holding the asset $S(0)$ makes our portfolio $S(T)$. Since, two different investments have the same value at $t = T$ (with absolute certainty), then the present values must also be equal:
   $
-    V(0) &= S(0) \
-    therefore C^E (0) - P^E (0) &= S(0) - K e^(-r T)
+                           V(0) & = S(0) \
+    therefore C^E (0) - P^E (0) & = S(0) - K e^(-r T)
   $
 ]
 
+=== Pay Off Curves
+
+Here, we will draw the pay-off curves for the combination of several options or a portfolio of options.
+
+==== Bull Spread
+
+Consider a portfolio of two options, $V = C_(K_1) - C_(K_2)$, where $K_2 > K_1$.#footnote[This just means that we are the holder of $C_(K_1)$ and the seller of $C_(K_2)$]
+
+This strategy is viable when the underlying asset price is expected to rise moderately. The maximum loss occurs if the asset price falls below $K_1$, while the maximum gain is capped at $K_2 - K_1$.
+
+=== Bear Spread
+
+Consider a portfolio of two options, $V = C_(K_1) - C_(K_2)$, where $K_1 > K_2$.
+
+This strategy is viable when the underlying asset price is expected to fall moderately. The minimum loss occurs if the asset price rises above $K_1$, while the maximum loss is capped at $K_1 - K_2$.
+
+#grid(
+  columns: 2,
+  figure(
+    image("imgs/Bull-Spread.png"),
+    caption: [Bull Spread Pay-Off Curve],
+  ),
+  figure(
+    image("imgs/Bear-Spread.png"),
+    caption: [Bear Spread Pay-Off Curve],
+  ),
+)
+
+=== Butterfly Spread
+
+Consider a portfolio of three options, $V = C_(K_1) - 2 C_(K_2) + C_(K_3)$, where $K_1 < K_2 < K_3$. Here, we see an inverted triangle like graph.
