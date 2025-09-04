@@ -461,7 +461,7 @@ Consider a portfolio of two options, $V = C_(K_1) - C_(K_2)$, where $K_2 > K_1$.
 
 This strategy is viable when the underlying asset price is expected to rise moderately. The maximum loss occurs if the asset price falls below $K_1$, while the maximum gain is capped at $K_2 - K_1$.
 
-=== Bear Spread
+==== Bear Spread
 
 Consider a portfolio of two options, $V = C_(K_1) - C_(K_2)$, where $K_1 > K_2$.
 
@@ -479,6 +479,97 @@ This strategy is viable when the underlying asset price is expected to fall mode
   ),
 )
 
-=== Butterfly Spread
+==== Butterfly Spread
 
 Consider a portfolio of three options, $V = C_(K_1) - 2 C_(K_2) + C_(K_3)$, where $K_1 < K_2 < K_3$. Here, we see an inverted triangle like graph.
+
+=== Option Pricing
+
+==== Single Period Binomial Lattice Model for European Options
+
+We will model the price of a European call option using a single period binomial lattice with the following assumptions in mind:
+- The price of the underlying stock is $S(0)$ at $t = 0$
+- At the end of a period, the price will either be $u S(0)$ with probability $p$ or $d S(0)$ with probability $1 - p$, where $u > 1$ and $d < 1$ are the up and down factors, respectively.
+- At every period, it is possible to borrow or lend at a risk-free interest rate $r$
+- Moreover, $u > R > d > 0$ to avoid arbitrage opportunities, where $R = 1 + r$
+#align(center)[
+  #grid(
+    columns: 2,
+    gutter: 10em,
+    figure(
+      diagram(
+        node((1, 1), $t = T\
+        u S(0)$),
+        edge($p$, "<-"),
+        node((0, 0), [$t = 0$\
+        $S(0)$]),
+        edge($1-p$, "->"),
+        node((1, -1), $t = T\
+        d S(0)$),
+      )
+    ),
+    figure(
+      diagram(
+        node((1, 1), $1 + r = R$),
+        edge("<-"),
+        node((0, 0), $1$),
+        edge("->"),
+        node((1, -1), $1 + r = R$),
+      )
+    )
+  )
+]
+
+#figure(
+  diagram(
+        node((1, 1), $C_u = (u S(0) - K)^+$),
+        edge($p$, "<-"),
+        node((0, 0), $C(T)$),
+        edge($1-p$, "->"),
+        node((1, -1), $C_d = (d S(0) - K)^+$),
+    ),
+    caption: [Call Option Pay-Off at Maturity]
+)
+
+Now, let us design a replicating portfolio of bonds#footnote[This is the same as investing the money in the bank here and represents a fixed-income security] and stocks such that its future value is equal to the value of the all option. Let the number of bonds be $a$ and the number of stocks be $b$, i.e. $p = (a, b)$.
+$
+  V_p(T) = C(T)
+$
+The present value of the portfolio is,
+$
+  V_p(0) = a B(0) + b S(0)
+$
+Moreover, using the above diagram, we can say that the value of $V_p$ at $t = T$ is,
+$
+  V_p(T) = cases(
+    a R B(0) + b u S(0) "with" p,
+    a R B(0) + b d S(0) "with" 1 - p,
+  )
+$
+
+Since the future value of the portfolio must equal the future value of the option, we have
+
+$
+  V_p(T) &= C(T) \
+  a R B(0) + b u S(0) = C_u  space &and space a R B(0) + b d S(0) = C_d\
+  therefore a = (u C_d - d C_u)/(R (u - d) B(0)) space &and space b = (C_u - C_d)/(S(0) (u - d))
+$
+
+To make the market arbitrage free,
+$
+  V_p(0) &= C(0) \
+  => C(0) &= a B(0) + b S(0) \
+  therefore C(0) &= 1/R [C_u ((R- d)/(u - d)) + C_d ((u - R)/(u - d))]
+$
+Clearly, if $hat(p) = (R - d)/(u - d)$ and $hat(q) = (u - R)/(u - d)$, then we can express the option price as a risk-neutral expectation:
+
+$
+  C(0) &= 1/R [(p) C_u + hat(q) C_d]
+$
+
+Here, $hat(p)$ is a risk-neutral probability measure. Moreover,
+$
+  E[C(0)] &= hat(p) C_u + hat(q) C_d \
+  therefore C(0) &= 1/R [E[C(0)]]
+$
+Thus, the present value is the expected value discounted at the risk-free rate.
