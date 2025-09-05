@@ -216,13 +216,19 @@ It produces `.o` files which reference functions/variables defined in other obje
   A loader is a system program that loads an executable file into memory and prepares it for execution. It allocates memory for the program's code and data segments, resolves any remaining references, and sets up the program's execution environment.
 ]
 
-It is responsible for loading the program into memory, setting up the stack and heap, and transferring control to the program's entry point. The loader may also perform additional tasks such as dynamic linking of shared libraries and relocation of code and data segments.
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    figure(
+        image("imgs/Linker-Loader.png"),
+        caption: [Role of Linker and Loader]
+    ),
+    [
+        It is responsible for loading the program into memory, setting up the stack and heap, and transferring control to the program's entry point. The loader may also perform additional tasks such as dynamic linking of shared libraries and relocation of code and data segments.
 
-#figure(
-  image("imgs/Linker-Loader.png", height: 25%),
-  caption: [Role of Linker and Loader]
+        This kinda answers why applications are OS specific. The compiled code contains system calls and library calls specific to the OS, and the linker/loader must be able to handle these appropriately.
+    ]
 )
-This kinda answers why applications are OS specific. The compiled code contains system calls and library calls specific to the OS, and the linker/loader must be able to handle these appropriately.
 
 == Design and Implementation
 
@@ -236,7 +242,6 @@ After the OS is designed, it must be implemented and tested to ensure that it me
 
 == Structures of Operating System
 
-
 #grid(
   columns: 2,
   gutter: 5pt,
@@ -244,5 +249,115 @@ After the OS is designed, it must be implemented and tested to ensure that it me
     image("imgs/MS-DOS-OS-Structure.png"),
     caption: [Structure of the MS-DOS Operating System]
   ),
-  [This is a very simple layered structure where each layer is built on top of the one below it. It works but just works. There is not much abstraction or separation of concerns. It is almost a single layer. The seperation is so bad that applications run in the same address space as the OS.]
+  [This is a very simple layered structure where each layer is built on top of the one below it. It works but just works. There is not much abstraction or separation of concerns. It is almost a single layer since all the layers interact directly with the base hardware. The separation is so bad that applications run in the same address space as the OS.]
 )
+
+=== Monolithic Structure
+
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+        #figure(
+        image("imgs/Unix-System-Structure.png"),
+        caption: [Structure of the Unix Operating System]
+    )
+    The entire OS works in kernel mode as a single large program called the _kernel_. Since there is one large kernel, all the OS services can call each other and share data easily. Since everything works in kernel mode, system calls and functions are direct and thus very efficient. The components can communicate directly using function calls. However, this also means that a bug in any part of the kernel can crash the entire system. Moreover, it is difficult to maintain and extend since any change requires recompiling and relinking the entire kernel.
+    ],
+    figure(
+        image("imgs/Linux-System-Structure.png"),
+        caption: [Structure of the Linux Operating System]
+    )
+)
+
+=== Layered Structure
+
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+        #figure(
+        image("imgs/Layered-Structure.png"),
+        caption: [Layered Operating System Structure]
+        )
+    ],
+    [
+        The entire OS is divided into layers, each built on top of the lower layers.\
+        The layers are designed such that each layer only interacts with the layer directly below it.\
+        This provides a clear separation of concerns and makes it easier to design, implement, and maintain the OS.\
+        However, it can be less efficient than a monolithic structure since each layer must communicate through well-defined interfaces, which can introduce overhead.
+    ]
+)
+Modern OS designs combine the layered approach with other structures to balance modularity and performance. It was used in `THE` OS#footnote[Made by the guy Dijkstra], `MULTICS` etc.
+
+=== Microkernel Structure
+
+This is essentially the opposite of the monolithic structure. The core functionality of the OS is implemented in a small kernel that runs in kernel mode, while other services run in user mode as separate processes (also called *servers*). The microkernel provides basic services such as inter-process communication, memory management, and process scheduling, while other services such as file systems, device drivers, and network protocols are implemented as user-space processes.
+
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    figure(
+        image("imgs/Microkernel-Structure.png"),
+        caption: [Microkernel Operating System Structure]
+    ),
+    [
+        It provides better modularity and separation of concerns, making it easier to maintain and extend the OS.\
+        It is more reliable and secure since a bug in a user-space service cannot crash the entire system.\
+        It is portable across different hardware architectures since the microkernel can be designed to be hardware-independent.\
+    ]
+)
+However, it can be less efficient than a monolithic structure since communication between the microkernel and user-space services can introduce overhead since more context switches are required. It is used in `MINIX`, `QNX`, `L4` etc. `Mach` is a popular microkernel that forms the basis for the `XNU` kernel used in macOS and iOS.
+
+=== Hybrid Structure
+
+This structure combines elements of both monolithic and microkernel designs. The core functionality of the OS is implemented in a small kernel that runs in kernel mode, while other services run in user mode as separate processes. However, some services may be implemented as part of the kernel for performance reasons.
+
+Linux and Solaris kernels are monolithic but have some modules that can be loaded and unloaded at runtime, making them somewhat modular. Windows NT uses a hybrid approach with a microkernel-like architecture for core services and monolithic components for performance-critical tasks.
+
+#definition[Module][
+    It is a separate, loadable part of the kernel that can be independently developed, tested, loaded, or unloaded at runtime. They provide a modular approach to OS design, combining benefits of both monolithic and microkernel structures.
+]
+
+== Operating System Generation
+
+It refers to the process of creating a customized operating system from a general-purpose OS codebase for a specific computer system or hardware configuration. It is basically "compiling" + "configuring" + "tailoring" an OS so that works efficiently on a specific hardware setup.
+
+Since OS do not come as one single prebuilt binary, they come as a collection of programs, modules and configuration options which during system generation (*sysgen*), the OS builder (*installer*) selects which modules to include, what hardware support is required and what policies to use. The system then assembles/compiles these into an executable kernel image.
+
+- *Specification:* Administrator specifies system needs (CPU type, memory size, device types, performance requirements)
+- *Selection:* OS modules are selected accordingly
+- *Compilation/Assembly:* The chosen modules are compiled and linked
+- *Generation:* The final OS image (kernel  + utilities) are built
+- *Bootstrapping:* The OS image is placed on a boot device to start the system
+
+To build and boot a Linux system, the following steps are typically followed:
++ Download Linux source code
++ Configure the kernel using `make menuconfig`
++ Compile the kernel using `make`
+    - This produces the kernel image (`vmlinuz`) and modules
+    - Compile the kernel modules using `make modules`
+    - Install the modules using `make modules_install`
++ Install the kernel using `make install`
+
+== System Boot
+
+The procedure of starting a computer and loading the kernel is called *booting* or *bootstrapping*. On most systems, a small program called the *bootstrap loader*#footnote[This is loaded into the memory by the BIOS (Basic Input/Output System) or UEFI (Unified Extensible Firmware Interface) firmware] is stored in ROM or EEPROM. When the computer is powered on or reset, the CPU starts executing this program, which initializes the hardware and loads the operating system kernel into memory.
+
+The BIOS loads the bootstrap loader which loads _GRUB_ (GRand Unified Bootloader) which is a popular bootloader used in many Linux systems. It displays a menu of available operating systems and allows the user to select which one to boot. GRUB then loads the selected OS kernel into memory and transfers control to it.
+
+After the full bootstrap program has been loaded, it can traverse the file system to find the kernel, load it into memory, and start its execution. It is at this time that the system is said to be "booted" or "started up".
+
+== Operating System Debugging#footnote[Some bitch Kernighan said "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it." makes sense but why tho]
+
+It is the process of finding and fixing errors (bugs, crashes, hangs, race conditions, memory leaks) in an operating system kernel or its components. Since the OS itself manages hardware, memory, processes, and I/O, debugging it often requires special tools, techniques, and environments.
+
+The OS generates _log files_ containing error information. Application failures can generate _core dump_ files capturing memory state at the time of the crash. OS failures can generate _crash dump_ files for post-mortem analysis containing kernel memory.
+
+We can use it for performance tuning by analyzing the logs and dumps to identify bottlenecks, resource contention, and other issues affecting system performance. *Profiling* tools can help visualize and understand resource usage patterns.
+
+*Tracing* means monitoring system calls, interrupts, and other events to understand system behavior. Tools like `strace` (for Linux) can trace system calls made by a process, while `dtrace` (for Solaris, macOS) provides dynamic tracing capabilities for the entire system. `gdb` is a source-level debugger that allows you to inspect the state of a running program, set breakpoints, and step through code.
+
+= Process Management
+
+
