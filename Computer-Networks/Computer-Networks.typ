@@ -283,11 +283,60 @@ Thus, Shannon Capacity is the theoretical upper limit on the data rate for a giv
 
 It is the process of converting digital data (bits) into a digital signal (voltage levels) suitable for transmission over a physical medium. The main objectives of line coding are to ensure reliable data transmission, minimize errors, and optimize bandwidth usage.
 
-The relation between the data rate and the signal rate is,
+The relation between the data rate and the signal rate#footnote[Number of signal elements sent per second] is,
 $
-  S = "case factor" times "data rate" times 1/r
+  S = "case factor" times "data rate" times 1/r quad "baud"
 $
 where, $r$ is the number of bits per signal element (also known as the "line code rate").
+
+Even though we previously said that the bandwidth is infinite, practical limitations such as noise, interference, and the physical properties of the transmission medium impose constraints on the effective bandwidth.
+
+The baud rate determines the required bandwidth for a digital signal. Thus, the minimum bandwidth is given by,
+$
+  B_"min" = c N 1/r => N_"max" = B_"min" r/c
+$
+Comparing with the Nyquist formula, we can see that the minimum bandwidth is directly related to the maximum data rate and the number of signal levels used.
+
+In _decoding_ a digital signal, the receiver calculates a running average of the received signal power, called the *baseline* which is compared to the incoming signal power. However, a long string of 0s and 1s can cause a drift in the baseline (this is called baseline wandering) which makes it difficult for the receiver to accurately detect the signal levels.
+
+Thee different types of line coding schemes are:
+- *Unipolar:* All the signals are on one side of the time axis (either all positive or all negative). It is simple to implement but has a DC component and poor synchronization. *NRZ* (Non-Return to Zero) is a common unipolar scheme where 1s are represented by a high voltage and 0s by zero voltage. It is called so since the signal does not return to zero between bits. However, it has no synchronization and a long string of 0s causes baseline wandering and is very costly.
+- *Polar:* The signals are on both sides of the time axis (positive and negative voltages). It has a DC component and better synchronization than unipolar. *NRZ-L* (Non-Return to Zero-Level) is a polar scheme where 1s are represented by a high voltage and 0s by a low voltage. It has no synchronization and a long string of 0s causes baseline wandering. *NRZ-I* (Non-Return to Zero-Inverted) is another polar scheme where a 1 is represented by a transition at the beginning of the bit interval and a 0 is represented by no transition. It has better synchronization than NRZ-L but still suffers from baseline wandering with long strings of 0s. Both of these have an average signal rate of $N l times 2 B d$. *RZ* (Return to Zero) is a polar scheme where 1s are represented by a high voltage and 0s by a low voltage, but the signal returns to zero in the middle of the bit interval. It has better synchronization than NRZ but requires more bandwidth (twice that of NRZ). *Biphase* (Manchester) is a polar scheme where 1s are represented by a transition from low to high in the middle of the bit interval and 0s are represented by a transition from high to low. It has excellent synchronization and no DC component but requires more bandwidth (twice that of NRZ). It combines _RZ_ and _NRZ-L_. *Differential Manchester* is a polar scheme where a transition at the beginning of the bit interval represents a 0 and no transition represents a 1, with a transition in the middle of the bit interval for synchronization. It has good synchronization and no DC component but requires more bandwidth (twice that of NRZ). It combines _RZ_ and _NRZ-I_.
+- *Bipolar:* The signals alternate between positive and negative voltages, with zero voltage representing 0s. It has no DC component and good synchronization. *AMI* (Alternate Mark Inversion) is a bipolar scheme where 1s are represented by alternating positive and negative voltages and 0s are represented by zero voltage. It has no DC component and good synchronization but can still suffer from baseline wandering with long strings of 0s. *Pseudoternary* is a bipolar scheme where 0s are represented by alternating positive and negative voltages and 1s are represented by zero voltage. It has no DC component and good synchronization but can still suffer from baseline wandering with long strings of 1s.
+
+== Bandwidth Utilization
+
+It refers to how efficiently the available bandwidth of a communication channel is used for transmitting data. The goal is to maximize the amount of useful data transmitted while minimizing wasted bandwidth.
+
+=== Multiplexing
+
+It means combining multiple signals into one signal over a shared medium. The main types of multiplexing are:
+- *FDM (Frequency Division Multiplexing):* Bandwidth is divided into frequency bands, each assigned to a different signal. E.g. radio, TV (different stations use different frequency bands)
+- *TDM (Time Division Multiplexing):* The entire bandwidth is allocated to each signal but for a different time slot. E.g. digital telephony (different calls use different time slots)
+- *WDM (Wavelength Division Multiplexing):* A form of FDM used in fiber optics, where different signals are carried by different light wavelengths. E.g. fiber optic communication (different data streams use different light wavelengths)
+- *CDM (Code Division Multiplexing):* Each signal is encoded with a unique code and transmitted over the entire frequency spectrum simultaneously. The receiver decodes using the same code. E.g. mobile communications (different users use different codes)
+
+=== Spreading
+
+It means intentionally using more bandwidth than the minimum required, to improve performance, security, or robustness. It is somewhat opposite to multiplexing. The main types of spreading are:
+- *DSSS (Direct Sequence Spread Spectrum):* Each bit of data is represented by multiple “chips” using a spreading code. Reduces interference and increases security. E.g. Wi-Fi (802.11b)
+- *FHSS (Frequency Hopping Spread Spectrum):* The carrier frequency changes rapidly according to a pseudorandom sequence. Reduces interference and increases security. E.g. Bluetooth
+- *CSS (Chirp Spread Spectrum):* The signal frequency increases or decreases over time in a linear fashion. Provides long-range communication with low power. E.g. LoRa (Long Range)
+
+== Transmission Media
+
+It refers to the physical path between the transmitter and receiver in a network, along which data (signals) travel. The main types of transmission media are:
+- *Guided Media:* Signals are confined to a physical path.
+  - *Twisted Pair Cable:* Two insulated copper wires twisted together to reduce electromagnetic interference.
+    - *Unshielded Twisted Pair (UTP):* No additional shielding, used in Ethernet cables (Cat5e, Cat6)
+    - *Shielded Twisted Pair (STP):* Additional shielding to reduce interference, used in industrial environments
+  - *Coaxial Cable:* A central conductor surrounded by insulation, a metallic shield, and an outer insulating layer. Used in cable TV and broadband internet.
+  - *Optical Fiber:* Thin strands of glass or plastic that transmit data as pulses of light. High bandwidth, low attenuation, immune to electromagnetic interference. Used in long-distance and high-speed data transmission.
+- *Unguided Media:* Signals are transmitted through the air or space without a physical path.
+  - *Radio Waves:* Used for short-range communication (Wi-Fi, Bluetooth) and long-range communication (AM/FM radio, TV)
+  - *Microwaves:* Used for point-to-point communication (cellular networks, satellite communication)
+  - *Infrared:* Used for short-range communication (remote controls, IrDA)
+  - *Satellite Communication:* Uses satellites to relay signals over long distances (GPS, satellite TV, satellite internet)
 
 = Data-Link Layer
 
