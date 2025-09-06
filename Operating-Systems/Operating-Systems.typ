@@ -1,7 +1,12 @@
 #import "@preview/ilm:1.4.1": *
 #import "@preview/physica:0.9.5": *
 #import "@preview/thmbox:0.2.0": *
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge, shapes
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node, shapes
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.8": *
+#show: codly-init
+
+#codly(languages: codly-languages, number-format: none, zebra-fill: none)
 
 #show: thmbox-init(counter-level: 2)
 #set text(lang: "en")
@@ -33,26 +38,22 @@ Instead of polling for events, which can waste CPU cycles, interrupts allow the 
 
 #figure(
   image("imgs/Interrupt-Timeline.png"),
-  caption: [Interrupt Timeline]
+  caption: [Interrupt Timeline],
 )
 When an interrupt occurs, it transfers control to the interrupt service routine (generally through the interrupt vector table) which contains the addresses#footnote[The CPU loads the ISR address into the _program counter_ and starts executing it] of all the service routines for different interrupt types.
 The CPU preserves its state by saving the program counter and other registers onto the stack before executing the interrupt handler.
 #figure(
   image("imgs/Interrupt-Driven-IO-Cycle.png"),
-  caption: [Interrupt-Driven I/O Cycle]
+  caption: [Interrupt-Driven I/O Cycle],
 )
 
 There is also a hardware device, *timer*, built into the CPU that generates interrupts at fixed or programmable intervals. It lets the OS regain control of the CPU after a set period, preventing any single process from monopolizing the CPU.
-
-#definition[System/Monitor Call][
-  A system call is a request made by a program to the operating system to perform a specific task or service that the program does not have permission to execute directly. System calls provide a controlled interface for user programs to access hardware resources and services provided by the operating system.
-]
 
 == Storage Structure
 
 #figure(
   image("imgs/Storage-Device-Hierarchy.png", height: 30%, fit: "contain"),
-  caption: [Storage Device Hierarchy]
+  caption: [Storage Device Hierarchy],
 )
 
 The main memory#footnote[It is random access, volatile] is the only large storage area that the CPU can access directly. Secondary storage devices, such as hard drives and SSDs, are used to store data and programs that are not currently in use. These devices are slower to access than main memory, so the operating system must manage the transfer of data between main memory and secondary storage efficiently.
@@ -69,11 +70,16 @@ The most common secondary storage devices are magnetic disks, optical discs, and
 
 == Input-Output Structure
 
-A large portion of the OS is devoted to managing I/O devices#footnote[Storage is also a type of I/O device] and operations. This includes device drivers, which are specialized software components that allow the OS to communicate with hardware devices. Device drivers provide a standard interface for the OS to interact with different types of hardware, abstracting the details of the hardware implementation. Each device controller, maintains a local buffer storage and a set of special registers, is in charge of a specific type of device. The CPU communicates with the device controller by reading and writing to these special registers.
-
-#figure(
-  image("imgs/Working-IO-Operation.png", height: 25%),
-  caption: [Working of an I/O Operation]
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Working-IO-Operation.png"),
+    caption: [Working of an I/O Operation],
+  ),
+  [
+    A large portion of the OS is devoted to managing I/O devices#footnote[Storage is also a type of I/O device] and operations. This includes device drivers, which are specialized software components that allow the OS to communicate with hardware devices. Device drivers provide a standard interface for the OS to interact with different types of hardware, abstracting the details of the hardware implementation. Each device controller, maintains a local buffer storage and a set of special registers, is in charge of a specific type of device. The CPU communicates with the device controller by reading and writing to these special registers.
+  ],
 )
 
 == Computer System Architecture
@@ -84,16 +90,22 @@ Computer systems can be classified on the basis of the number of general-purpose
   - *Symmetric Multiprocessing (SMP):* In SMP systems, all processors have equal access to memory and I/O devices, and they share the same operating system instance. This allows for better load balancing and resource utilization.
   - *Asymmetric Multiprocessing (AMP):* In AMP systems, each processor is assigned a specific task or set of tasks, and they may have their own operating system instances. This can lead to more efficient processing for certain workloads but may require more complex communication mechanisms between processors.
 #figure(
-  image("imgs/Mutiprocessor-Types.png"),
-  caption: [Types of Multiprocessor Systems (SMP vs AMP)]
+  image("imgs/Mutiprocessor-Types.png", height: 15%),
+  caption: [Types of Multiprocessor Systems (SMP vs AMP)],
 )
 - *Clustered Systems:* These systems consist of multiple independent computers (nodes) that work together to perform tasks. They are connected through a high-speed network and can provide improved performance, fault tolerance, and scalability. These systems can be used for load balancing, high availability, and parallel processing and can be structured asymmetrically#footnote[Here, one machine in hot-standby mode while the other runs applications] or symmetrically#footnote[Here, $>2$ machines share the workload equally and monitor each other].
 
 #definition[Dual-Core Design][
-  A dual-core design refers to a single processor chip that contains two independent processing units (cores). Each core can execute instructions separately, allowing for true parallelism within a single physical processor. Dual-core (and multi-core) designs improve performance and efficiency by enabling multiple tasks or threads to be processed simultaneously, reducing bottlenecks compared to single-core processors. Modern CPUs often feature multiple cores to better handle multitasking and parallel workloads.
-  #figure(
-    image("imgs/Dual-Core-Design.png", height: 25%),
-    caption: [Dual-Core Design]
+  #grid(
+    columns: 2,
+    gutter: 10pt,
+    figure(
+      image("imgs/Dual-Core-Design.png", height: 15%),
+      caption: [Dual-Core Design],
+    ),
+    [
+      A dual-core design refers to a single processor chip that contains two independent processing units (cores). Each core can execute instructions separately, allowing for true parallelism within a single physical processor. Dual-core (and multi-core) designs improve performance and efficiency by enabling multiple tasks or threads to be processed simultaneously, reducing bottlenecks compared to single-core processors. Modern CPUs often feature multiple cores to better handle multitasking and parallel workloads.
+    ],
   )
 ]
 
@@ -122,7 +134,7 @@ Operating systems provide an environment for the execution of programs and thus,
 
 #figure(
   image("imgs/Operating-System-Services.png"),
-  caption: [Operating System Services]
+  caption: [Operating System Services],
 )
 
 *File Management System* is a crucial component of an operating system that provides a way to store, organize, and manage data on storage devices. It offers a hierarchical structure for organizing files and directories, allowing users to easily access and manipulate their data. The file management system is responsible for tasks such as file creation, deletion, reading, writing, and permissions management. It also abstracts the details of the underlying storage hardware, providing a consistent interface for applications to work with files.
@@ -155,10 +167,10 @@ Modern CPUs support two modes of operation:
 The *mode bit* in the CPU indicates the current mode, $0$ for kernel mode and $1$ for user mode. When executing OS kernel instructions (system calls, interrupts, exceptions), the CPU switches from user mode to kernel mode. When the OS finishes executing, it switches back to user mode. This dual-mode operation ensures that user programs cannot directly access critical system resources, providing a layer of protection and stability for the operating system.
 #figure(
   image("imgs/Kernel-Mode-Bit.png"),
-  caption: [Mode Bit Operation]
+  caption: [Mode Bit Operation],
 )
 
-#definition[System Call][
+#definition[System/Monitor Call][
   It is a mechanism that allows user programs to request services from the operating system's kernel. System calls provide a controlled interface for accessing hardware and system resources, ensuring that user programs operate within the constraints of the operating system's security and protection mechanisms.
 ]
 These are typically written in a high-level programming language like `C`, `C++` and are accessed by programs via a high-level _Application Programming Interface (API)_. We have `Win32` for Windows and `POSIX` for Unix-like systems.
@@ -184,7 +196,7 @@ There are three main methods of passing arguments to the OS:
 A *hypervisor* (or virtual machine monitor VMM) sits between the hardware and the OS which allocates CPU, memory, storage and I/O resources to each VM as needed, creating the illusion that each VM has its own dedicated hardware.
 #figure(
   image("imgs/Virtualization.png", height: 25%),
-  caption: [Virtualization Architecture]
+  caption: [Virtualization Architecture],
 )
 
 *Emulation* is related but instead of sharing the host CPU instruction set, emulation mimics different hardware or architectures in software. E.g. running a Nintendo console game on a PC.
@@ -217,17 +229,17 @@ It produces `.o` files which reference functions/variables defined in other obje
 ]
 
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    figure(
-        image("imgs/Linker-Loader.png"),
-        caption: [Role of Linker and Loader]
-    ),
-    [
-        It is responsible for loading the program into memory, setting up the stack and heap, and transferring control to the program's entry point. The loader may also perform additional tasks such as dynamic linking of shared libraries and relocation of code and data segments.
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Linker-Loader.png"),
+    caption: [Role of Linker and Loader],
+  ),
+  [
+    It is responsible for loading the program into memory, setting up the stack and heap, and transferring control to the program's entry point. The loader may also perform additional tasks such as dynamic linking of shared libraries and relocation of code and data segments.
 
-        This kinda answers why applications are OS specific. The compiled code contains system calls and library calls specific to the OS, and the linker/loader must be able to handle these appropriately.
-    ]
+    This kinda answers why applications are OS specific. The compiled code contains system calls and library calls specific to the OS, and the linker/loader must be able to handle these appropriately.
+  ],
 )
 
 == Design and Implementation
@@ -247,46 +259,46 @@ After the OS is designed, it must be implemented and tested to ensure that it me
   gutter: 5pt,
   figure(
     image("imgs/MS-DOS-OS-Structure.png"),
-    caption: [Structure of the MS-DOS Operating System]
+    caption: [Structure of the MS-DOS Operating System],
   ),
-  [This is a very simple layered structure where each layer is built on top of the one below it. It works but just works. There is not much abstraction or separation of concerns. It is almost a single layer since all the layers interact directly with the base hardware. The separation is so bad that applications run in the same address space as the OS.]
+  [This is a very simple layered structure where each layer is built on top of the one below it. It works but just works. There is not much abstraction or separation of concerns. It is almost a single layer since all the layers interact directly with the base hardware. The separation is so bad that applications run in the same address space as the OS.],
 )
 
 === Monolithic Structure
 
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    [
-        #figure(
-        image("imgs/Unix-System-Structure.png"),
-        caption: [Structure of the Unix Operating System]
+  columns: 2,
+  gutter: 10pt,
+  [
+    #figure(
+      image("imgs/Unix-System-Structure.png"),
+      caption: [Structure of the Unix Operating System],
     )
     The entire OS works in kernel mode as a single large program called the _kernel_. Since there is one large kernel, all the OS services can call each other and share data easily. Since everything works in kernel mode, system calls and functions are direct and thus very efficient. The components can communicate directly using function calls. However, this also means that a bug in any part of the kernel can crash the entire system. Moreover, it is difficult to maintain and extend since any change requires recompiling and relinking the entire kernel.
-    ],
-    figure(
-        image("imgs/Linux-System-Structure.png"),
-        caption: [Structure of the Linux Operating System]
-    )
+  ],
+  figure(
+    image("imgs/Linux-System-Structure.png"),
+    caption: [Structure of the Linux Operating System],
+  ),
 )
 
 === Layered Structure
 
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    [
-        #figure(
-        image("imgs/Layered-Structure.png"),
-        caption: [Layered Operating System Structure]
-        )
-    ],
-    [
-        The entire OS is divided into layers, each built on top of the lower layers.\
-        The layers are designed such that each layer only interacts with the layer directly below it.\
-        This provides a clear separation of concerns and makes it easier to design, implement, and maintain the OS.\
-        However, it can be less efficient than a monolithic structure since each layer must communicate through well-defined interfaces, which can introduce overhead.
-    ]
+  columns: 2,
+  gutter: 10pt,
+  [
+    #figure(
+      image("imgs/Layered-Structure.png"),
+      caption: [Layered Operating System Structure],
+    )
+  ],
+  [
+    The entire OS is divided into layers, each built on top of the lower layers.\
+    The layers are designed such that each layer only interacts with the layer directly below it.\
+    This provides a clear separation of concerns and makes it easier to design, implement, and maintain the OS.\
+    However, it can be less efficient than a monolithic structure since each layer must communicate through well-defined interfaces, which can introduce overhead.
+  ],
 )
 Modern OS designs combine the layered approach with other structures to balance modularity and performance. It was used in `THE` OS#footnote[Made by the guy Dijkstra], `MULTICS` etc.
 
@@ -295,17 +307,17 @@ Modern OS designs combine the layered approach with other structures to balance 
 This is essentially the opposite of the monolithic structure. The core functionality of the OS is implemented in a small kernel that runs in kernel mode, while other services run in user mode as separate processes (also called *servers*). The microkernel provides basic services such as inter-process communication, memory management, and process scheduling, while other services such as file systems, device drivers, and network protocols are implemented as user-space processes.
 
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    figure(
-        image("imgs/Microkernel-Structure.png"),
-        caption: [Microkernel Operating System Structure]
-    ),
-    [
-        It provides better modularity and separation of concerns, making it easier to maintain and extend the OS.\
-        It is more reliable and secure since a bug in a user-space service cannot crash the entire system.\
-        It is portable across different hardware architectures since the microkernel can be designed to be hardware-independent.\
-    ]
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Microkernel-Structure.png"),
+    caption: [Microkernel Operating System Structure],
+  ),
+  [
+    It provides better modularity and separation of concerns, making it easier to maintain and extend the OS.\
+    It is more reliable and secure since a bug in a user-space service cannot crash the entire system.\
+    It is portable across different hardware architectures since the microkernel can be designed to be hardware-independent.\
+  ],
 )
 However, it can be less efficient than a monolithic structure since communication between the microkernel and user-space services can introduce overhead since more context switches are required. It is used in `MINIX`, `QNX`, `L4` etc. `Mach` is a popular microkernel that forms the basis for the `XNU` kernel used in macOS and iOS.
 
@@ -316,7 +328,7 @@ This structure combines elements of both monolithic and microkernel designs. The
 Linux and Solaris kernels are monolithic but have some modules that can be loaded and unloaded at runtime, making them somewhat modular. Windows NT uses a hybrid approach with a microkernel-like architecture for core services and monolithic components for performance-critical tasks.
 
 #definition[Module][
-    It is a separate, loadable part of the kernel that can be independently developed, tested, loaded, or unloaded at runtime. They provide a modular approach to OS design, combining benefits of both monolithic and microkernel structures.
+  It is a separate, loadable part of the kernel that can be independently developed, tested, loaded, or unloaded at runtime. They provide a modular approach to OS design, combining benefits of both monolithic and microkernel structures.
 ]
 
 == Operating System Generation
@@ -335,9 +347,9 @@ To build and boot a Linux system, the following steps are typically followed:
 + Download Linux source code
 + Configure the kernel using `make menuconfig`
 + Compile the kernel using `make`
-    - This produces the kernel image (`vmlinuz`) and modules
-    - Compile the kernel modules using `make modules`
-    - Install the modules using `make modules_install`
+  - This produces the kernel image (`vmlinuz`) and modules
+  - Compile the kernel modules using `make modules`
+  - Install the modules using `make modules_install`
 + Install the kernel using `make install`
 
 == System Boot
@@ -360,4 +372,191 @@ We can use it for performance tuning by analyzing the logs and dumps to identify
 
 = Process Management
 
+A process is a program in execution. It is an active entity, as opposed to a program which is a passive entity. A process needs certain resources like CPU time, memory, files and I/O devices to accomplish its task. These resources are allocated to the process by the operating system. (Already defined above)
 
+A process has multiple components:
+- *Program Code (Text Section):* This is the executable code of the program.
+- *Program Counter:* This register indicates the address of the next instruction to be executed for this process.
+- *Stack:* This section contains temporary data such as function parameters, return addresses, and local variables.
+- *Data Section:* This area contains global variables and static variables that are used by the program.
+- *Heap:* This is a region of memory that is dynamically allocated during the process's runtime for variables and data structures.
+
+#figure(
+  image("imgs/Process-State-Diagram.png"),
+  caption: [Process State Diagram],
+)
+
+A process can be in one of the following states:
+- *New:* The process is being created.
+- *Ready:* The process is waiting to be assigned to a CPU for execution.
+- *Running:* The process is currently being executed by the CPU.
+- *Waiting (Blocked):* The process is waiting for some event to occur (like I/O completion or a signal).
+- *Terminated:* The process has finished execution.
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Process-Control-Block.png"),
+    caption: [Process Control Block (PCB)],
+  ),
+  [
+    Each process is represented in the OS by a data structure called the *Process Control Block (PCB)* which contains information about the process, including:
+    - *Process State:* The current state of the process (new, ready, running, waiting, terminated).
+    - *Process ID (PID):* A unique identifier for the process.
+    - *Program Counter:* The address of the next instruction to be executed.
+    - *CPU Registers:* The contents of the CPU registers when the process is not running.
+    - *Memory Management Information:* Information about the process's memory allocation, such as base and limit registers, page tables, or segment tables.
+    - *Accounting Information:* Information about the CPU usage, execution time, and other resource usage statistics.
+    - *I/O Status Information:* Information about the process's I/O devices, open files, and other I/O-related data.
+  ],
+)
+
+A process is represented by the C struct, `task_struct` in Linux.
+```c
+struct task_struct {
+    volatile long state;       // Process state
+    struct thread_info *thread_info; // Thread information
+    struct task_struct *parent; // Parent process
+    pid_t pid;                // Process ID
+    unsigned int flags;       // Process flags
+    struct mm_struct *mm;     // Memory management information
+    struct files_struct *files; // Open files
+    struct signal_struct *signal; // Signal handling information
+    struct list_head tasks;   // List of all processes
+    // ... (many more fields)
+};
+```
+
+#definition[Thread#footnote[Will know more later]][
+  A thread is the smallest unit of execution within a process. It is a sequence of executable instructions that can be scheduled and executed independently by the CPU. A process can contain multiple threads, which share the same memory space and resources of the parent process but have their own program counter, stack, and registers.
+]
+
+== Process Scheduling
+
+This is the activity of the OS that handles the selection of processes for execution on the CPU. The goal of process scheduling is to maximize CPU utilization, ensure fairness among processes, provide a responsive user experience and have minimum waiting and turnaround times.
+
+We have three types of schedulers:
+- *Long-Term Scheduler (Job Scheduler):* It selects processes from the pool of new processes and loads them into memory for execution. It controls the degree of multiprogramming by determining how many processes are allowed to be in memory at any given time. It is invoked infrequently, typically when a new process is created or an existing process terminates.
+- *Medium-Term Scheduler:* It is responsible for temporarily removing processes from memory (swapping out) and later bringing them back into memory (swapping in) to manage the degree of multiprogramming and improve system performance. It is invoked when the system is under heavy load or when a process has been waiting for a long time.
+- *Short-Term Scheduler (CPU Scheduler):* It selects processes from the pool of ready processes and allocates the CPU to one of them. It is invoked frequently, typically every few milliseconds, to ensure that the CPU is always busy executing processes.
+
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Process-Scheduling-Queues.png"),
+    caption: [Process Scheduling],
+  ),
+  [
+    For process scheduling, we maintain two queues:
+    - *Ready Queue:* This queue contains all processes that are in the ready state and are waiting to be assigned to a CPU for execution.
+    - *Waiting Queue:* This queue contains all processes that are in the waiting state and are waiting for some event to occur (like I/O completion or a signal).
+  ],
+)
+
+#definition[Context Switch][
+  It is the process of saving the state of a currently running process and restoring the state of a previously suspended process. This allows the CPU to switch between different processes, enabling multitasking and efficient use of system resources.
+]
+When a context switch occurs, the OS saves the current process's state (including the program counter, CPU registers, and memory management information) in its PCB and loads the state of the next process to be executed from its PCB. This involves updating the CPU registers, program counter, and memory management information to reflect the new process's state.
+
+== Operations on Processes
+
+=== Process Creation
+
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Process-Tree.png"),
+    caption: [Process Tree],
+  ),
+  [
+    A process may create multiple processes, which are called its *children*. The creating process is called the *parent*. The relationship between processes forms a tree structure, with the initial process (often called `init` in Unix-like systems) as the root.
+  ],
+)
+Processes are identified using a unique integer called the *Process ID (PID)*. Each process also has a *Parent Process ID (PPID)* that identifies its parent process.
+
+In terms of execution, a new process can either continue to execute concurrently with the parent or the parent can wait until the child process terminates. In terms of address space, a new process can either share the parent's address space or have a separate copy of it.
+
+In Unix-like systems, a new process is created using the `fork()` system call, which creates a copy of the parent process. The new process can then use the `exec()` family of system calls to replace its address space with a new program. The parent process can use the `wait()` system call to wait for the child process to terminate and retrieve its exit status.
+#grid(
+  columns: 3,
+  gutter: 5pt,
+  [
+    #codly(header: [Using `fork()`])
+    ```c
+    int main() {
+        const pid_t pid = fork();
+
+        if (pid < 0) {
+            perror("fork");
+            return EXIT_FAILURE;
+        }
+
+        if (pid == 0) {
+            printf("Child process. PID: %d\n", getpid());
+        } else {
+            printf("Parent process. PID: %d, Child PID: %d\n", getpid(), pid);
+        }
+
+        return EXIT_SUCCESS;
+    }
+    ```
+  ],
+  [
+    #codly(header: [Using `exec()`])
+    ```c
+    int main() {
+        const pid_t pid = fork();
+
+        if (pid < 0) {
+            perror("fork");
+            return EXIT_FAILURE;
+        }
+
+        if (pid == 0) {
+            execlp("ls", "ls", "-l", (char *)NULL);
+            perror("execlp");
+            exit(EXIT_FAILURE);
+        }
+        printf("Parent process. PID: %d, Child PID: %d", getpid(), pid);
+        wait(nullptr);
+
+        return EXIT_SUCCESS;
+    }
+    ```
+  ],
+  [
+    #codly(header: [Using `wait()`])
+    ```c
+    int main() {
+        const pid_t pid = fork();
+
+        if (pid < 0) {
+            perror("fork");
+            return EXIT_FAILURE;
+        }
+
+        if (pid == 0) {
+            printf("Child process running. PID: %d\n", getpid());
+            sleep(2);
+            printf("Child process exiting.\n");
+        }
+        else {
+            printf("Parent waiting for child.\n");
+            wait(nullptr);
+            printf("Child completed.\n");
+        }
+
+        return EXIT_SUCCESS;
+    }
+    ```
+  ],
+)
+
+=== Process Termination
+
+A process can terminate in one of two ways:
+- *Normal Termination:* The process completes its execution and exits voluntarily by calling the `exit()` system call. This allows the process to release its resources and return an exit status to its parent process.
+- *Abnormal Termination:* The process is terminated involuntarily by the operating system due to an error or signal. This can occur due to various reasons, such as illegal memory access, division by zero, or receiving a termination signal (like `SIGKILL` or `SIGTERM`).
