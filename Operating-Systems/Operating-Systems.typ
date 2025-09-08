@@ -11,10 +11,13 @@
 #show: thmbox-init(counter-level: 2)
 #set text(lang: "en")
 #set figure(numbering: none)
+#show figure.where(kind: "thmbox"): set block(breakable: true)
 
 #let definition-counter = counter("definition")
 #show: sectioned-counter(definition-counter, level: 2)
 #let definition = definition.with(counter: definition-counter)
+#let problem = theorem.with(variant: "", numbering: none)
+#let solution = proposition.with(variant: "", numbering: none)
 
 #show: ilm.with(
   title: [Operating Systems],
@@ -360,9 +363,9 @@ The BIOS loads the bootstrap loader which loads _GRUB_ (GRand Unified Bootloader
 
 After the full bootstrap program has been loaded, it can traverse the file system to find the kernel, load it into memory, and start its execution. It is at this time that the system is said to be "booted" or "started up".
 
-== Operating System Debugging#footnote[Some bitch Kernighan said "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it." makes sense but why tho]
+== Operating System Debugging
 
-It is the process of finding and fixing errors (bugs, crashes, hangs, race conditions, memory leaks) in an operating system kernel or its components. Since the OS itself manages hardware, memory, processes, and I/O, debugging it often requires special tools, techniques, and environments.
+#footnote[Some bitch Kernighan said "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it." makes sense but why tho]It is the process of finding and fixing errors (bugs, crashes, hangs, race conditions, memory leaks) in an operating system kernel or its components. Since the OS itself manages hardware, memory, processes, and I/O, debugging it often requires special tools, techniques, and environments.
 
 The OS generates _log files_ containing error information. Application failures can generate _core dump_ files capturing memory state at the time of the crash. OS failures can generate _crash dump_ files for post-mortem analysis containing kernel memory.
 
@@ -482,81 +485,306 @@ In terms of execution, a new process can either continue to execute concurrently
 In Unix-like systems, a new process is created using the `fork()` system call, which creates a copy of the parent process. The new process can then use the `exec()` family of system calls to replace its address space with a new program. The parent process can use the `wait()` system call to wait for the child process to terminate and retrieve its exit status.
 #grid(
   columns: 3,
-  gutter: 5pt,
+  gutter: 2pt,
   [
     #codly(header: [Using `fork()`])
     ```c
-    int main() {
-        const pid_t pid = fork();
-
-        if (pid < 0) {
-            perror("fork");
-            return EXIT_FAILURE;
-        }
-
-        if (pid == 0) {
-            printf("Child process. PID: %d\n", getpid());
-        } else {
-            printf("Parent process. PID: %d, Child PID: %d\n", getpid(), pid);
-        }
-
-        return EXIT_SUCCESS;
-    }
+pid_t pid = fork();
+if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
+if (!pid) printf("Child PID:%d\n", getpid());
+else printf("Parent PID:%d, Child PID:%d\n", getpid(), pid);
+return EXIT_SUCCESS;
     ```
   ],
   [
     #codly(header: [Using `exec()`])
     ```c
-    int main() {
-        const pid_t pid = fork();
-
-        if (pid < 0) {
-            perror("fork");
-            return EXIT_FAILURE;
-        }
-
-        if (pid == 0) {
-            execlp("ls", "ls", "-l", (char *)NULL);
-            perror("execlp");
-            exit(EXIT_FAILURE);
-        }
-        printf("Parent process. PID: %d, Child PID: %d", getpid(), pid);
-        wait(nullptr);
-
-        return EXIT_SUCCESS;
-    }
+pid_t pid = fork();
+if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
+if (!pid) { execlp("ls","ls","-l",(char*)NULL); perror("execlp"); exit(EXIT_FAILURE); }
+printf("Parent PID:%d, Child PID:%d", getpid(), pid);
+wait(NULL); return EXIT_SUCCESS;
     ```
   ],
   [
     #codly(header: [Using `wait()`])
     ```c
-    int main() {
-        const pid_t pid = fork();
-
-        if (pid < 0) {
-            perror("fork");
-            return EXIT_FAILURE;
-        }
-
-        if (pid == 0) {
-            printf("Child process running. PID: %d\n", getpid());
-            sleep(2);
-            printf("Child process exiting.\n");
-        }
-        else {
-            printf("Parent waiting for child.\n");
-            wait(nullptr);
-            printf("Child completed.\n");
-        }
-
-        return EXIT_SUCCESS;
-    }
+pid_t pid = fork();
+if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
+if (!pid) { printf("Child PID:%d\n", getpid()); sleep(2); printf("Child exit.\n"); }
+else { printf("Parent waiting...\n"); wait(NULL); printf("Child done.\n"); }
+return EXIT_SUCCESS;
     ```
   ],
 )
 
 === Process Termination
 
-A process can terminate in one of two ways:
-- *Normal Termination:* The process completes its execution and exits voluntarily by calling the `exit()` system call. This allows the process to release its resources and return an exit status to its parent process.
-- *Abnormal Termination:* The process is terminated involuntarily by the operating system due to an error or signal. This can occur due to various reasons, such as illegal memory access, division by zero, or receiving a termination signal (like `SIGKILL` or `SIGTERM`).
+- *Voluntary Termination:* A process executes its last statement and then explicitly calls the `exit()` system call. Now, the process returns a status code (this is passed using the `wait()` system call that the parent may invoke) to its parent.
+- *Resource Allocation:* Once a process exists, the memory (stack, heap, code) is freed, open files, I/O devices and locks are released and its PCB is marked as terminated.
+- *Parent-Initiated Termination:* This happens when the parent does not wait for the child to finish but _forces_ termination. The parent uses an `abort()` system call. This could happen when the child exceeds resource limits, the child's work is no longer needed or the parent is exiting and the OS does not allow children to continue alone.
+- *Cascading Termination:* When a parent is terminated, then all its children (grand-children and so on) must also be terminated#footnote[This occurs in some OS]. This is initiated by the OS to prevent orphaned subtrees of processes.
+- *Waiting for Child Termination:* The parent may call `wait()` to pause until a child finishes, collect the child's exit status and reclaim the child's PCB entry. `wait()` also returns the PID of the terminated child.
+
+#definition[Zombie Process][
+  It is a process that has completed execution but still has an entry in the process table. This occurs when the parent process has not yet read the exit status of the terminated child process using the `wait()` system call. Zombie processes do not consume system resources like CPU or memory, but they do occupy a slot in the process table, which can lead to resource exhaustion if many zombies accumulate.
+]
+#definition[Orphan Process][
+  It is a process whose parent process has terminated or exited before the child process. In most operating systems, orphan processes are automatically adopted by a special system process (like `init` in Unix-like systems) to ensure that they can still be properly managed and terminated when they complete their execution.
+]
+
+== Interprocess Communication
+
+The processes executing concurrently within a system may be:
+#definition[Independent Process][
+  It is a process that does not share data or resources with other processes. It operates in its own memory space and does not communicate or synchronize with other processes.
+]
+#definition[Cooperating Process][
+  It is a process that shares data or resources with other processes. It can communicate and synchronize with other processes to achieve a common goal or perform a specific task.
+]
+
+We require an environment that allows process cooperation for _information sharing_, _computation speedup_, _modularity_ and _convenience_. There are two main models for interprocess communication (IPC), _shared memory_ and _message passing_.
+
+=== Shared Memory
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Shared-Memory.png"),
+    caption: [Shared Memory IPC],
+  ),
+  [
+    Here, processes share a region of memory. The kernel is used to setup the shared memory region but dips and communication happens without kernel intervention. Thus, this is the fastest form of IPC. Normally, the kernel prevents getting in another process's pants but if the processes consent to share memory, the kernel allows it. This method is useful for processes that need to exchange large amounts of data quickly.
+  ]
+)
+
+#problem[Producer-Consumer Problem#footnote[There is also another variation which uses an unbounded buffer]][
+  We have a finite buffer of size $N$ shared by two types of processes:
+  - *Producer* processes generate items and place them in the buffer.
+  - *Consumer* processes remove items from the buffer and consume them.
+  Constraints:
+  - The producer must wait if the buffer is full before inserting a new item
+  - The consumer must wait if the buffer is empty before removing an item
+  - Access to the buffer must be mutually exclusive, i.e. no two processes may access it simultaneously
+  The _goal_ is to ensure correct synchronization so that items are produced and consumed in order, without overwriting data or consuming invalid data.
+]
+
+#solution[Using Two Pointers][
+  Consider the shared data:
+  ```c
+  #define BUFFER_SIZE 10
+  item buffer[BUFFER_SIZE];
+  int in = 0;   // Index where the producer will place the next item
+  int out = 0;  // Index where the consumer will take the next item
+  ```
+  #grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+    The producer process:
+    ```c
+    item next_produced;
+    while (true) {
+      /* Produce an item in next_produced */
+      while ((in + 1) % BUFFER_SIZE == out) ; // Wait if buffer is full
+      buffer[in] = next_produced;            // Place item in buffer
+      in = (in + 1) % BUFFER_SIZE;           // Update in index
+    }
+    ```
+    ],
+    [
+    The consumer process:
+    ```c
+    item next_consumed;
+    while (true) {
+      while (in == out) ;                     // Wait if buffer is empty
+      next_consumed = buffer[out];            // Remove item from buffer
+      out = (out + 1) % BUFFER_SIZE;          // Update out index
+      /* Consume the item in next_consumed */
+    }
+    ```
+    ]
+  )
+  Here, we can only use `BUFFER_SIZE - 1` slots to distinguish between full and empty states#footnote[This is a common technique in ring buffer implementations]. However, there are other pressing issues with this solution:
+  - Both processes may simultaneously check the buffer state and enter the critical section and cause race conditions.
+  - The busy-waiting wastes CPU cycles.
+  - It works only for one producer and one consumer.
+]
+We can improve slightly on this solution by being able to use the entire buffer by having an integer count of the number of items in the buffer. However, this does not solve the other issues.
+#pagebreak()
+#solution[Using `counter`][
+  #grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+    The producer process:
+    ```c
+    item next_produced;
+    while (true) {
+      /* Produce an item in next_produced */
+      while (counter == BUFFER_SIZE) ; // Wait if buffer is full
+      buffer[in] = next_produced;     // Place item in buffer
+      in = (in + 1) % BUFFER_SIZE;    // Update in index
+      counter++;                        // Increment count
+    }
+    ```
+    ],
+    [
+    The consumer process:
+    ```c
+    item next_consumed;
+    while (true) {
+      while (counter == 0) ;            // Wait if buffer is empty
+      next_consumed = buffer[out];     // Remove item from buffer
+      out = (out + 1) % BUFFER_SIZE;   // Update out index
+      counter--;                         // Decrement count
+      /* Consume the item in next_consumed */
+    }
+    ```
+    ]
+  )
+  This infact brings us *race conditions* on the `counter` variable. Consider the following implementation for incrementing and decrementing the counter:
+  #grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+      ```c
+      register1 = counter
+      register1 = register1 + 1
+      counter = register1
+      ```
+    ],
+    [
+      ```c
+      register2 = counter
+      register2 = register2 - 1
+      counter = register2
+      ```
+    ]
+  )
+  Say the execution order is (with count = 5 initially):
+  + Producer: `register1 = counter` (register1 = 5)
+  + Consumer: `register2 = counter` (register2 = 5)
+  + Producer: `register1 = register1 + 1` (register1 = 6)
+  + Consumer: `register2 = register2 - 1` (register2 = 4)
+  + Producer: `counter = register1` (counter = 6)
+  + Consumer: `counter = register2` (counter = 4)
+  The final value of `counter` is 4 instead of 5, which is incorrect
+]
+
+=== Message Passing
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Message-Passing.png"),
+    caption: [Message Passing IPC],
+  ),
+  [
+    Here, processes communicate by sending and receiving messages. The kernel is involved in the communication, which can introduce some overhead. This method is useful for processes that do not share a common memory space or are on different machines.
+
+    This IPC facility provides two operations:
+    - *Send(message):* This operation allows a process to send a message to another process
+    - *Receive(message):* This operation allows a process to receive a message from another process
+  ]
+)
+#pagebreak()
+The message can either be:
+- *Fixed Size:* The message has a predetermined size, which simplifies memory management but can lead to wasted space if the message is smaller than the allocated size.
+- *Variable Size:* The message can have a variable size, which allows for more flexibility but requires more complex memory management.
+
+A communication link must be established between the sender and receiver processes. It can be implemented physically using shared memory, hardware bus or network connection. The methods for logically implementing a link are: (there are several issues like _naming_, _synchronization_ and _buffering_)
+
+==== Naming
+
+The processes that wish to communicate must be able to refer to each other.
+
+Using *Direct Communication*, each processes must explicitly name the recipient or sender of the message. The communication link is established automatically between the two processes. The properties are:
+- Each process must have a unique identifier (ID)
+- A link is associated with exactly one pair of communicating processes
+- The link may be unidirectional or bidirectional
+This scheme exhibits symmetry in addressing, i.e. both sender and receiver must name each other to communicate. There is also another variant where only the sender names the receiver, which is asymmetric.
+
+The disadvantage in both of these is the limited modularity of the resulting process definitions since changing the name of a process requires changing the code of all other processes that communicate with it.
+
+Using *Indirect Communication*, messages are sent to and received from mailboxes (also called ports). A mailbox is a logical entity that is identified by a unique ID. A link is established between a pair of mailboxes. The properties are:
+- Each mailbox has a unique ID
+- Two processes can communicate only if they share a mailbox
+- A mailbox is any object into which messages can be placed by a process and from which messages can be removed
+- A link may be associated with more than two processes
+- A link may be unidirectional or bidirectional
+- A mailbox can either be owned by a process or by the OS
+
+Consider a process P1 which sends a message to a mailbox with P2 and P3. If both P2 and P3 try to receive the message, then we have:
+- Allow at most one process to receive the message. The other process must wait until a new message is sent to the mailbox.
+- Allow a link to be associated with at most two processes. This is like direct communication.
+- Allow the system to select arbitrarily which process will receive the message (either P2 or P3). The system may define an algorithm for selecting which process will receive the message (like round robin). The system may identify the receiver to the sender.
+
+==== Synchronization
+
+Communication takes place using `send()` and `receive()` operations. These can be either blocking or non-blocking.
+- *Blocking Send:* The sender is blocked until the message is received by the receiver. This is also called synchronous communication.
+- *Non-Blocking Send:* The sender sends the message and continues execution. This is also called asynchronous communication.
+- *Blocking Receive:* The receiver is blocked until a message is available. If no message is available, the process is put to sleep.
+- *Non-Blocking Receive:* The receiver retrieves a message if one is available and continues execution. If no message is available, the process continues without waiting.
+
+==== Buffering
+
+Messages exchanged by processes reside in temporary queues (buffers). These are implemented in three ways:
+- *Zero Capacity (Rendezvous):* The queue has no buffer space. A message must be received before the next message can be sent. Both sender and receiver must wait for each other to be ready. This is like blocking send and blocking receive.
+- *Bounded Capacity:* The queue has a finite buffer size. If the buffer is full, the sender must wait until space is available. If the buffer is empty, the receiver must wait until a message is available.
+- *Unbounded Capacity:* The queue has infinite buffer space. The sender never waits. If the buffer is empty, the receiver must wait until a message is available. This requires dynamic memory allocation.
+
+=== Pipes
+
+It is an IPC mechanism that provides a unidirectional communication channel between two processes. One process writes data into the pipe and another reads from it. Data flows in a first-in-first-out (FIFO) manner. Pipes are commonly used for communication between related processes, such as a parent and child process.
+
+==== Unnamed Pipes
+
+These are created using the `pipe()` system call and are typically used for communication between a parent process and its child processes. They are temporary and exist only as long as the processes are running. E.g. `ls | grep ".c"`, here, the shell internally creates an unnamed pipe to connect the output of `ls` to the input of `grep`.
+
+==== Named Pipes (FIFOs)
+
+These are called FIFOs (First In First Out) and are created using the `mkfifo()` system call or the `mkfifo` shell command. They have a name in the file system and can be used for communication between unrelated processes. Named pipes persist in the file system until they are explicitly deleted. E.g.
+```bash
+mkfifo mypipe          # Create a named pipe
+echo "Hello" > mypipe  # Write to the pipe
+cat < mypipe           # Read from the pipe
+rm mypipe              # Delete the named pipe
+```
+
+== Communications in Client-Server Systems
+
+=== Sockets
+
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Socket.png"),
+    caption: [Socket IPC],
+  ),
+  [
+    A socket is an endpoint for communication between two machines. It is a software abstraction that represents a network connection. Sockets provide a way for processes to communicate over a network using standard protocols like TCP (Transmission Control Protocol) and UDP (User Datagram Protocol). It is represented by a file descriptor in the OS and support bidirectional communication. It is identified by an IP address and a port number.
+  ]
+)
+
+A server process creates a socket, binds it to a specific port, and listens for incoming connections. A client process creates a socket and connects to the server's socket using the server's IP address and port number. Once the connection is established, both processes can send and receive data through the socket. Servers implement specific services (like telnet, FTP, HTTP) and listen to requests on well-known ports#footnote[All ports below 1024 are considered well-known ports and can be used to implement standard services].
+
+=== Remote Procedure Calls (RPC)
+
+It is a communication mechanism that allows a process to invoke a procedure (function) in another address space (commonly on another physical machine). It abstracts the details of the network communication, making it appear as if the procedure is being called locally.
+
+This is how a typical RPC works:
++ Client calls a local stub procedure, passing the required parameters
++ A client stub (auto-generated proxy) takes the function arguments and marshals them (serializes into a byte stream)
++ The client stub sends the request over the network (usually via sockets)
++ The server stub receives the request, unmarshals the arguments back into native data
++ The server executes the actual procedure
++ The result is marshalled and sent back to the client
++ The client stub receives and unmarshals the result
++ The client program continues as if the function was executed locally
+
+== Threads
