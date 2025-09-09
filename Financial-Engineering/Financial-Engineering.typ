@@ -498,15 +498,21 @@ We will model the price of a European call option using a single period binomial
     gutter: 10em,
     figure(
       diagram(
-        node((1, 1), $t = T\
-        u S(0)$),
+        node(
+          (1, 1),
+          $t = T\
+          u S(0)$,
+        ),
         edge($p$, "<-"),
         node((0, 0), [$t = 0$\
-        $S(0)$]),
+          $S(0)$]),
         edge($1-p$, "->"),
-        node((1, -1), $t = T\
-        d S(0)$),
-      )
+        node(
+          (1, -1),
+          $t = T\
+          d S(0)$,
+        ),
+      ),
     ),
     figure(
       diagram(
@@ -515,20 +521,20 @@ We will model the price of a European call option using a single period binomial
         node((0, 0), $1$),
         edge("->"),
         node((1, -1), $1 + r = R$),
-      )
-    )
+      ),
+    ),
   )
 ]
 
 #figure(
   diagram(
-        node((1, 1), $C_u = (u S(0) - K)^+$),
-        edge($p$, "<-"),
-        node((0, 0), $C(T)$),
-        edge($1-p$, "->"),
-        node((1, -1), $C_d = (d S(0) - K)^+$),
-    ),
-    caption: [Call Option Pay-Off at Maturity]
+    node((1, 1), $C_u = (u S(0) - K)^+$),
+    edge($p$, "<-"),
+    node((0, 0), $C(T)$),
+    edge($1-p$, "->"),
+    node((1, -1), $C_d = (d S(0) - K)^+$),
+  ),
+  caption: [Call Option Pay-Off at Maturity],
 )
 
 Now, let us design a replicating portfolio of bonds#footnote[This is the same as investing the money in the bank here and represents a fixed-income security] and stocks such that its future value is equal to the value of the all option. Let the number of bonds be $a$ and the number of stocks be $b$, i.e. $p = (a, b)$.
@@ -550,26 +556,109 @@ $
 Since the future value of the portfolio must equal the future value of the option, we have
 
 $
-  V_p(T) &= C(T) \
-  a R B(0) + b u S(0) = C_u  space &and space a R B(0) + b d S(0) = C_d\
-  therefore a = (u C_d - d C_u)/(R (u - d) B(0)) space &and space b = (C_u - C_d)/(S(0) (u - d))
+                                                V_p(T) & = C(T) \
+                       a R B(0) + b u S(0) = C_u space & and space a R B(0) + b d S(0) = C_d \
+  therefore a = (u C_d - d C_u)/(R (u - d) B(0)) space & and space b = (C_u - C_d)/(S(0) (u - d))
 $
 
 To make the market arbitrage free,
 $
-  V_p(0) &= C(0) \
-  => C(0) &= a B(0) + b S(0) \
-  therefore C(0) &= 1/R [C_u ((R- d)/(u - d)) + C_d ((u - R)/(u - d))]
+          V_p(0) & = C(0) \
+         => C(0) & = a B(0) + b S(0) \
+  therefore C(0) & = 1/R [C_u ((R- d)/(u - d)) + C_d ((u - R)/(u - d))]
 $
 Clearly, if $hat(p) = (R - d)/(u - d)$ and $hat(q) = (u - R)/(u - d)$, then we can express the option price as a risk-neutral expectation:
 
 $
-  C(0) &= 1/R [(p) C_u + hat(q) C_d]
+  C(0) & = 1/R [hat(p) C_u + hat(q) C_d]
 $
 
 Here, $hat(p)$ is a risk-neutral probability measure. Moreover,
 $
-  E[C(1)] &= hat(p) C_u + hat(q) C_d \
-  therefore C(0) &= 1/R [E[C(1)]]
+         E[C(1)] & = hat(p) C_u + hat(q) C_d \
+  therefore C(0) & = 1/R [E[C(1)]]
 $
 Thus, the present value is the expected value discounted at the risk-free rate.
+
+==== Multi-Period Binomial Lattice Model for European Options
+
+We can extend the single period binomial lattice to a multi-period binomial lattice with $n$ periods. Here, at each period, the stock price can either go up by a factor of $u$ or down by a factor of $d$. Thus, at the end of $n$ periods, the stock price can take $n + 1$ possible values.
+
+For simplicity, let us consider a 2-period binomial lattice with the same assumptions as before.
+#figure(diagram(
+  node(
+    (2, 2),
+    $t = 2\
+    u^2 S(0)$,
+  ),
+  edge($p$, "<-"),
+  node(
+    (1, 1),
+    $t = 1\
+    u S(0)$,
+  ),
+  edge((1, 1), (2, 0), $1-p$, "->"),
+  edge($p$, "<-"),
+  node((0, 0), [$t = 0$\
+    $S(0)$]),
+  edge($1-p$, "->"),
+  node(
+    (1, -1),
+    $t = 1\
+    d S(0)$,
+  ),
+  edge($p$, "->"),
+  node(
+    (2, 0),
+    $t = 2\
+    u d S(0)$,
+  ),
+  node(
+    (1, -1),
+    $t = 1\
+    d S(0)$,
+  ),
+  edge($1-p$, "->"),
+  node(
+    (2, -2),
+    $t = 2\
+    d^2 S(0)$,
+  ),
+)),
+
+#figure(diagram(
+  node((2, 2), $C_(u u) = (u^2 S(0) - K)^+$),
+  edge($p$, "<-"),
+  node((1, 1), $C_u = display(1/R [hat(p)C_(u u) + (1- hat(p))C_(u d)])$),
+  edge((1, 1), (2, 0), $1-p$, "->"),
+  edge($p$, "<-"),
+  node((0, 0), [$C(0)$]),
+  edge($1-p$, "->"),
+  node(
+    (1, -1),
+    $C_d = display(1/R [hat(p)C_(u d) + (1- hat(p))C_(d d)])$,
+  ),
+  edge($p$, "->"),
+  node(
+    (2, 0),
+    $C_(u d) = (u d S(0) - K)^+$,
+  ),
+  node(
+    (1, -1),
+    $C_d = display(1/R [hat(p)C_(u d) + (1- hat(p))C_(d d)])$,
+  ),
+  edge($1-p$, "->"),
+  node(
+    (2, -2),
+    $C_(d d) = (d^2 S(0) - K)^+$,
+  ),
+))
+
+Thus, we can see that the option price at any node is the discounted expected value of the option prices at the next nodes.
+$
+  therefore C(0) = 1/R^2 [hat(p)^2 C_(u u) + 2 hat(p)(1 - hat(p)) C_(u d) + (1 - hat(p))^2 C_(d d)]
+$
+Generalising this to $n$ periods, we get,
+$
+  C(0) = 1/R^n sum_(i=0)^n binom(n, i) hat(p)^i (1 - hat(p))^(n-i) C_(u^i d^(n-i))
+$
