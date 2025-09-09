@@ -489,31 +489,31 @@ In Unix-like systems, a new process is created using the `fork()` system call, w
   [
     #codly(header: [Using `fork()`])
     ```c
-pid_t pid = fork();
-if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
-if (!pid) printf("Child PID:%d\n", getpid());
-else printf("Parent PID:%d, Child PID:%d\n", getpid(), pid);
-return EXIT_SUCCESS;
+    pid_t pid = fork();
+    if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
+    if (!pid) printf("Child PID:%d\n", getpid());
+    else printf("Parent PID:%d, Child PID:%d\n", getpid(), pid);
+    return EXIT_SUCCESS;
     ```
   ],
   [
     #codly(header: [Using `exec()`])
     ```c
-pid_t pid = fork();
-if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
-if (!pid) { execlp("ls","ls","-l",(char*)NULL); perror("execlp"); exit(EXIT_FAILURE); }
-printf("Parent PID:%d, Child PID:%d", getpid(), pid);
-wait(NULL); return EXIT_SUCCESS;
+    pid_t pid = fork();
+    if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
+    if (!pid) { execlp("ls","ls","-l",(char*)NULL); perror("execlp"); exit(EXIT_FAILURE); }
+    printf("Parent PID:%d, Child PID:%d", getpid(), pid);
+    wait(NULL); return EXIT_SUCCESS;
     ```
   ],
   [
     #codly(header: [Using `wait()`])
     ```c
-pid_t pid = fork();
-if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
-if (!pid) { printf("Child PID:%d\n", getpid()); sleep(2); printf("Child exit.\n"); }
-else { printf("Parent waiting...\n"); wait(NULL); printf("Child done.\n"); }
-return EXIT_SUCCESS;
+    pid_t pid = fork();
+    if (pid < 0) { perror("fork"); return EXIT_FAILURE; }
+    if (!pid) { printf("Child PID:%d\n", getpid()); sleep(2); printf("Child exit.\n"); }
+    else { printf("Parent waiting...\n"); wait(NULL); printf("Child done.\n"); }
+    return EXIT_SUCCESS;
     ```
   ],
 )
@@ -556,7 +556,7 @@ We require an environment that allows process cooperation for _information shari
   ),
   [
     Here, processes share a region of memory. The kernel is used to setup the shared memory region but dips and communication happens without kernel intervention. Thus, this is the fastest form of IPC. Normally, the kernel prevents getting in another process's pants but if the processes consent to share memory, the kernel allows it. This method is useful for processes that need to exchange large amounts of data quickly.
-  ]
+  ],
 )
 
 #problem[Producer-Consumer Problem#footnote[There is also another variation which uses an unbounded buffer]][
@@ -582,29 +582,29 @@ We require an environment that allows process cooperation for _information shari
     columns: 2,
     gutter: 10pt,
     [
-    The producer process:
-    ```c
-    item next_produced;
-    while (true) {
-      /* Produce an item in next_produced */
-      while ((in + 1) % BUFFER_SIZE == out) ; // Wait if buffer is full
-      buffer[in] = next_produced;            // Place item in buffer
-      in = (in + 1) % BUFFER_SIZE;           // Update in index
-    }
-    ```
+      The producer process:
+      ```c
+      item next_produced;
+      while (true) {
+        /* Produce an item in next_produced */
+        while ((in + 1) % BUFFER_SIZE == out) ; // Wait if buffer is full
+        buffer[in] = next_produced;            // Place item in buffer
+        in = (in + 1) % BUFFER_SIZE;           // Update in index
+      }
+      ```
     ],
     [
-    The consumer process:
-    ```c
-    item next_consumed;
-    while (true) {
-      while (in == out) ;                     // Wait if buffer is empty
-      next_consumed = buffer[out];            // Remove item from buffer
-      out = (out + 1) % BUFFER_SIZE;          // Update out index
-      /* Consume the item in next_consumed */
-    }
-    ```
-    ]
+      The consumer process:
+      ```c
+      item next_consumed;
+      while (true) {
+        while (in == out) ;                     // Wait if buffer is empty
+        next_consumed = buffer[out];            // Remove item from buffer
+        out = (out + 1) % BUFFER_SIZE;          // Update out index
+        /* Consume the item in next_consumed */
+      }
+      ```
+    ],
   )
   Here, we can only use `BUFFER_SIZE - 1` slots to distinguish between full and empty states#footnote[This is a common technique in ring buffer implementations]. However, there are other pressing issues with this solution:
   - Both processes may simultaneously check the buffer state and enter the critical section and cause race conditions.
@@ -618,31 +618,31 @@ We can improve slightly on this solution by being able to use the entire buffer 
     columns: 2,
     gutter: 10pt,
     [
-    The producer process:
-    ```c
-    item next_produced;
-    while (true) {
-      /* Produce an item in next_produced */
-      while (counter == BUFFER_SIZE) ; // Wait if buffer is full
-      buffer[in] = next_produced;     // Place item in buffer
-      in = (in + 1) % BUFFER_SIZE;    // Update in index
-      counter++;                        // Increment count
-    }
-    ```
+      The producer process:
+      ```c
+      item next_produced;
+      while (true) {
+        /* Produce an item in next_produced */
+        while (counter == BUFFER_SIZE) ; // Wait if buffer is full
+        buffer[in] = next_produced;     // Place item in buffer
+        in = (in + 1) % BUFFER_SIZE;    // Update in index
+        counter++;                        // Increment count
+      }
+      ```
     ],
     [
-    The consumer process:
-    ```c
-    item next_consumed;
-    while (true) {
-      while (counter == 0) ;            // Wait if buffer is empty
-      next_consumed = buffer[out];     // Remove item from buffer
-      out = (out + 1) % BUFFER_SIZE;   // Update out index
-      counter--;                         // Decrement count
-      /* Consume the item in next_consumed */
-    }
-    ```
-    ]
+      The consumer process:
+      ```c
+      item next_consumed;
+      while (true) {
+        while (counter == 0) ;            // Wait if buffer is empty
+        next_consumed = buffer[out];     // Remove item from buffer
+        out = (out + 1) % BUFFER_SIZE;   // Update out index
+        counter--;                         // Decrement count
+        /* Consume the item in next_consumed */
+      }
+      ```
+    ],
   )
   This infact brings us *race conditions* on the `counter` variable. Consider the following implementation for incrementing and decrementing the counter:
   #grid(
@@ -661,7 +661,7 @@ We can improve slightly on this solution by being able to use the entire buffer 
       register2 = register2 - 1
       counter = register2
       ```
-    ]
+    ],
   )
   Say the execution order is (with count = 5 initially):
   + Producer: `register1 = counter` (register1 = 5)
@@ -688,7 +688,7 @@ We can improve slightly on this solution by being able to use the entire buffer 
     This IPC facility provides two operations:
     - *Send(message):* This operation allows a process to send a message to another process
     - *Receive(message):* This operation allows a process to receive a message from another process
-  ]
+  ],
 )
 #pagebreak()
 The message can either be:
@@ -768,7 +768,7 @@ rm mypipe              # Delete the named pipe
   ),
   [
     A socket is an endpoint for communication between two machines. It is a software abstraction that represents a network connection. Sockets provide a way for processes to communicate over a network using standard protocols like TCP (Transmission Control Protocol) and UDP (User Datagram Protocol). It is represented by a file descriptor in the OS and support bidirectional communication. It is identified by an IP address and a port number.
-  ]
+  ],
 )
 
 A server process creates a socket, binds it to a specific port, and listens for incoming connections. A client process creates a socket and connects to the server's socket using the server's IP address and port number. Once the connection is established, both processes can send and receive data through the socket. Servers implement specific services (like telnet, FTP, HTTP) and listen to requests on well-known ports#footnote[All ports below 1024 are considered well-known ports and can be used to implement standard services].
@@ -788,3 +788,184 @@ This is how a typical RPC works:
 + The client program continues as if the function was executed locally
 
 == Threads
+
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Single-VS-Multi-Threaded.png"),
+    caption: [Thread Structure],
+  ),
+  [
+    #definition[Thread][
+      It is the smallest unit of execution within a process. It is a lightweight execution flow#footnote[A process has its own memory space, code, data and resources] inside a process that shares most of the process's resources but has its own program counter, registers and stack. Multiple threads within a process share the same code section, heap and open files and OS resources.
+    ]
+  ],
+)
+A thread has the following components:
+- *Thread ID:* A unique identifier for the thread within the process.
+- *Program Counter:* The address of the next instruction to be executed by the thread.
+- *Registers:* The CPU registers used by the thread during its execution.
+- *Stack:* A separate stack for each thread to store local variables, function parameters, and return addresses.
+
+The benefits of using threads are:
+- *Responsiveness:* In a multi-threaded application, if one thread is blocked (e., waiting for I/O), other threads can continue to execute, improving the overall responsiveness of the application
+- *Resource Sharing:* Threads within the same process share the same memory space and resources, making it easier to share data and communicate between threads without the need for complex IPC mechanisms
+- *Economy:* Creating and managing threads is generally more efficient than creating and managing processes, as threads have lower overhead in terms of memory, CPU usage and thread switching time#footnote[It has lower overhead than context switching between processes]
+- *Scalability:* Multi-threaded applications can take advantage of multi-core processors by distributing threads across multiple CPU cores, improving performance and scalability
+
+=== Multicore/Multiprocessor Programming
+
+The challenges in programming for multicore/multiprocessor systems are:
+#columns(2)[
+  - Dividing activites
+  - Balance
+  - Data splitting
+  #colbreak()
+  - Data dependency
+  - Testing and debugging
+]
+
+#figure(image("imgs/Parallelism.png"), caption: [Parallelism])
+#definition[Parallelism][
+  It is the simultaneous execution of multiple tasks or processes to improve performance and efficiency. In a parallel system, multiple processors or cores work together to execute different parts of a program concurrently, allowing for faster completion of tasks.
+]
+There are two types of parallelism:
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Data-Parallelism.png"),
+  ),
+  figure(
+    image("imgs/Task-Parallelism.png"),
+  ),
+)
+
+#figure(
+  image("imgs/Concurrency.png"),
+  caption: [Concurrency],
+)
+#definition[Concurrency][
+  It is the ability of a system to handle multiple tasks or processes at the same time, but not necessarily simultaneously. In a concurrent system, multiple tasks may be in progress at the same time, but they may not be executing simultaneously on different processors or cores. Concurrency is often achieved through techniques like time-sharing, where the CPU switches between different tasks rapidly to give the illusion of simultaneous execution.
+]
+
+Amdahl's Law gives the theoretical speedup in program execution when part of the program is parallelized.
+$
+  S = 1/((1 - P) + (P / N))
+$
+
+
+=== Multithreading Models
+
+#definition[User Threads][
+  These are managed in the user space by a thread library (`pthreads`) without kernel support. The kernel is unaware of the existence of user threads. Scheduling and context switching is done by the thread library. They are lightweight and have low overhead, but if one thread makes a blocking system call, the entire process is blocked.
+]
+#definition[Kernel Threads][
+  These are managed directly by the OS kernel. The kernel is aware of the existence of kernel threads and schedules them independently. They can take advantage of multiple processors and can make blocking system calls without blocking the entire process. However, they have higher overhead due to kernel involvement in scheduling and context switching.
+]
+
+==== Many-to-One Model
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Many-to-One-Model.png"),
+    caption: [Many-to-One Model],
+  ),
+  [
+    Here, many user-level threads are mapped to a single kernel thread. The OS sees only one process and is unaware of the multilple threads within it. The thread creation is done entirely in the user space using a thread library. It has fast thread creation and context switching since it does not involve the kernel and is lightweight and portable. However, if one thread makes a blocking system call, the entire process is blocked and is not true parallelism since only one thread can access the kernel at a time. E.g. Solaris Green Threads, GNU Portable Threads.
+  ],
+)
+
+==== One-to-One Model
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/One-to-One-Model.png"),
+    caption: [One-to-One Model],
+  ),
+  [
+    Here, each user-level thread is mapped to a separate kernel thread. The OS is aware of all the threads and can schedule them independently. It allows true parallelism since multiple threads can run on multiple processors simultaneously. If one thread makes a blocking system call, other threads can continue to execute. However, it has higher overhead due to kernel involvement in thread management and is limited by the maximum number of threads that can be created by the OS. E.g. Windows, Linux.
+  ],
+)
+
+==== Many-to-Many Model
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Many-to-Many-Model.png"),
+    caption: [Many-to-Many Model],
+  ),
+  [
+    Here, many user-level threads are mapped to a smaller or equal number of kernel threads. The OS is aware of the kernel threads and can schedule them independently. It allows true parallelism and can handle blocking system calls without blocking the entire process. It provides flexibility in managing the number of threads and can optimize resource usage. However, it has higher complexity in implementation and may have overhead due to the mapping between user and kernel threads. E.g. Solaris Threads.
+  ],
+)
+
+==== Two-Level Model
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Two-Level-Model.png"),
+    caption: [Two-Level Model],
+  ),
+  [
+    This is the same as the many-to-many model, but it allows a user thread to be bound to a specific kernel thread. This provides the benefits of both models, allowing for true parallelism and handling blocking system calls while also providing flexibility in thread management.
+  ],
+)
+
+==== Implicit Threading
+
+This is a high-level abstraction where the compiler or runtime system automatically manages thread creation, scheduling, and synchronization. The programmer does not have to explicitly create or manage threads. This model is often used in functional programming languages and parallel programming frameworks. There are five common approaches:
+- *Thread Pools:* A pool of worker threads is created at the start of the program. Tasks are assigned to available threads from the pool, reducing the overhead of thread creation and destruction.
+- *Fork-Join:* The program is divided into tasks that can be executed in parallel. The main thread forks new threads to execute tasks and then joins them back together when they are complete.
+- *OpenMP:* It is an API that provides a set of compiler directives, library routines, and environment variables for parallel programming in C, C++, and Fortran. It allows the programmer to specify parallel regions in the code using pragmas, and the compiler generates the necessary code for thread management and synchronization.
+- *Grand Central Dispatch (GCD):* It is a technology developed by Apple for macOS and iOS that provides a high-level API for managing concurrent tasks. It uses a dispatch queue to manage the execution of tasks on a pool of threads.
+- *Intel Threading Building Blocks (TBB):* It is a C++ template library developed by Intel that provides a high-level abstraction for parallel programming. It allows the programmer to express parallelism using algorithms and data structures, and the library manages thread creation, scheduling, and synchronization.
+
+=== Threading Issues
+
+==== `fork()` and `exec()` System Calls
+
+The `fork()` system calls creates a new process by duplicating the calling process. It returns 0 to the child process and the child's PID to the parent process (-1 on error) and we get two processes, the parent process and the child process.
+
+The `exec()` family of functions replaces the current process image with a new program. It simply transforms the calling process into a different program. It returns -1 on error and after a successful call, the old program code, data and stack are replaced by the new program.
+
+The problem here is, does `fork()` duplicate only the calling thread or all threads in the process? The POSIX standard states that only the calling thread is duplicated in the child process. The child process contains a copy of the parent's address space, but only the calling thread is active. All other threads are not duplicated and do not exist in the child process.
+
+==== Signal Handling
+
+Signals are used to notify a process that a specific event has occurred. They are asynchronous and can be sent by the OS or other processes. When a signal is sent to a process, the OS interrupts the normal flow of execution and invokes a signal handler function to handle the signal.
+
+A signal handler is used to process signals, which occur when a signal generated by a particular event is sent to a process. Each signal is handled by either a default signal handler or a user-defined signal handler. The default action for most signals is to terminate the process, but some signals can be ignored or caught by a user-defined handler.
+
+The problem here is, which thread in a multi-threaded process should handle the signal? There are three possible approaches:
+- *Signal is delivered to the thread that generated it:* This approach is simple and intuitive, but it may not be suitable for all types of signals. For example, if a thread generates a signal that indicates an error, it may not be the best thread to handle the error.
+- *Signal is delivered to a specific thread:* This approach allows the programmer to specify which thread should handle a specific signal. This can be useful for signals that require special handling, such as signals that indicate a resource limit has been exceeded.
+- *Signal is delivered to any thread that is not blocking the signal:* This approach allows the OS to choose which thread should handle the signal based on its current state. This can be useful for signals that can be handled by any thread, such as signals that indicate a timer has expired.
+
+==== Thread Cancellation
+
+It is the process of terminating a thread before it has completed its execution. There are two types of thread cancellation:
+- *Asynchronous Cancellation:* The target thread is terminated immediately, regardless of its current state. This can lead to resource leaks and inconsistent states if the thread is in the middle of a critical operation.
+- *Deferred Cancellation:* The target thread is notified that it should terminate, but it is allowed to finish its current operation before terminating. This is a safer approach, as it allows the thread to clean up resources and reach a consistent state before terminating. This is the default mode in POSIX threads.
+However, invoking cancellation is a request, the actual cancellation depends on the target thread's state and its ability to handle the cancellation request.
+
+==== Thread Local Storage
+
+It is a mechanism that allows each thread to have its own copy of a variable. Unlike global variables (shared across threads), TLS ensures per-thread private data. It is useful for storing data that is specific to a thread, such as error codes, buffers, or state information and avoids the need for synchronization when accessing thread-specific data.
+
+==== Scheduler Activations
+
+It is a mechanism that allows the OS to manage user-level threads while still providing the benefits of kernel-level thread management. It provides a way for the OS to notify the user-level thread library about events that affect thread scheduling, such as blocking system calls or interrupts. The user-level thread library can then take appropriate actions, such as creating new threads, scheduling existing threads, or handling blocking operations. This allows the user-level thread library to have more control over thread scheduling and management, while still allowing the OS to handle low-level events that affect thread execution.
+
+= CPU Scheduling
+
+
