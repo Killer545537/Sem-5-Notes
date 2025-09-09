@@ -1,3 +1,16 @@
 # Semester 5 Notes
 
-Install `typst` and `gum` to create the PDF files.
+This repository contains Semester 5 notes written in [Typst](https://typst.app/).  
+Two shell scripts are included:
+
+- `build.sh`: Builds `.typ` files into PDFs.
+- `preview.sh`: Previews `.typ` files.
+
+---
+
+## Dependencies
+
+- [Typst](https://typst.app/)
+- [gum](https://github.com/charmbracelet/gum)
+
+---
