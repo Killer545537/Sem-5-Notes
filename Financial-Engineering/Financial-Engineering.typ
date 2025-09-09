@@ -569,7 +569,7 @@ $
 
 Here, $hat(p)$ is a risk-neutral probability measure. Moreover,
 $
-  E[C(0)] &= hat(p) C_u + hat(q) C_d \
-  therefore C(0) &= 1/R [E[C(0)]]
+  E[C(1)] &= hat(p) C_u + hat(q) C_d \
+  therefore C(0) &= 1/R [E[C(1)]]
 $
 Thus, the present value is the expected value discounted at the risk-free rate.
