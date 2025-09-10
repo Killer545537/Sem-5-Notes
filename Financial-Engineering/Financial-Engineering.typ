@@ -662,3 +662,48 @@ Generalising this to $n$ periods, we get,
 $
   C(0) = 1/R^n sum_(i=0)^n binom(n, i) hat(p)^i (1 - hat(p))^(n-i) C_(u^i d^(n-i))
 $
+
+#lemma(numbering: none)[
+  If $u > R > d$ does not hold, then the no arbitrage principle is violated.
+]
+#proof[
+  Let $R >= u > d$, then we construct a portfolio, $p = (a = -1/(S(0)), b = 1/(B(0)))$.
+  $
+    V_p(0) & = a B(0) + b S(0) = 0 \
+    V_p(T) & = cases(
+      -u/(S(0)) S(0) + R/(B(0)) B(0) = R - u >= 0 "with" p,
+      -d/(S(0)) S(0) + R/(B(0)) B(0) = R - d >= 0 "with" 1 - p,
+    ) \
+    & = cases(
+      R - u > 0 "with" p,
+      R - d >= 0 "with" 1 - p,
+    ) \
+    therefore V_p(T) & >= 0 "with absolute certainty"
+  $
+  Thus, we have an arbitrage opportunity which violates the no arbitrage principle.
+
+  Let $u > d >= R$, then we construct a portfolio, $p = (a = 1/(S(0)), b = -1/(B(0)))$.
+  $
+    V_p(0) & = a B(0) + b S(0) = 0 \
+    V_p(T) & = cases(
+      u/(S(0)) S(0) - R/(B(0)) B(0) = u - R >= 0 "with" p,
+      d/(S(0)) S(0) - R/(B(0)) B(0) = d - R >= 0 "with" 1 - p,
+    ) \
+    & = cases(
+      u - R >= 0 "with" p,
+      d - R > 0 "with" 1 - p,
+    ) \
+    therefore V_p(T) & >= 0 "with absolute certainty"
+  $
+  Thus, we have an arbitrage opportunity which violates the no arbitrage principle.
+]
+
+#theorem[First Fundamental Theorem of Asset Pricing][
+  A market is arbitrage-free if and only if there exists at least one risk-neutral probability measure.
+]
+#definition[Risk-Neutral Probability Measure][
+  It is a probability measure under which the discounted price processes of tradable assets are martingales. It is a vector $hat(p) = (hat(p_1), hat(p_2), \ldots, hat(p_n))$, where
+  - $sum hat(p_i) = 1$
+  - $hat(p_i) >= 0 forall i$
+  - $forall$ security $k$ we have $S^k (0) = display((E_hat(p)[S^k (T)])/R)$ where $S^k (T)$ is the value of the $k^"th"$ security at time $T$.
+]
