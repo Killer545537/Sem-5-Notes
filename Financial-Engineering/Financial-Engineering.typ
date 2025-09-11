@@ -707,3 +707,11 @@ $
   - $hat(p_i) >= 0 forall i$
   - $forall$ security $k$ we have $S^k (0) = display((E_hat(p)[S^k (T)])/R)$ where $S^k (T)$ is the value of the $k^"th"$ security at time $T$.
 ]
+
+==== Option Pricing on Dividend Paying Stock
+
+If the stock pays a dividend $D$ at time $tau in [0, T]$, then we subtract $D$ from the values of all the nodes at point $tau$ and then calculate the option price as before.
+
+==== Multi-Period Binomial Lattice Model for American Options
+
+We can use the same multi-period binomial lattice model for American options with a slight modification. Here, at each node, we check if exercising the option immediately is more profitable than holding it till maturity.

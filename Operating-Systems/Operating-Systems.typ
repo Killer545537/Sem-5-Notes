@@ -968,4 +968,120 @@ It is a mechanism that allows the OS to manage user-level threads while still pr
 
 = CPU Scheduling
 
+It is the process by which the operating system decides which process in the ready queue should be allocated the CPU next, whenever the CPU becomes idle. Since the CPU is a limited and highly demanded resource, efficient scheduling is crucial for maximizing system performance. It only applies to the processes in the ready queue (not blocked on I/O). The scheduler chooses a process based on a scheduling algorithm.
+
+These decisions however can only be made when a process:
+- *Switches from running to waiting state:* This happens when a process requests I/O or some other event. (Non-Preemptive)
+- *Switches from running to ready state:* This happens when a process is interrupted by the OS (timer interrupt). (Preemptive)
+- *Switches from waiting to ready state:* This happens when an I/O operation is completed. (Preemptive)
+- *Terminates:* This happens when a process completes its execution. (Non-Preemptive)
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/CPU-I:O-Burst-Cycle.png"),
+    caption: [CPU-I/O Burst Cycle],
+  ),
+  [
+    #definition[CPU-I/O Burst Cycle][
+      It is the alternating sequence of CPU bursts and I/O bursts that a process goes through during its execution. A CPU burst is a period of time when a process is executing on the CPU, while an I/O burst is a period of time when a process is waiting for I/O operations to complete.
+    ]
+    Most processes exhibit this behavior, with short bursts of CPU activity followed by longer periods of I/O wait and alternate between these two states. The final CPU burst is followed by process termination.
+  ],
+)
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Dispatch-Latency.png"),
+    caption: [Dispatcher],
+  ),
+  [
+    #definition[Dispatcher][
+      It is the module that gives control of the CPU to the process selected by the short-term scheduler. This involves switching context, switching to user mode and jumping to the proper location in the user program to restart that program.
+    ]
+    The time it takes for the dispatcher to stop one process and start another is known as the _dispatch latency_.
+  ],
+)
+
+== Scheduling Criteria
+
+The performance of a scheduling algorithm can be evaluated based on the following criteria: (these are also the goals of scheduling)
+- *CPU Utilization:* The percentage of time the CPU is busy. The goal is to keep the CPU as busy as possible (e.g., 40% to 90%).
+- *Throughput:* The number of processes completed per unit time. The goal is to maximize throughput (e.g., 10 to 100 processes per second).
+- *Turnaround Time:* The total time taken from submission to completion of a process. The goal is to minimize turnaround time. $= "Completion Time" - "Arrival Time"$
+- *Waiting Time:* The total time a process spends in the ready queue. The goal is to minimize waiting time. $= "Turnaround Time" - "Burst Time"$
+- *Response Time:* The time from submission of a request until the first response is produced. The goal is to minimize response time.
+- *Fairness:* Ensuring that all processes get a fair share of the CPU.
+
+== Scheduling Algorithms
+
+#definition[Non-Preemptive/Cooperative Scheduling][
+  It is a type of CPU scheduling where a running process is allowed to continue executing until it voluntarily releases the CPU, either by terminating or switching to a waiting state. The operating system does not forcibly interrupt the process, which can lead to longer wait times for other processes.
+]
+#definition[Preemptive Scheduling][
+  It is a type of CPU scheduling where the operating system can interrupt and suspend a currently running process in order to allocate the CPU to another process. This allows for better responsiveness and ensures that high-priority processes can be executed promptly.
+]
+
+=== First-Come, First-Served (FCFS) Scheduling
+
+It is the simplest scheduling algorithm that schedules processes in the order they arrive in the ready queue. The process that arrives first is executed first, followed by the next process in the queue and so on. It is a non-preemptive algorithm. The ready queue is treated as a FIFO queue and the scheduler picks the first process in the queue. This shit cannot be used in time-sharing systems.
+
+The main disadvantage of FCFS scheduling is the _convoy effect_, where shorter processes get stuck waiting behind longer processes, leading to poor overall system performance.
+
+=== Shortest Job First (SJF) Scheduling
+
+It is an algorithm where the process with the shortest burst time is selected for execution next. This can lead to improved turnaround time and waiting time for shorter processes. However, it can also result in _starvation_ for longer processes if shorter processes keep arriving. It is non-preemptive.
+
+It can be made preemptive (called Shortest Remaining Time First, SRTF) where the remaining time of the currently running process is compared with the burst time of the newly arrived process. If the new process has a shorter burst time, it preempts the currently running process. Here, the waiting time is $"Total Waiting Time" - "Time executed for" - "Arrival Time"$.
+
+In theory, it can achieve optimal turnaround time and waiting time for all processes, but in practice, it can lead to high overhead due to frequent context switching. It also requires knowledge of the burst time of each process, which is not always available#footnote[Can be estimated using exponential averaging, $t_(n + 1) = alpha t_n + (1 - alpha) t_n$ where $0 < alpha < 1$ but generally $alpha = 0.5$].
+
+=== Priority Scheduling
+
+It is an algorithm where each process is assigned a priority, and the process with the highest priority is selected for execution next. It can be either preemptive or non-preemptive. In preemptive priority scheduling, if a new process arrives with a higher priority than the currently running process, it preempts the current process. In non-preemptive priority scheduling, the current process continues to execute until it completes or voluntarily releases the CPU. It is flexible (models system > kernel thingys). However, it can lead to starvation for lower-priority process which can be mitigated using _aging_ (gradually increasing the priority of waiting processes).
+
+=== Round Robin (RR) Scheduling
+
+It is a preemptive scheduling algorithm designed for time-sharing systems. Each process is assigned a fixed time slice or quantum (e.g., 10-100 milliseconds) during which it can execute. If a process does not complete within its time slice, it is preempted and placed at the end of the ready queue, allowing the next process to execute. This continues in a cyclic manner until all processes are completed. The performance however depends on the size of the time quantum#footnote[Generally taken to be more than the context switching time].
+
+The waiting time for each process can be calculated as:
+$
+  "Waiting Time" & = "Turnaround Time" - "Burst Time" \
+                 & = "Last Start Time" - "Arrival Time" - ("Preemption" times "Quantum")
+$
+
+=== Multilevel Queue Scheduling
+
+It is an algorithm in which processes are permanently divided into different queues, each queue having its own scheduling algorithm. It is used when processes can be classified into different categories (like foreground and background processes). The ready queue is split into several seperate queues like system processes, interactive processes, batch processes etc.
+
+For processes with priority, each priority level can have its own queue. The scheduling is done first between the queues (based on priority) and then within each queue (based on the queue's scheduling algorithm). This can lead to starvation for lower-priority queues, which can be mitigated using _aging_.
+
+
+=== Multilevel Feedback Queue Scheduling
+
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Multilevel-Feedback-Queue-Scheduling.png"),
+    caption: [Multilevel Feedback Queue Scheduling],
+  ),
+  [
+    It is a more flexible version of multilevel queue scheduling where processes can move between queues based on their behavior and requirements. It allows a process to change its priority level (and hence its queue) based on its CPU burst characteristics. For example, if a process uses too much CPU time, it may be moved to a lower-priority queue. Conversely, if a process waits too long in a lower-priority queue, it may be moved to a higher-priority queue. This dynamic adjustment helps to improve overall system responsiveness and fairness.
+  ],
+)
+
+The scheduling is done first between the queues (based on priority) and then within each queue (based on the queue's scheduling algorithm). This can lead to starvation for lower-priority queues, which can be mitigated using _aging_.
+
+In general, a multilevel feedback queue scheduler is defined by the following parameters:
+- The number of queues
+- The scheduling algorithm for each queue
+- The method used to determine when to upgrade a process to a higher-priority queue
+- The method used to determine when to downgrade a process to a lower-priority queue
+- The method used to determine which queue a process will enter when it enters the system
+
+= Process Synchronization
 
