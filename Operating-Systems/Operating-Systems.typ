@@ -1085,3 +1085,345 @@ In general, a multilevel feedback queue scheduler is defined by the following pa
 
 = Process Synchronization
 
+#definition[Race Condition][
+  It is a condition where the outcome of a process depends on the sequence or timing of uncontrollable events, such as the order in which threads are scheduled to run. This can lead to unpredictable behavior and bugs that are difficult to reproduce and debug.
+]
+
+#problem[Critical Section Problem][
+  Given $n$ processes ${P_i}$ that share resources, each process has a section of code called the _critical section_ where it accesses shared resources. The goal is to design a protocol that ensures:
+  - *Mutual Exclusion:* No two processes are in their critical sections at the same time
+  - *Progress:* If no process is in its critical section and there are processes that wish to enter their critical sections, then only those processes that are not in their remainder sections can participate in the decision of which process will enter its critical section next, and this selection cannot be postponed indefinitely
+  - *Bounded Waiting:* There exists a bound on the number of times that other processes are allowed to enter their critical sections after a process has made a request to enter its critical section and before that request is granted. This prevents starvation
+]
+
+Here, each process $P_i$ looks like:
+```
+do {
+    // Remainder Section
+    // Entry Section
+    // Critical Section
+    // Exit Section
+}
+```
+#solution[Interrupt-Based Solution][
+  Disable interrupts before entering the critical section and enable them after exiting. This ensures that no other process can interrupt the current process while it is in its critical section.
+
+  However, this is a shitty solution because:
+  - It works only on uniprocessor systems since on multiprocessor systems, other processors can still run and access shared resources as disabling interrupts only affects the local processor
+  - Disabling interrupts for a long time can lead to missed interrupts and system instability. Make the system unresponsive
+  - If one process keeps the CPU for a long time, other processes will be starved
+]
+#solution[Software Solution 1][
+  Assume there are only two proceses and `load` and `store` are atomic operations. Take a variable `turn` which indicates whose turn it is to enter the critical section. Each process sets `turn` to the other process's ID before entering its critical section and then waits until `turn` is equal to its own ID. This ensures that only one process can be in its critical section at a time. Initially say `turn = i`.
+
+  #codly(header: [Process $P_i$])
+  ```c
+  while (true) {
+      while (turn == j); // Busy wait
+      // Critical Section
+      turn = j;         // Give turn to the other process
+      // Remainder Section
+  }
+  ```
+
+  Again, this is a shitty solution because:
+  - If only one process wants to enter its critical section, it will still have to wait for the other process to give it the turn, violating the progress condition (the other is in the remainder section and still has a say in the decision). This is called _strict alternation_
+  - It relies on busy waiting, wasting CPU cycles
+  - There is no bounded waiting guarantee, i.e., one process can be starved if the other process keeps entering its critical section
+
+  This does have mutual exclusion though so decent enough
+]
+#solution[Peterson's Solution][
+  It is a classic big boy software solution for two processes. It uses two shared variables:
+  - `flag[i]`: indicates if process `P_i` wants to enter its critical section
+  - `turn`: indicates whose turn it is to enter the critical section
+
+  #codly(header: [Process $P_i$])
+  ```c
+  while (true) {
+      flag[i] = true;
+      turn = j;
+      while (flag[j] && turn == j); // Busy wait
+      // Critical Section
+      flag[i] = false;
+      // Remainder Section
+  }
+  ```
+
+  This is a good solution because it satisfies all three conditions:
+  - Mutual Exclusion: Only one process can be in its critical section at a time
+  - Progress: If no process is in its critical section, the process that wants to enter can do so
+  - Bounded Waiting: Each process will get a chance to enter its critical section after a finite number of turns
+
+  But, we fucked up with modern computers because of compiler optimizations and CPU instruction reordering. To fix this, we need to use memory barriers or atomic operations to ensure the correct ordering of operations.
+]
+Consider,
+#columns(3)[
+    Shared Data,
+    ```c
+    boolen flag = false;
+    int x = 0;
+    ```
+    #colbreak()
+    Process P1,
+    ```c
+    while (!flag); // Busy wait
+    printf("%d", x);
+    ```
+    #colbreak()
+    Process P2,
+    ```c
+    x = 100;
+    flag = true;
+    ```
+]
+The expected output is `100` (looking at the obvious order), however, if the instructions are reordered, `flag = true` may execute before `x = 100`, leading to the output being `0`. Because of this, Peterson's solution may allow both processes to enter their critical sections simultaneously, violating mutual exclusion.
+
+== Memory Barriers
+
+A memory model#footnote[This help programmers to reason about the correctness of concurrent programs] is a set of rules that define how memory operations (reads and writes) on shared memory behave, especially when multiple processors or threads are involved. It specifies:
+- *Visibility:* When a write by one processor becomes visible to other processors
+- *Ordering:* The order in which memory operations appear to execute
+
+There are two main types of memory models:
+- *Strongly Ordered/Sequential Consistency:* This model ensures that memory operations appear to be executed in a strict order, as if they were executed by a single thread. This is the easiest model to reason about but can be inefficient on modern hardware.
+- *Weakly Ordered/Relaxed Consistency:* This model allows memory operations to be reordered for performance optimization. This can lead to situations where different processors see memory operations in different orders, making it more difficult to reason about the correctness of concurrent programs.
+
+#definition[Memory Barriers][
+  These are special instructions that prevent the compiler and CPU from reordering memory operations across the barrier. They ensure that all memory operations before the barrier are completed before any memory operations after the barrier are started. This is crucial in concurrent programming to maintain data consistency and prevent race conditions.
+]
+When a memory barrier is encountered, the following rules apply:
+- All load and store operations before the barrier must be completed before any load or store operations after the barrier can begin
+- The compiler is not allowed to reorder memory operations across the barrier
+
+== Synchronization Hardware
+
+The easiest solution is a _uniprocessor solution_ where we can disable interrupts while in the critical section. This ensures that no other process can interrupt the current process while it is in its critical section. However, this only works on uniprocessor systems and can lead to missed interrupts and system instability and not a scalable solution.
+
+=== Hardware Instructions
+
+These are special hardware instructions that provide atomic operations for synchronization. They are implemented at the CPU level and ensure that certain operations are completed without interruption.
+
+==== Test-and-Set Instruction
+
+It is an atomic instruction that tests the value of a memory location and sets it to a new value in a single, indivisible operation. It is commonly used to implement spinlocks for mutual exclusion.
+```c
+bool test_and_set(bool *target) {
+    bool rv = *target;
+    *target = true;
+    return rv;
+}
+```
+
+==== Compare-and-Swap Instruction
+
+It is an atomic instruction that compares the value of a memory location to a given value and, if they are equal, swaps it with a new value. It is commonly used to implement lock-free data structures and algorithms.
+```c
+int compare_and_swap(int *target, int expected, int new_value) {
+    int rv = *target;
+    if (rv == expected) *target = new_value;
+    return rv;
+}
+```
+
+These operations are used as building blocks for higher-level synchronization primitives like mutexes, semaphores and monitors.
+
+#codly(header: ["Bounded-Waiting with Compare-and-Swap"])
+```c
+while (true) {
+    waiting[i] = true;
+    key = true;
+    while (waiting[j] && key) key = compare_and_swap(&lock, false, true);
+    waiting[i] = false;
+    // Critical Section
+    j = (i + 1) % n;
+    while (j != i && !waiting[j]) j = (j + 1) % n;
+    if (j == i) lock = false;
+    else waiting[j] = false;
+    // Remainder Section
+}
+```
+
+=== Atomic Variables
+
+These are special types of variables that support atomic operations, ensuring that operations on them are completed without interruption. They are typically implemented using hardware instructions like test-and-set or compare-and-swap. Atomic variables provide a way to perform thread-safe operations on shared data without the need for locks, reducing the overhead and contention associated with traditional locking mechanisms.
+
+Say we have an atomic integer `atomic_int counter = 0;`, to implement an atomic increment operation, we can use `compare_and_swap` as follows:
+```c
+void increment(atomic_int *counter) {
+    int old_value, new_value;
+    do {
+        old_value = atomic_load(counter); // Load the current value
+        new_value = old_value + 1;        // Calculate the new value
+    } while (compare_and_swap(counter, old_value, new_value) != old_value);
+}
+```
+
+The previous solutions are complicated and inaccessible to application programmers. So we use software tools to solve the critical section problem.
+
+== Software Solutions
+
+=== Mutex Locks
+
+This is the simplest and most common synchronization primitive. It provides mutual exclusion by allowing only one thread to hold the lock at a time. A thread must acquire the lock before entering its critical section and release the lock after exiting. If the lock is already held by another thread, the requesting thread will block until the lock becomes available. The key features of mutex locks are:
+- *Mutual Exclusion:* Only one thread can hold the lock at a time, ensuring mutual exclusion
+- *Lock Acquisition:* A thread must acquire the lock before entering its critical section
+- *Lock Release:* A thread must release the lock after exiting its critical section
+- *Ownership:* Only the thread that holds the lock can release it
+Most operating systems and threading libraries provide built-in support#footnote[`pthread_mutex` in POSIX] for mutex locks, making them easy to use in multi-threaded applications.
+
+The basic operations are:
+- `lock(mutex)`: Acquires the mutex lock. If the lock is already held by another thread, the calling thread will block until the lock becomes available.
+- `unlock(mutex)`: Releases the mutex lock. Only the thread that holds the lock can release it.
+These are atomic operation implemented using hardware instructions like test-and-set or compare-and-swap.
+
+However, this solution requires busy waiting (thus, this lock is called a spinlock) which wastes CPU cycles. To avoid this, we can use blocking locks where a thread that cannot acquire the lock is put to sleep and is woken up when the lock becomes available.
+
+#codly(header: [Solution using Mutex Locks])
+```c
+while (true) {
+    acquire(mutex);
+    // Critical Section
+    release(mutex);
+    // Remainder Section
+}
+```
+
+=== Semaphores
+#footnote[Introduced by Edsger Dijkstra in 1965]
+It is a synchronization primitive used to control access to a shared resource by multiple processes or threads. It is a more general synchronization mechanism than mutex locks and can be used to solve a variety of synchronization problems, including the critical section problem. Basically, it is an integer variable that is accessed through two atomic operations: `wait()` and `signal()`. The key features of semaphores are:
+- *Counting Semaphore#footnote[Well technically we can implement this as a binary semaphore]:* It can take non-negative integer values and is used to control access to a resource pool with multiple instances.
+- *Binary Semaphore:* It can take only the values 0 and 1 and is used to provide mutual exclusion, similar to a mutex lock.
+- *Wait (P) Operation:* Decrements the semaphore value. If the value becomes negative, the calling process is blocked until the semaphore value becomes positive.
+- *Signal (V) Operation:* Increments the semaphore value. If there are processes blocked on the semaphore, one of them is unblocked.
+
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+        #codly(header: [Wait (P) Operation])
+        ```c
+        wait(semaphore *S) {
+            while (S <= 0); // Busy wait
+            S--;
+        }
+        ```
+    ],
+    [
+        #codly(header: [Signal (V) Operation])
+        ```c
+        signal(semaphore *S) {
+            S++;
+        }
+        ```
+    ]
+)
+
+#codly(header: [Memory Barrier using Semaphores])
+```c
+sem_t synch; // synch = 0
+
+Process P1 {
+    S1; // execute S1
+    signal(&synch);
+}
+Process P2 {
+    wait(&synch);
+    S2; // execute S2
+}
+```
+
+However, this also requires busy waiting which wastes CPU cycles. To avoid this, we can use blocking semaphores where a process that cannot decrement the semaphore is put to sleep and is woken up when the semaphore value becomes positive. We can implement this using a queue to keep track of the processes that are blocked on the semaphore.
+
+#codly(header: ["Waiting Queue"])
+```c
+typedef struct {
+    int value;
+    struct process *queue; // Queue of waiting processes
+} semaphore;
+```
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+        #codly(header: [Wait (P) Operation])
+        ```c
+        wait(semaphore *S) {
+            S->value--;
+            if (S->value < 0) {
+                // Add process to S->queue
+                block(); // Block the process
+            }
+        }
+        ```
+    ],
+    [
+        #codly(header: [Signal (V) Operation])
+        ```c
+        signal(semaphore *S) {
+            S->value++;
+            if (S->value <= 0) {
+                // Remove a process from S->queue
+                wakeup(); // Wake up the process
+            }
+        }
+        ```
+    ]
+)
+
+Since semaphores are pretty low level we can run into some problems like:
+- *Deadlock:* This occurs when two or more processes are waiting for each other to release resources, leading to a situation where none of the processes can proceed. For example, if process P1 holds semaphore S1 and is waiting for semaphore S2, while process P2 holds semaphore S2 and is waiting for semaphore S1, both processes will be blocked indefinitely.
+- *Priority Inversion:* This occurs when a higher-priority process is waiting for a lower-priority process to release a semaphore, leading to a situation where the higher-priority process is effectively blocked by the lower-priority process. This can lead to suboptimal system performance and responsiveness.
+- *Starvation:* This occurs when a process is perpetually denied access to a resource because other higher-priority processes are continuously granted access. This can happen if a process with a lower priority is waiting for a semaphore that is frequently acquired by higher-priority processes.
+And most stupid of them all, using the wrong order of `wait()` and `signal()` can lead to incorrect behavior and violations of mutual exclusion.
+
+There are also monitors which are high-level synchronization constructs that provide a way to encapsulate shared data and the operations that manipulate that data. They are designed to simplify the process of writing concurrent programs by providing a higher level of abstraction than semaphores or mutex locks.
+
+== Liveness
+
+#definition[Liveness][
+  It is a property of concurrent systems that ensures that certain actions or events will eventually occur. In the context of process synchronization, liveness guarantees that processes will not be indefinitely delayed or blocked from making progress.
+]
+
+=== Deadlock
+
+This is caused by the following four conditions:
+- *Mutual Exclusion:* At least one resource must be held in a non-sharable mode, i.e., only one process can use the resource at any given time.
+- *Hold and Wait:* A process must be holding at least one resource and waiting to acquire additional resources that are currently being held by other processes.
+- *No Preemption:* Resources cannot be forcibly taken away from a process holding them; they must be released voluntarily by the process.
+- *Circular Wait:* There must be a circular chain of two or more processes, each of which is waiting for a resource held by the next process in the chain.
+
+Consider the following example with two processes and two resources:
+#grid(
+    columns: 2,
+    gutter: 10pt,
+    [
+        #codly(header: [Process P1])
+        ```c
+        wait(S); // Acquire resource R1
+        wait(Q); // Wait for resource R2
+        // Critical Section
+        signal(Q); // Release resource R2
+        signal(S); // Release resource R1
+        ```
+    ],
+    [
+        #codly(header: [Process P2])
+        ```c
+        wait(Q); // Acquire resource R2
+        wait(S); // Wait for resource R1
+        // Critical Section
+        signal(S); // Release resource R1
+        signal(Q); // Release resource R2
+        ```
+    ]
+)
+Here, if process P1 acquires resource R1 and process P2 acquires resource R2, both processes will be waiting for each other to release the resources they need, leading to a deadlock.
+
+=== Starvation
+
+It is a situation where a process is perpetually denied access to a resource because other higher-priority processes are continuously granted access. This can happen if a process with a lower priority is waiting for a semaphore that is frequently acquired by higher-priority processes.
+
+=== Priority Inversion
+
+It occurs when a higher-priority process is waiting for a lower-priority process to release a semaphore, leading to a situation where the higher-priority process is effectively blocked by the lower-priority process. This can lead to suboptimal system performance and responsiveness. This can be solved using _priority inheritance_ where the lower-priority process temporarily inherits the higher priority of the waiting process until it releases the semaphore.
