@@ -1379,6 +1379,41 @@ And most stupid of them all, using the wrong order of `wait()` and `signal()` ca
 
 There are also monitors which are high-level synchronization constructs that provide a way to encapsulate shared data and the operations that manipulate that data. They are designed to simplify the process of writing concurrent programs by providing a higher level of abstraction than semaphores or mutex locks.
 
+=== Monitors
+
+It is an abstract data type that encapsulates shared data and the operations that manipulate that data. Only one process can be active within the monitor at any given time, ensurig mutual exclusion.
+
+#codly(header: [Monitor Implementation using Semaphores])
+```c
+typedef struct {
+    semaphore mutex; // Binary semaphore for mutual exclusion
+    semaphore next;  // Semaphore for next process
+    int next_count;  // Count of processes waiting on next
+} monitor;
+// Each procedure in the monitor is implemented as:
+void monitor_procedure(monitor *m) {
+    wait(&m->mutex);
+    // Critical Section
+    if (m->next_count > 0) signal(&m->next);
+    else signal(&m->mutex);
+}
+```
+
+==== Condition Variables
+
+These are synchronization primitives used to allow processes to wait for certain conditions to be met. They provide a way for processes to block and wait for a specific condition to become true, and to be notified when that condition changes. These are always used with monitors (or a mutex/lock). It provides two main operations:
+- `wait()`: A process that calls `wait()` on a condition variable `x` is suspended until another process signals that the condition has changed.
+- `signal()`: A process that calls `signal()` on a condition variable `x` wakes up one of the processes waiting on `x`, if any.
+
+#codly(header: [Monitor Implementation using Condition Variables])
+```c
+typedef struct {
+    condition_variable cond; // Condition variable for blocking/waking up processes
+    int value;               // Value being monitored
+} monitor;
+```
+If several processes are waiting on the same condition variable, we can use the conditional-wait construct `x.wait(c)` where `c` is an integer (priority number) where the process with the highest priority is woken up first.
+
 == Liveness
 
 #definition[Liveness][
@@ -1427,3 +1462,27 @@ It is a situation where a process is perpetually denied access to a resource bec
 === Priority Inversion
 
 It occurs when a higher-priority process is waiting for a lower-priority process to release a semaphore, leading to a situation where the higher-priority process is effectively blocked by the lower-priority process. This can lead to suboptimal system performance and responsiveness. This can be solved using _priority inheritance_ where the lower-priority process temporarily inherits the higher priority of the waiting process until it releases the semaphore.
+
+= Deadlocks
+
+A system consists of different resource types $R_1$, $R_2$, ..., $R_m$ where each resource type $R_i$ has $W_i$ instances. A process can request and release resources of different types. Each process utilises a resource in the order, _request_ $->$ _use_ $->$ _release_.
+
+== Resource Allocation Graph
+
+Consider a set of vertices $V$ and edges $E$, where $V = T union R$, where $T = {T_i | i <= n}$ represents all the threads in the system and $R = {R_i | i <= m}$ represents all the resource types in the system (a resource can either be single instance or multiple instance.). A request edge is defined as $T_i -> R_j$ and an assignment edge is defined as $R_j -> T_i$. A request edge indicates that thread $T_i$ has requested an instance of resource type $R_j$ and is waiting for it. An assignment edge indicates that an instance of resource type $R_j$ has been allocated to thread $T_i$.
+
+Now, if the graph contains no cycles, then no thread in the system is deadlocked. If the graph contains a cycle and each resource type has only one instance, then a deadlock exists. If the graph contains a cycle and at least one resource type has multiple instances, then a deadlock may exist.
+
+== Handling Deadlocks
+
+We can either prevent or avoid deadlocks. Prevention is easier to implement but is not as efficient as avoidance.
+
+=== Deadlock Prevention
+
+We just need to invalidate one of the four necessary conditions for deadlock:
+- *Mutual Exclusion:* Trivial for shareable resources. We just need to ensure this for non-sharable resources.
+- *Hold and Wait:* We can ensure that a process can only request resources when it is not holding any resources. This can be done by requiring a process to release all its resources before requesting new ones or by requiring a process to request all the resources it will need at once.
+- *No Preemption:* If a process is holding some resources and requests another resource that cannot be immediately allocated to it, then all resources currently being held are released. The process will be restarted only when it can regain its old resources as well as the new ones that it is requesting.
+- *Circular Wait:* We can impose a total ordering of all resource types and require that each process can only request resources in an increasing order of enumeration.
+
+Invalidating the circular wait condition is the most common. Say that we have two mutexes `M1 = 1` and `M2 = 5`, if a thread already holds `M2`, it cannot request `M1` since `5 > 1`.
