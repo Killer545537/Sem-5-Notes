@@ -715,3 +715,56 @@ If the stock pays a dividend $D$ at time $tau in [0, T]$, then we subtract $D$ f
 ==== Multi-Period Binomial Lattice Model for American Options
 
 We can use the same multi-period binomial lattice model for American options with a slight modification. Here, at each node, we check if exercising the option immediately is more profitable than holding it till maturity.
+
+= Advanced Pricing Models
+
+Option Theory was revolutionized by the Black-Scholes-Merton Model#footnote[Given by Fischer Black, Myron Scholes, and Robert Merton] (which also got a Nobel Prize) in 1973. This model provides a theoretical estimate of the price of European-style options and is widely used in the financial industry. Another great model is the CRR Model#footnote[Given by Cox, Ross and Rubinstein] which is a discrete-time model for option pricing.
+
+The Black-Scholes-Merton Model is the limiting case of the CRR Model as the number of time steps approaches infinity.
+
+== CRR Model
+
+The CRR Model is a multi-period binomial lattice model with the following assumptions:
+- The underlying stock pays no dividend
+- No transaction costs or taxes are involved
+- It is possible to borrow and lend at a risk-free interest rate $r$
+- The no arbitrage principle holds and thus a risk-neutral probability measure exists
+- The stock price follows a binomial distribution with up and down factors $u$ and $d$ respectively
+- Divide the interval $[0, T]$ into $n$ subintervals of equal length $Delta t = T/n$. Take,
+$
+  E_k = cases(
+    u "with" p,
+    d "with" 1 - p,
+  )
+$
+Where $k in [1, n]$ and $E_k$ follows the Bernoulli distribution#footnote[We remember that $sum "Bernoulli" = "Binomial"$].
+
+The stock price at $T$ is given by,
+$
+  S(T) &= S(0) product_(k=1)^n E_k \
+  => ln S(T) &= ln S(0) + H quad (H = sum_(k=1)^n ln E_k)
+$
+
+#thmbox(numbering: none, title: "Useful Results", variant: "")[
+  $
+    E[ln E_k] &= p ln u + (1 - p) ln d \
+    "Var"(ln E_k) &= p (1 - p) (ln u - ln d)^2 \
+  $
+  Thus we see that $ln E_k$ follows,
+  $
+    ln E_k tilde D(p ln u + (1 - p) ln d, p (1 - p) (ln u - ln d)^2)
+  $
+  Which we can standardize as,
+  $
+    Z_k = (ln E_k - E[ln E_k])/sqrt("Var"(ln E_k)) tilde D(0, 1) => ln E_k = sqrt("Var"(ln E_k)) Z_k + E[ln E_k]
+  $
+]
+
+Here, we can also define _drift_ $mu$ and _volatility_ $sigma$ as,
+$
+  E[ln E_k] = mu Delta t quad and quad "Var"(ln E_k) = sigma^2 Delta t
+$
+Thus, we also see that,
+$
+  ln E_k = sigma sqrt(Delta t) Z_k + mu Delta t
+$
