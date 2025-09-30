@@ -766,5 +766,40 @@ $
 $
 Thus, we also see that,
 $
-  ln E_k = sigma sqrt(Delta t) Z_k + mu Delta t
+  ln E_k &= sigma sqrt(Delta t) Z_k + mu Delta t \
+  => sum E_k & = sigma sqrt(Delta t) Y_k + mu T quad (Y_k = sum Z_k)
 $
+Here, $Y_k$ is a simple random walk.
+
+#definition[Simple Random Walk][
+  A random walk is a stochastic process where the random variable at each step is independent and identically distributed. $S_0 = 0$ and $S_n = sum_(i=1)^n X_i$ where $X_i$ is the random variable at the $i^"th"$ step.
+]
+
+#lemma(numbering: none)[
+  For a CRR model with probability $p$ of going up and $1-p$ of going down, the stock price at time $T$ is given by,
+  $
+    S(T) = S(0) e^(mu T + sigma sqrt(T) Y_n)
+  $
+  where $mu$ is the drift and $sigma$ is the volatility.
+]
+
+If $Y tilde N(mu, sigma^2)$, then, $e^Y tilde "LN"(mu, sigma^2)$.
+
+$
+  ln (S(T)/S(0)) = mu T + sigma sqrt(Delta t) Y_n tilde N(mu T, sigma^2 T)
+$
+
+#definition[Return][
+  The return is any measure of the growth of an asset. Typically, it is the log return,
+  $
+    R(T) = ln (S(T)/S(0)) tilde N(mu T, sigma^2 T)
+  $
+  which is normally distributed with mean $mu T$ and variance $sigma^2 T$.
+
+  The return at some time $t$ is given by,
+  $
+    R(T) = ln (S(T)/S(T-1))
+  $
+]
+
+Since, we were pretty stupid back then, we used $R(T) = (S(T) - S_(T-1))/S_(T-1)$ instead of $R(T) = ln (S(T)/S(T-1))$.
