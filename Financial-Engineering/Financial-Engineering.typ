@@ -803,3 +803,31 @@ $
 ]
 
 Since, we were pretty stupid back then, we used $R(T) = (S(T) - S_(T-1))/S_(T-1)$ instead of $R(T) = ln (S(T)/S(T-1))$.
+
+== Mathing of CRR Model with Multi-Period Binomial Lattice Model
+
+Using,
+$
+  E[ln E_k] = p ln u + (1 - p) ln d &= mu Delta t \
+  "Var"(ln E_k) = p (1 - p) (ln u - ln d)^2 &= sigma^2 Delta t \
+$
+
+Assume#footnote[*This is a pretty big assumption*],
+$
+  u d &= 1 \
+  => ln u + ln d &= 0 \
+  therefore U + D &= 0 \
+$
+
+Using the above assumption, we get,
+$
+  U^2 &= (mu Delta t)^2 + sigma^2 Delta t \
+  p &= 1/2 ((mu Delta t)/U + 1)
+$
+For sufficiently large $n$, we can use $(Delta t)^2 approx 0$, thus,
+$
+  U &= sigma sqrt(Delta t) \
+  p &= 1/2 (mu/sigma sqrt(Delta t) + 1)
+$
+#footnote[It is to be noted that the above $p$ is not the RNPM but the actual probability of going up]
+Thus, we can see that the CRR Model is a multi-period binomial lattice model with the up and down factors $u$ and $d$ respectively.
