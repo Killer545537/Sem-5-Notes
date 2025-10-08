@@ -831,3 +831,68 @@ $
 $
 #footnote[It is to be noted that the above $p$ is not the RNPM but the actual probability of going up]
 Thus, we can see that the CRR Model is a multi-period binomial lattice model with the up and down factors $u$ and $d$ respectively.
+
+== Black-Scholes-Merton Model
+
+Now, consider a counter on the up and down tick movements on the stock price at a time $k in [1, n]$ as a Bernoulli random variable.
+
+$
+  Y_k = cases(
+    1 "with" p "if stock goes up",
+    0 "with" 1 - p "if stock goes down",
+  )
+$
+Then,
+$
+  S(T) &= S(0) u^(sum Y_k) d^(n - sum Y_k) \
+  => ln S(T)/S(0) &= T/(Delta t) ln d + (ln u - ln d) sum_(k = 1)^(T/(Delta t)) Y_k
+$
+From the *CRR Model*, we know that $ln u = sigma sqrt(Delta t)$, $ln d = -sigma sqrt(Delta t)$ and $p = 1/2 (mu/sigma sqrt(Delta t) + 1)$. Thus, replacing these values, we get,
+$
+  ln S(T)/S(0) = (-sigma T)/(sqrt(Delta t)) + 2 sigma sqrt(Delta t) sum_(k = 1)^(T/(Delta t)) Y_k
+$
+Clearly, $E[Y_k] = p$ and $"Var"[Y_k] = p (1 - p)$, hence#footnote[Pretty obvious tbh, just put $n -> infinity$ for variance],
+$
+  E[ln S(T)/S(0)] &= mu T \
+  "Var"[ln S(T)/S(0)] &= sigma^2 T \
+$
+Thus, we see that $ln S(T)/S(0) tilde N(mu T, sigma^2 T)$ under market probability measure $p$.
+
+However, this is not the risk-neutral probability measure we need to price this shit. The RNPM is given by,
+$
+  hat(p) &= (R - d)/(u - d)
+$
+where $u = e^(sigma sqrt(Delta t)$, $d = u^(-1)$ and $R = e^(r Delta t)$. Plugging the first order approximations, we get,
+$
+  hat(p) = 1/2((2r - sigma^2)/(2 sigma) sqrt(Delta t) + 1)
+$
+Again, finding the mean and variance of the log return using RNPM we have,
+$
+  E[ln S(T)/S(0)] &= (r - sigma^2/2) T \
+  "Var"[ln S(T)/S(0)] &= sigma^2 T \
+$
+Thus, we see that $ln S(T)/S(0) tilde N((r - sigma^2/2) T, sigma^2 T)$ under risk neutral probability measure $hat(p)$.
+
+Finally, for the grand final, we calculate the price of the option,
+$
+  C(0) &= e^(r T) E_hat(p) [C(T)] \
+  &= e^(r T) E_hat(p) [(S(0)e^w - k)^+] quad (w = ln S(T)/S(0)) \
+  &= e^(r T) integral (S(0)e^w - k)^+ f_w (w) dd(w) quad (f_w (w) "is the PDF") \
+  &= e^(r T) integral_(w >= w_1) (S(0)e^w - k) f_w (w) dd(w) quad (S(0)e^w - k >= 0 => w >= ln k/S(0) = w_1) \
+$
+If $X tilde N(mu, sigma^2)$, then,
+$
+  "PDF"(x) = (1/(sigma sqrt(2 pi))) e^(-1/2 ((x - mu)/sigma)^2)
+$
+$
+  C(0) = e^(r T)/(sigma sqrt(2 pi T)) integral_(w >= w_1) (S(0)e^w - k) e^(-1/2 [(w - (r - sigma^2/2) T)/(sigma sqrt(T))]^2) dd(w)
+$
+Taking,
+$
+  y &= (w - (r - sigma^2/2) T)/(sigma sqrt(T)) => w = sigma sqrt(T) y + (r - sigma^2/2) T => dd(w) = sigma sqrt(T) dd(y) \
+  w_1 &= ln k/S(0) => y_1 = 1/(sigma sqrt(T))[ln k/S(0) - (r - sigma^2/2) T] \
+$
+$
+  C(0) &= e^(r T)/(sqrt(2 pi)) integral_(y >= y_1) (S(0)e^(sigma sqrt(T) y + (r - sigma^2/2) T) - k) e^(-y^2/2) dd(y) \
+  &= S(0) e^(-r T)/(sqrt(2 pi)) integral_(y >= y_1) e^(y sigma sqrt(T) + (r - sigma^2/2)T - y^2 / 2) dd(y) - (k e^(-r T))/(sqrt(2 pi)) integral_(y >= y_1) e^(-y^2/2) dd(y) \
+$
