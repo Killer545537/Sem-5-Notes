@@ -896,3 +896,21 @@ $
   C(0) &= e^(r T)/(sqrt(2 pi)) integral_(y >= y_1) (S(0)e^(sigma sqrt(T) y + (r - sigma^2/2) T) - k) e^(-y^2/2) dd(y) \
   &= e^(-r T)/(sqrt(2 pi)) integral_(y >= y_1) S(0) e^(y sigma sqrt(T) + (r - sigma^2/2)T - y^2 / 2) dd(y) - (k e^(-r T))/(sqrt(2 pi)) integral_(y >= y_1) e^(-y^2/2) dd(y) \
 $
+Consider the first integral,
+$
+  I_1 &= e^(-r T)/(sqrt(2 pi)) integral_(y >= y_1) S(0) e^(y sigma sqrt(T) + (r - sigma^2/2)T - y^2 / 2) dd(y) \
+  &= S(0)/sqrt(2 pi) integral_(y >= y_1 - sigma sqrt(T)) e^(-y^2/2) dd(y) \
+$
+Now, we define the notation,
+$
+  Phi(x) = 1/sqrt(2 pi) integral_(-infinity)^x e^(-y^2/2) dd(y)
+$
+Therefore, we can see that $C(0)$ comes out to be not a fucking mess,
+$
+  C(0) = S(0) Phi(d_1) - k e^(-r T) Phi(d_2) \
+$
+where,
+$
+  d_1= (ln S(0)/k + (r + sigma^2/2)T)/(sigma sqrt(T)) quad and quad d_2 = d_1 - sigma sqrt(T)
+$
+This however, does not work for American options. But, does work for European options on dividend paying stocks with a slight modification.
