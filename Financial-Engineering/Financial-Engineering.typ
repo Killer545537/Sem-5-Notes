@@ -767,7 +767,7 @@ $
 Thus, we also see that,
 $
   ln E_k &= sigma sqrt(Delta t) Z_k + mu Delta t \
-  => sum E_k & = sigma sqrt(Delta t) Y_k + mu T quad (Y_k = sum Z_k)
+  => sum ln E_k & = sigma sqrt(Delta t) Y_k + mu T quad (Y_k = sum Z_k)
 $
 Here, $Y_k$ is a simple random walk.
 
@@ -783,26 +783,26 @@ Here, $Y_k$ is a simple random walk.
   where $mu$ is the drift and $sigma$ is the volatility.
 ]
 
-If $Y tilde N(mu, sigma^2)$, then, $e^Y tilde "LN"(mu, sigma^2)$.
+#footnote[If $Y tilde N(mu, sigma^2)$, then, $e^Y tilde "LN"(mu, sigma^2)$]
 
 $
-  ln (S(T)/S(0)) = mu T + sigma sqrt(Delta t) Y_n tilde N(mu T, sigma^2 T)
+  ln S(T)/S(0) = mu T + sigma sqrt(Delta t) Y_n tilde N(mu T, sigma^2 T)
 $
 
 #definition[Return][
   The return is any measure of the growth of an asset. Typically, it is the log return,
   $
-    R(T) = ln (S(T)/S(0)) tilde N(mu T, sigma^2 T)
+    "Total Return" = ln S(T)/S(0) tilde N(mu T, sigma^2 T)
   $
   which is normally distributed with mean $mu T$ and variance $sigma^2 T$.
 
   The return at some time $t$ is given by,
   $
-    R(T) = ln (S(T)/S(T-1))
+    R(T) = ln S(T)/S(T-1)
   $
 ]
 
-Since, we were pretty stupid back then, we used $R(T) = (S(T) - S_(T-1))/S_(T-1)$ instead of $R(T) = ln (S(T)/S(T-1))$.
+Since, we were pretty stupid back then, we used $R(T) = (S(T) - S(T-1))/S(T-1)$ instead of $R(T) = ln S(T)/S(T-1)$.
 
 == Mathing of CRR Model with Multi-Period Binomial Lattice Model
 
@@ -894,5 +894,5 @@ $
 $
 $
   C(0) &= e^(r T)/(sqrt(2 pi)) integral_(y >= y_1) (S(0)e^(sigma sqrt(T) y + (r - sigma^2/2) T) - k) e^(-y^2/2) dd(y) \
-  &= S(0) e^(-r T)/(sqrt(2 pi)) integral_(y >= y_1) e^(y sigma sqrt(T) + (r - sigma^2/2)T - y^2 / 2) dd(y) - (k e^(-r T))/(sqrt(2 pi)) integral_(y >= y_1) e^(-y^2/2) dd(y) \
+  &= e^(-r T)/(sqrt(2 pi)) integral_(y >= y_1) S(0) e^(y sigma sqrt(T) + (r - sigma^2/2)T - y^2 / 2) dd(y) - (k e^(-r T))/(sqrt(2 pi)) integral_(y >= y_1) e^(-y^2/2) dd(y) \
 $
