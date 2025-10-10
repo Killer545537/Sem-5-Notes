@@ -444,3 +444,61 @@ $
   f_i(S_i) = max {gamma(S_i) + f_(i-1)(T(S_(i-1)))}
 $
 where $f_i(S_i)$ is the optimal return function at stage $i$ with state $S_i$, $gamma(S_i)$ is the return from the decision at stage $i$ and $T(S_(i-1))$ is the transition function that gives the state at stage $i-1$ based on the state at stage $i$.
+
+= Queuing Theory
+
+We will look at the flow of customers from inifinte/finite population towards a service facility into a queue and then being serviced.
+
+We need queues because:
+- The number of customers exceed the number of servers
+- Servers do not work efficiently and take more than the prescribed time to serve a customer
+
+#definition[Customer][
+  It is an entity that requires service from the service facility.
+]
+#definition[Queue][
+  It is a line of customers waiting for service. This does not include the customers being served.
+]
+#definition[Service Facility/Channel][
+  It is the system that provides service to the customers.
+]
+
+== Queuing System
+
+The four factors of a queuing system are:
+- *Input/Arrival Pattern:* The customers may arrive in the system at known tmies or randomly#footnote[But a random distribution cannot be studied]. We assume that the arrivals follow a Poisson distribution.
+- *Customer Behaviour:* The customers may either be patient#footnote[Mathematically uninteresting] or impatient. The impatient customers may be one of the following:
+  - *Balking:* Customers who do not join the queue if it is too long
+  - *Reneging:* Customers who leave the queue after joining it if the wait is too long
+  - *Jockeying:* Customers who switch between queues to get served faster
+- *Queue Discipline:* It is the order in which customers are served. Some disciplines are:
+  - *First-Come-First-Served (FCFS):* Customers are served in the order they arrive
+  - *Last-Come-First-Served (LCFS):* The most recent arrival is served first
+  - *Service in Random Order (SIRO):* Customers are served in a random order
+  - *Priority Service:* Customers with higher priority are served first. This can be pre-emptive#footnote[Higher priority customer can interrupt the service of a lower priority customer] or non-pre-emptive#footnote[Higher priority customer is placed ahead in the queue].
+- *Service Pattern:* This represents the arrangement of service facilities. There may be infinite servers or finite servers#footnote[The customers must obviously be greater]. These are of the following types:
+  - *Single Queue Single Servers*
+  - *Single Queue Multiple Servers*
+  - *Multiple Queue Single Servers*
+  - *Several Servers:* These servers may be in parallel#footnote[All servers are identical] or in series#footnote[Customers must go through each server in a sequence].
+
+== Characteristics of Queuing System
+
+#definition[Mean Arrival Rate][
+  It is the average number of customers arriving per time period. It is denoted by $lambda$.
+]
+#definition[Mean Service Rate][
+  It is the average number of customers that can be served per time period by a single server. It is denoted by $mu$.
+]
+#definition[Queue Length][
+  It is the number of customers in the queue waiting for service. It is denoted by $L_q$.
+]
+#definition[System Length][
+  It is the number of customers in the system, including those being served. It is denoted by $L_s$.
+]
+#definition[Waiting Time in Queue][
+  It is the average time a customer spends waiting in the queue before being served. It is denoted by $W_q$.
+]
+#definition[Waiting Time in System][
+  It is the average time a customer spends in the system, including both waiting and service time. It is denoted by $W_s$.
+]
