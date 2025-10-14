@@ -502,3 +502,58 @@ The four factors of a queuing system are:
 #definition[Waiting Time in System][
   It is the average time a customer spends in the system, including both waiting and service time. It is denoted by $W_s$.
 ]
+#definition[Utilisation Factor/Traffic Intensity][
+  It is the ratio of the mean arrival rate to the mean service rate. It is denoted by $rho = lambda/mu$.
+  It is a measure of how busy the system is. For a stable system, $rho < 1$.
+]
+#definition[Steady State][
+  It is a condition where the properties of the queuing system do not change over time. This occurs when the arrival rate is less than the service rate, allowing the system to reach equilibrium.
+]
+#pagebreak()
+#definition[Transient State][
+  It is a condition where the properties of the queuing system change over time. This occurs when the arrival rate is greater than or equal to the service rate, leading to an unstable system.
+]
+
+== Kendall's Notation
+A queuing system is represented as $A\/S\/c : L\/D$, where:
+- *A:* Arrival process distribution (e.g., M for Markovian/Poisson, D for Deterministic, G for General)
+- *S:* Service time distribution (e.g., M for Markovian/Exponential, D for Deterministic, G for General)
+- *c:* Number of servers ($c = 1$ or $c = N > 1$)
+- *L:* Queue length (e.g., $infinity$ or $N$)
+- *D:* Queue discipline (e.g., FCFS, LCFS, SIRO, Priority)
+
+We will only look at:
+- *M/M/1: $infinity$/FCFS* (Single Queue Single Server)
+- *M/M/: $L$/FCFS* (Single Queue Multiple Servers)
+- *M/M/1: $infinity$/FCFS* (Finite Population Single Queue Single Server)
+- *M/M/: $L$/FCFS* (Finite Population Multiple Queue Single Server)
+
+== M/M/1: $infinity$/FCFS
+Consider the traffic intensity $rho = lambda/mu$. We can reason as to why $rho < 1$ for a stable system, because if $rho >= 1$, then the arrival rate is greater than or equal to the service rate, leading to an unstable system where the queue length grows indefinitely. Remember that the queue length does not mean how long the queue can be, but the average number of customers in the queue.
+
+Take a small interval of time $h$, where only one arrival or one service can occur. The probabilities are:
+- *Arrival:* $P("1 arrival in " h) = lambda h$
+- *No Arrival:* $P("0 arrivals in " h) = 1 - lambda h$
+- *Service:* $P("1 service in " h) = mu h$
+- *No Service:* $P("0 services in " h) = 1 - mu h$ (This is only if there is at least one customer in the system)
+
+Let $P_n (t)$ be the probability of having $n$ customers in the system at time $t$. This is given by,
+$
+  P_n (t + h) &= P_(n-1)(t) (lambda h)(1 - mu h) + P_(n+1) (t)(1- lambda h)(mu h) + P_n (t) (1 - lambda h)(1 - mu h) \
+  => (P_n (t + h) - P_n (t))/(h) &= lambda P_(n-1)(t) + mu P_(n+1)(t) - (lambda + mu) P_n (t) quad ("Ignoring higher order terms in " h)
+$
+Studying the transient state is kinda pointless, so we look at the steady state where $t -> infinity$ and thus, $dd(P_n)/dd(t) = 0$. Thus,
+$
+  (lambda + mu) P_n = lambda P_(n-1) + mu P_(n+1)
+$
+This is a simple recurrence relation, which we can solve, if we get the base case $P_0$,
+$
+  P_0 (t + h) &= P_0 (t) (1- lambda h) (1) + P_1 (t) (1 - lambda h)(mu h) \
+  => (P_0 (t + h) - P_0 (t))/(h) &= - lambda P_0 (t) + mu P_1 (t) \
+  therefore P_1/P_0 &= rho
+$
+Knowing the common ratio $lambda/mu = rho$, say the solution is of the form $P_n = A rho^n$. Clearly, $sum P_n = 1$,
+$
+  sum P_n = sum A rho^n = A/(1 - rho) = 1 => A = 1 - rho \
+  therefore P_n = (1 - rho) rho^n
+$
