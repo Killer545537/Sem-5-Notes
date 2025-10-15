@@ -914,3 +914,72 @@ $
   d_1= (ln S(0)/k + (r + sigma^2/2)T)/(sigma sqrt(T)) quad and quad d_2 = d_1 - sigma sqrt(T)
 $
 This however, does not work for American options. But, does work for European options on dividend paying stocks with a slight modification.
+
+= Portfolio Optimization
+
+Now, like the good boys we are, we will try to maximize the return of our portfolio while minimizing the risk. Portfolio optimization is a way to construct a portfolio using optimization techniques to achieve specific investment goals, such as maximizing returns or minimizing risk. Thus, simply speaking it is an optimisation problem of the type,
+$
+  &"Minimize Risk of Portfolio"\
+  &"Maximize Return of Portfolio"\
+  &"subject to"\
+  &"  Limited Resources and other goals"
+$
+
+#definition[Risk][
+  It is the possible deviation from the desired goal or return.
+]
+
+The return is defined as,
+$
+  "Absolute Return" = X_1 - X_0 med or med  "Relative Return" = X_1/X_0 med or med "Rate of Return" = (X_1 - X_0)/X_0
+$
+
+#definition[Portfolio][
+  It is denoted by a vector $p = (x_1, x_2, dots, x_n) in bb(R)^n$ where each $x_i$ is the amount invested in the $i^"th"$ asset.
+]
+
+The first portfolio optimization model was given by Harry Markowitz in 1952, which is known as the Mean-Variance Optimization Model.
+
+== Portfolio Return
+
+Let $X_0$ be the total budget at $t = 0$ and $X_(0i)$ be the budget allocated to the $i^"th"$ asset. Thus, we have,
+$
+  sum X_(0i) = X_0
+$
+This is a pretty stupid way of defining the portfolio. A better way is to define the portfolio as a vector of weights.
+
+Let $w_i$ be the weight of the $i^"th"$ asset in the portfolio, i.e.,
+$
+  X_(0i) = w_i X_0 => sum w_i = 1
+$
+This makes whatever we do scale invariant.
+
+Let $R_i$ be the total return on the $i^"th"$ asset over the investment horizon $T$. Thus,
+$
+  "Total amount of money generated" = sum R_i X_(0 i) \
+  "Total return" = R = (sum R_i X_(0 i))/X_0 = sum w_i R_i \
+  "Rate of Return" = r = (sum R_i X_(0 i) - X_0)/X_0 = sum w_i r_i
+$
+
+#thmbox(numbering: none, title: "Good to Know ✨", variant: "")[
+  $
+    "Var"[sum X_i] = sum "Cov"[X_i, X_j] = sum "Var"[X_i] + 2 sum_(i < j) "Cov"[X_i, X_j] \
+  $
+  Clearly, $"Cov"[X_i, X_i] = "Var"[X_i]$. The covariance a measure that indicates the direction of the relationship between two random variables, showing whether they tend to move in the same or opposite directions.
+  $
+    "Cov"[X, Y] = E[(X - E[X])(Y - E[Y])] = E[X Y] - E[X]E[Y] \
+    "Corr"[X, Y] = "Cov"[X, Y]/(sqrt("Var"[X]) sqrt("Var"[Y])) in [-1, 1] \
+  $
+  Technically, we should know all this shit, but we're stupid.
+]
+
+The return of a portfolio is given by $E[R]$ or $E[r]$,
+$
+  E[r] &= E[sum w_i r_i] \
+  &= sum w_i E[r_i] \
+  &= sum w_i mu_i quad (E[r_i] = mu_i)
+$
+The risk of a portfolio is given by its variance,
+$
+  "Var"[sum w_i r_i] &= sum w_i^2 sigma_i ^2 + 2 sum_(i < j) w_i w_j sigma_(i j) quad ("Var"[X_i] = sigma_i ^2 and "Cov"[X_i, X_j] = sigma_(i j) ^2)
+$
