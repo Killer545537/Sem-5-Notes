@@ -30,6 +30,8 @@
   abstract: [],
 )
 
+#set quote(block: true)
+
 = Introduction to Financial Instruments, Interest Rates and Pricing of Bonds
 
 #definition[Financial Systems][
@@ -983,3 +985,52 @@ The risk of a portfolio is given by its variance,
 $
   "Var"[sum w_i r_i] &= sum w_i^2 sigma_i ^2 + 2 sum_(i < j) w_i w_j sigma_(i j) quad ("Var"[X_i] = sigma_i ^2 and "Cov"[X_i, X_j] = sigma_(i j) ^2)
 $
+
+== Diversification
+
+This means keeping different and large number of assets.
+
+#quote(attribution: [Wise Man])[
+  Do not put all your eggs in one basket.
+]
+
+=== Effect of Diversification
+
+Clearly, from experience we can say that diversification can reduce the risk of the portfolio. Let's see that.
+
+Consider assets that are uncorrelated#footnote[If $X_i$ and $X_j$ are uncorrelated, then $"Cov"[X_i, X_j] = 0$, however, the converse is not true] in nature, i.e. $"Cov"[X_i, X_j] = 0 space forall i, j$. Say#footnote[This is said to be a naive portfolio with equal weights to all assets] $w_i = 1/n$, $sigma_i^2 = sigma^2$ and $mu_i = mu$ for all $i$. Thus,
+$
+  E[r] &= mu \
+  "Var"[r] &= sigma^2/n => lim_(n -> infinity) "Var"[r] = 0
+$
+And thus, we can see that diversification reduces the risk of the portfolio.
+
+Now, say the assets are correlated with $"Cov"[X_i, X_j] = rho sigma^2$ for all $i eq.not j$. Thus,
+$
+  E[r] &= mu \
+  "Var"[r] &= (1/n) sigma^2 + (n - 1)/n rho sigma^2 => lim_(n -> infinity) "Var"[r] = rho sigma^2
+$
+And thus, we can see that diversification reduces the risk of the portfolio, but not to zero.
+
+The above results are pretty intuitive. If the assets are uncorrelated, then diversification can reduce the risk to zero, however, if they are correlated, then diversification can only reduce the risk to a certain extent.
+
+== Diagram of a Portfolio
+
+Consider two assets with their respective mean returns as $mu_1, mu_2$, variance as $sigma_1^2, sigma_2^2$ and covariance as $sigma_(12)$. Thus, the return and risk of a portfolio with weights $1 - alpha$ and $alpha$ is given by,
+$
+  "Portfolio Return" & = (1 - alpha) mu_1 + alpha mu_2 \
+  "Portfolio Standard Deviation" & = sqrt((1 - alpha)^2 sigma_1^2 + alpha^2 sigma_2^2 + 2 alpha (1 - alpha) sigma_(12))
+$
+Now, using the correlation coefficient $rho = sigma_(12)/(sigma_1 sigma_2)$, we can rewrite the portfolio standard deviation as,
+$
+  "Portfolio Standard Deviation" = sqrt((1 - alpha)^2 sigma_1^2 + alpha^2 sigma_2^2 + 2 alpha (1 - alpha) rho sigma_1 sigma_2)
+$
+Looking at the extremeties of $rho$, we see that,
+- If $rho = 1$, then the assets are perfectly positively correlated and thus,
+  $
+    "Portfolio Standard Deviation" = (1-alpha) sigma_1 + alpha sigma_2
+  $
+- If $rho = -1$, then the assets are perfectly negatively correlated and thus,
+  $
+    "Portfolio Standard Deviation" = | (1-alpha) sigma_1 - alpha sigma_2 |
+  $
