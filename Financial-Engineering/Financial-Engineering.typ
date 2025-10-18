@@ -1034,3 +1034,9 @@ Looking at the extremeties of $rho$, we see that,
   $
     "Portfolio Standard Deviation" = | (1-alpha) sigma_1 - alpha sigma_2 |
   $
+#figure(
+  image("imgs/Portfolio-Diagram.png", height: 20%),
+  caption: [Digram of Portfolio with Two Assets]
+)
+
+We can extend this to multiple assets and plot the efficient frontier.
