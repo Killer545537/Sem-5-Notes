@@ -557,3 +557,41 @@ $
   sum P_n = sum A rho^n = A/(1 - rho) = 1 => A = 1 - rho \
   therefore P_n = (1 - rho) rho^n
 $
+
+From this, we can find the other characteristics of the queuing system as,
+$
+  L_s & = sum n P_n = (1 - rho) sum n rho^n = rho/(1 - rho) \
+  L_q & = L_s - rho = rho^2/(1 - rho) \
+$
+
+Using Little's Equation, we get,
+$
+  W_s & = L_s/lambda = 1/(mu - lambda) \
+  W_q & = L_q/lambda = lambda/(mu (mu - lambda))
+$
+
+#example[M/M/1: $infinity$/FCFS][
+  A T.V. repairman finds that the time spent on this jobs is exponentially distributed with a mean of 30 minutes. If he repairs the sets in the order in which they arrive and if the arrival of sets is approximately a Poisson process with an average rate of 10 per 8 hour-day. Find:
+  + Expected idle time each day
+  + How many jobs are ahead of the average set just brought in
+]
+#explanation[
+  Here, $lambda = 10$. Since he can repair 16 sets in an 8-hour day, $mu = 16$. Thus, $rho = 10/16 = 0.625$.
+  + The repairman is idle when there are no sets to repair, which is $P_0 = 1 - rho = 0.375$. Thus, the expected idle time each day is $0.375 times 8 = 3$ hours.
+  + The number of jobs ahead of the average set just brought in is the average number of jobs in the system, which is $L_s = rho/(1 - rho) = 5/3 approx 2 "TV sets"$.
+]
+
+== M/M/1: $L$/FCFS
+
+The probabilities are in the same ratio as before, but now we have the constraint that the maximum number of customers in the system is $L$. Thus,
+$
+  sum_(n = 0)^(n = L) P_n &= 1 \
+  => P_0 &= (1 - rho)/(1 - rho^(L + 1)) \
+$
+Moreover, there is no constraint on $rho$ here. Thus, if $rho = 1$, $P_0 = 1/(L + 1)$.
+
+The other characteristics are,
+$
+  L_s & = sum_(n = 0)^(n = L) n P_n = rho/(1 - rho) - ((L + 1) rho^(L + 1))/(1 - rho^(L + 1)) \
+  L_q & = L_s - lambda_"eff"/mu  quad (lambda_"eff" = lambda (1 - P_L))\
+$
