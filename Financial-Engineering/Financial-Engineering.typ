@@ -1040,3 +1040,62 @@ Looking at the extremeties of $rho$, we see that,
 )
 
 We can extend this to multiple assets and plot the efficient frontier.
+
+== Markowitz Model
+
+This model basically asks the question,
+$
+    "Min" & "Var"[sum w_i r_i] = sum_(i > j) w_i w_j sigma_(i j) \
+    "subject to" & E[sum w_i r_i] = sum w_i mu_i = R^* \
+    & sum w_i = 1
+$
+If short selling is allowed, $w_i in bb(R)$, otherwise $w_i in [0, 1]$. We will first consider the case where short selling is allowed.
+
+Consider an $n$ asset portfolio,
+$
+    "Var"[sum w_i r_i] = bold(w)^T Sigma bold(w) quad (bold(w) = mat(delim: "[",w_1; w_2; dots.v; w_n))
+$
+where, $Sigma$ is the variance-covariance matrix, $Sigma = mat(delim: "[", sigma_(i j))_(n times n)$. By definition#footnote[A matrix is said to be positive definite if $forall x$, $bold(x)^T A bold(x) >= 0$], $Sigma$ is a symmetric positive definite square matrix in the quadratic form#footnote[This is also an interesting fact].
+
+#thmbox(numbering: none, title: "Interesting Facts about Markowitz Model ✨", variant: "")[
+    - It is a quadratic programming problem thus, it has a unique global minimum
+    - It has linear constraints
+    - It has two input vectors, $bold(mu)$ and $Sigma$
+]
+
+=== Two Asset Portfolio
+$
+    "Min" & 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) \
+    "subject to" & mu_1 w_1 + mu_2 w_2 = R^* \
+    & w_1 + w_2 = 1
+$
+Using Lagrange multipliers, we have,
+$
+    L(w_1, w_2; lambda_1, lambda_2) = 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) - lambda_1 (mu_1 w_1 + mu_2 w_2 - R^*) - lambda_2 (w_1 + w_2 - 1)
+$
+Solving the following system of equations gives us a unique optimal solution,
+#columns(2)[
+    $
+        pdv(L, w_1) &= 0 \
+        pdv(L, w_2) &= 0
+    $
+    #colbreak()
+    $
+        pdv(L, lambda_1) &= 0 \
+        pdv(L, lambda_2) &= 0
+    $
+]
+$
+    mu_1 w_1 + mu_2 w_2 &= R^* \
+    w_1 + w_2 &= 1
+$
+
+== N Asset Portfolio
+
+Consider the general $n$ asset portfolio with weights $bold(w)_(n times 1)$ and the two lagrange multipliers $lambda_1$ and $lambda_2$ having mean return $R^*$. Thus,
+$
+    sum_(j = 1)^n sigma_(i j) w_j - lambda_1 mu_i - lambda_2 &= 0 quad forall i in [1, n] \
+    sum w_i mu_i &= R^* \
+    sum w_i &= 1 \
+$
+i.e., $n + 2$ equations with $n + 2$ variables which can be solved to get a unique optimal solution trivially.
