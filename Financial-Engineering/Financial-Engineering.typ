@@ -1049,7 +1049,9 @@ $
     "subject to" & E[sum w_i r_i] = sum w_i mu_i = R^* \
     & sum w_i = 1
 $
-If short selling is allowed, $w_i in bb(R)$, otherwise $w_i in [0, 1]$. We will first consider the case where short selling is allowed.
+If short selling is allowed, $w_i in bb(R)$, otherwise $w_i in [0, 1]$.
+
+=== Short Selling Allowed
 
 Consider an $n$ asset portfolio,
 $
@@ -1063,7 +1065,7 @@ where, $Sigma$ is the variance-covariance matrix, $Sigma = mat(delim: "[", sigma
     - It has two input vectors, $bold(mu)$ and $Sigma$
 ]
 
-=== Two Asset Portfolio
+==== Two Asset Portfolio
 $
     "Min" & 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) \
     "subject to" & mu_1 w_1 + mu_2 w_2 = R^* \
@@ -1090,7 +1092,7 @@ $
     w_1 + w_2 &= 1
 $
 
-== N Asset Portfolio
+==== N Asset Portfolio
 
 Consider the general $n$ asset portfolio with weights $bold(w)_(n times 1)$ and the two lagrange multipliers $lambda_1$ and $lambda_2$ having mean return $R^*$. Thus,
 $
@@ -1099,3 +1101,13 @@ $
     sum w_i &= 1 \
 $
 i.e., $n + 2$ equations with $n + 2$ variables which can be solved to get a unique optimal solution trivially.
+
+== Short Selling Not Allowed
+
+This simply adds one simple constraint to the problem#footnote[Which kinda makes it impossible to solve by hand],
+$
+    "Min" & 1/2 sum sigma_(i j) w_i w_j\
+    "subject to" & sum mu_i w_i = R^* \
+    & sum w_i = 1 \
+    & w_i >= 0
+$
