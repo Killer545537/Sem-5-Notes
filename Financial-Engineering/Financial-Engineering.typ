@@ -1102,7 +1102,7 @@ $
 $
 i.e., $n + 2$ equations with $n + 2$ variables which can be solved to get a unique optimal solution trivially.
 
-== Short Selling Not Allowed
+=== Short Selling Not Allowed
 
 This simply adds one simple constraint to the problem#footnote[Which kinda makes it impossible to solve by hand],
 $
@@ -1111,3 +1111,36 @@ $
     & sum w_i = 1 \
     & w_i >= 0
 $
+
+== The Capital Asset Pricing Model (CAPM)
+
+#definition[Market Portfolio][
+  It is a theoretical bundle of investments that includes every type of asset available in the financial market, with each asset weighted according to its total market value.
+]
+If the market portfolio $M$ is efficient, the expected return $overline(r_i)$ of any asset $i$ satisfies,
+$
+    overline(r_i) - r_f &= beta_i (overline(r_M) - r_f) \
+    r_i - r_f &= beta_i (r_M - r_f) + epsilon_i
+$
+where,
+- $r_f$ is the risk-free rate of return
+- $overline(r_M)$ is the expected return of the market portfolio
+- $beta_i = ("Cov"[r_i, r_M])/(sigma_M^2)$ is the $beta$ of the asset $i$, which indicates the market influence on $overline(r_i)$
+- $epsilon_i$ is the error term with $E[epsilon_i] = 0$ and $"Cov"[epsilon_i, r_M] = 0$
+This formula indicates how the return of an asset is related to the overall market return, adjusted for the asset's sensitivity to market movements (beta) and the risk-free rate.
+
+#definition[$beta$ of a Portfolio][
+    If $beta_i$ is the $beta$ of the $i^"th"$ asset, then the $beta$ of the portfolio is,
+    $
+        beta = sum w_i beta_i
+    $
+]
+
+Looking at the variance in the error term, we see that,
+$
+    "Var"[r_i] &= "Var"[r_f + beta_i (r_M - r_f) + epsilon_i]
+    &= beta_i^2 sigma_M^2 + sigma_(epsilon_i)^2
+$
+Thus, it clear that there are two types of risks associated with an asset:
+- Systematic Risk#footnote[Also called market risk, it is the inherent risk that affects the entire market or a particular segment of the market. It is non-diversifiable], which is represented by $beta_i^2 sigma_M^2$
+- Unsystematic Risk#footnote[Also called specific risk, it is the risk that is specific to a particular company or industry. It is diversifiable], which is represented by $sigma_(epsilon_i)^2$
