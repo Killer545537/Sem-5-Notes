@@ -1473,6 +1473,54 @@ Consider a set of vertices $V$ and edges $E$, where $V = T union R$, where $T = 
 
 Now, if the graph contains no cycles, then no thread in the system is deadlocked. If the graph contains a cycle and each resource type has only one instance, then a deadlock exists. If the graph contains a cycle and at least one resource type has multiple instances, then a deadlock may exist.
 
+#grid(
+	columns: (1fr, 2fr),
+	gutter: 10pt,
+	figure(
+		image("imgs/Resource-Allocation.png"),
+		caption: [Resource Allocation Graph],
+	),
+	[
+		We have:
+		- One instance of $R_1$
+		- One instance of $R_3$
+		- Two instance of $R_2$
+		- Four instance of $R_4$
+		- $T_1$ holds one instance of $R_1$ and waits for one instance of $R_2$
+		- $T_2$ holds one instance of $R_1$, one instance of $R_2$ and waits for one instance of $R_3$
+		- $T_3$ holds one instance of $R_3$
+	]
+)
+
+#example[Deadlock Detection][
+	#grid(
+		columns: (1fr, 2fr),
+		gutter: 10pt,
+		figure(
+			image("imgs/Resource-Allocation-EX-1.png"),
+			caption: [Deadlock Detection Example],
+		),
+		[
+			Check if the following system is in a deadlock state.
+		]
+	)
+]
+#solution[
+	We solve these questions using the following table and writing the processes that can get completed one after the other:
+	#table(
+		columns: 7,
+		align: center,
+		table.header(
+			[], table.cell(colspan: 2)[Allocations], table.cell(colspan: 2)[Request], table.cell(colspan: 2)[Available]
+		),
+		[], [$R_1$], [$R_2$], [$R_1$], [$R_2$], [$R_1$], [$R_2$],
+		$P_1$, [0], [1], [1], [0], [0], [0],
+		$P_2$, [1], [0], [0], [0], [1], [0],
+		$P_3$, [1], [0], [0], [1], [1], [1]
+	)
+	Thus, the correct order will be $P_2 -> P_1 -> P_3$.
+]
+
 == Handling Deadlocks
 
 We can either prevent or avoid deadlocks. Prevention is easier to implement but is not as efficient as avoidance.
@@ -1486,3 +1534,44 @@ We just need to invalidate one of the four necessary conditions for deadlock:
 - *Circular Wait:* We can impose a total ordering of all resource types and require that each process can only request resources in an increasing order of enumeration.
 
 Invalidating the circular wait condition is the most common. Say that we have two mutexes `M1 = 1` and `M2 = 5`, if a thread already holds `M2`, it cannot request `M1` since `5 > 1`.
+
+=== Deadlock Avoidance
+
+This requires that the system has some additional a priori information about how resources are to be requested.
+
+The simplest (also the most useful) model requires each thread to declare the maximum number of resources of each type that it _may_ need. Then, the deadlock-avoidance-algorithm dynamically examines the resource-allocation state#footnote[It is defined by the number of available and allocated resources and the maximum demands of the process] to ensure that there can never be a circular-wait condition.
+
+#grid(
+	columns: (2fr, 3fr),
+	gutter: 10pt,
+	figure(
+		image("imgs/Safe-Unsafe-Deadlock.png")
+	),
+	definition[Safe State][
+		A system is in a safe state, if $space exists <T_1, T_2, dots.h, T_n>$ of all threads such that $forall T_i$ the resources that $T_i$ can still request can be satisfied by the currently available resources and the resources held by all $T_j$, where $j < i$.
+		- If $T_i$ is not immediately satisfied, then it can wait until all $T_j$ have finished and released their resources
+		- When $T_j$ is finished, $T_i$ can obtain all the resources it needs, execute, and return its allocated resources to the system
+		- When $T_i$ terminates, $T_(i + 1)$ can obtain its needed resources, and so on
+	]
+)
+
+==== Resource Allocation Graph Algorithm
+
+Here, we define a new type of edge called a *Claim Edge* ($P_i arrow.r.dotted R_j$). It denotes that a process _may_ request some resource.
+- It converts to a request edge when a thread makes a request for a resource
+- It converts to an assignment edge when the resource is allocated
+- When the resource is released, it converts back to a claim edge
+
+The request can only be granted if converting the request edge to an assignment edge does not result in a cycle in the resource-allocation graph.
+
+This only works for single instance resources.
+
+==== Banker's Algorithm
+
+This is much better than the previous one since it works for multiple instance resources as well. It is named so because it is analogous to a banker who lends money to customers, ensuring that the bank never allocates its available cash in such a way that it cannot satisfy the needs of all its customers.
+
+Let $n$ be the number of processes and $m$ be the number of resource types. We define the following data structures:
+- *Available*: It is a vector of length $m$ that indicates the number of available resources of each type. $"available"[j] = k$ implies k instances of resource $j$.
+- *Max*: It is an $n times m$ matrix that defines the maximum demand of each process. $"max"[i][j] = k$ implies that process $i$ may request at most $k$ instances of resource type $j$.
+- *Allocation*: It is an $n times m$ matrix that defines the number of resources of each type currently allocated to each process. $"allocation"[i][j] = k$ implies that process $i$ is currently allocated $k$ instances of resource type $j$.
+- *Need*: It is an $n times m$ matrix that indicates the remaining resource needs of each process. It is defined as $"need"[i][j] = "max"[i][j] - "allocation"[i][j]$.
