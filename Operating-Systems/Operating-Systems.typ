@@ -1498,7 +1498,6 @@ Now, if the graph contains no cycles, then no thread in the system is deadlocked
 		gutter: 10pt,
 		figure(
 			image("imgs/Resource-Allocation-EX-1.png"),
-			caption: [Deadlock Detection Example],
 		),
 		[
 			Check if the following system is in a deadlock state.
