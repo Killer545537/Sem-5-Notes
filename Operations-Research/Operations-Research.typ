@@ -595,3 +595,7 @@ $
   L_s & = sum_(n = 0)^(n = L) n P_n = rho/(1 - rho) - ((L + 1) rho^(L + 1))/(1 - rho^(L + 1)) \
   L_q & = L_s - lambda_"eff"/mu  quad (lambda_"eff" = lambda (1 - P_L))\
 $
+
+== M/M/C: $infinity$/FCFS
+
+= Simulation
