@@ -1574,3 +1574,95 @@ Let $n$ be the number of processes and $m$ be the number of resource types. We d
 - *Max*: It is an $n times m$ matrix that defines the maximum demand of each process. $"max"[i][j] = k$ implies that process $i$ may request at most $k$ instances of resource type $j$.
 - *Allocation*: It is an $n times m$ matrix that defines the number of resources of each type currently allocated to each process. $"allocation"[i][j] = k$ implies that process $i$ is currently allocated $k$ instances of resource type $j$.
 - *Need*: It is an $n times m$ matrix that indicates the remaining resource needs of each process. It is defined as $"need"[i][j] = "max"[i][j] - "allocation"[i][j]$.
+
+#example[
+	Given the following data structures, find if the system is in a safe state:
+	$
+		"Allocation" &= mat(
+			0, 0, 1, 2;
+			1, 0, 0, 0;
+			1, 3, 5, 4;
+			0, 6, 3, 2;
+			0, 0, 1, 4
+		) \
+		"Max" &= mat(
+			0, 0, 1, 2;
+			1, 7, 5, 0;
+			2, 3, 5, 6;
+			0, 6, 5, 2;
+			0, 6, 5, 6
+		) \
+		"Available" &= [1, 5, 2, 0]
+	$
+]
+#solution[
+	Need to fix this
+	#table(
+		columns: 4*4 + 1,
+		align: center,
+		table.header(
+			[], table.cell(colspan: 4)[*Allocation*], table.cell(colspan: 4)[*Max*], table.cell(colspan: 4)[*Available*], table.cell(colspan: 4)[*Need*]
+		),
+		[], [A], [B], [C], [D], [A], [B], [C], [D], [A], [B], [C], [D], [A], [B], [C], [D],
+		$P_0$, [0], [0], [1], [2], [0], [0], [1], [2], [1], [5], [2], [0], [0], [0], [0], [0],
+		$P_1$, [1], [0], [0], [0], [1], [7], [5], [0], [1], [5], [2], [0], [0], [7], [5], [0],
+		$P_2$, [1], [3], [5], [4], [2], [3], [5], [6], [1], [5], [2], [0], [1], [0], [0], [2],
+		$P_3$, [0], [6], [3], [2], [0], [6], [5], [2], [1], [5], [2], [0], [0], [0], [2], [0],
+		$P_4$, [0], [0], [1], [4], [0], [6], [5], [6], [1], [5], [2], [0], [0], [6], [4], [2]
+	)
+	Thus, we can see that the safe sequence is $P_0 -> P_2 -> P_3 -> P_4 -> P_1$.
+]
+
+The safe state algorithm works as follows:
++ Let Work and Finish be vectors of length m and n respectively. Initialize Work = Available and Finish[i] = false for all i.
++ Find an index i such that both: (go to step 3 if no such i exists)
+   - Finish[i] == false
+   - Need[i] <= Work
++ Work = Work + Allocation[i]; Finish[i] = true; go to step 2.
++ If Finish[i] == true for all i, then the system is in a safe state.
+
+=== Deadlock Detection Algorithm
+
+It is a method used by the OS to determine if a deadlock has occurred in the system. It is typically used in systems where deadlock prevention or avoidance is not implemented.
+
+==== Single Instance of Each Resource Type
+
+Here, we construct a wait-for graph from the resource-allocation graph by removing the resource nodes and collapsing the edges. A cycle in the wait-for graph indicates a deadlock.
+
+The wait-for graph is maintained where the nodes represent processes and a directed edge from process $P_i$ to process $P_j$ indicates that process $P_i$ is waiting for a resource held by process $P_j$. Periodically, the OS invokes a deadlock detection algorithm that searches for cycles in the wait-for graph.
+
+But, this is kinda time consuming since we need to search for cycles in a graph which takes $O(n^2)$ time, thus, it is invoked infrequently.
+
+==== Multiple Instances of Each Resource Type
+
+Here, we use a similar approach to the banker's algorithm. We maintain the following data structures:
+- *Available*: It is a vector of length $m$ that indicates the number of available resources of each type. $"available"[j] = k$ implies k instances of resource $j$.
+- *Allocation*: It is an $n times m$ matrix that defines the number of resources of each type currently allocated to each process. $"allocation"[i][j] = k$ implies that process $i$ is currently allocated $k$ instances of resource type $j$.
+- *Request*: It is an $n times m$ matrix that indicates the current request of each process. $"request"[i][j] = k$ implies that process $i$ is currently requesting $k$ more instances of resource type $j$.
+
+The deadlock detection algorithm works as follows:
++ Let Work and Finish be vectors of length m and n respectively. Initialize Work = Available and Finish[i] = false for all i.
++ Find an index i such that both: (go to step 3 if no such i exists)
+   - Finish[i] == false
+   - Request[i] <= Work
++ Work = Work + Allocation[i]; Finish[i] = true; go to step 2.
++ If Finish[i] == false for some i, then process $P_i$ is deadlocked.
+The time complexity of this algorithm is $O(m  n^2)$ since each process may need to be examined multiple times.
+
+=== Deadlock Recovery
+
+==== Process Termination/Pessimistic Approach
+
+This involves terminating one or more processes involved in the deadlock until the deadlock is resolved. There are two approaches:
+- *Terminate all deadlocked processes:* This is the simplest approach but can lead to significant loss of work and data.
+- *Terminate processes one at a time:* This approach involves terminating one process at a time and checking if the deadlock is resolved. This continues until the deadlock is resolved. The process to be terminated can be selected based on various criteria such as priority, CPU time used, resources held, etc.
+
+==== Resource Preemption/Optimistic Approach
+
+This involves temporarily taking resources away from one or more processes involved in the deadlock and allocating them to other processes until the deadlock is resolved. The key steps are:
+- *Select a victim process:* This involves selecting a process to preempt resources from. The selection can be based on various criteria such as priority, CPU time used, resources held, etc.
+- *Preempt resources:* This involves taking resources away from the selected process and allocating them to other processes that are waiting for those resources.
+- *Rollback the victim process:* This involves rolling back the victim process to a safe state before it acquired the preempted resources. This may involve saving the state of the process before preemption and restoring it later.
+- *Restart the victim process:* This involves restarting the victim process after it has been rolled back to a safe state.
+
+So, the thing is that deadlocks realistically don't occur that often in practice, so most systems just ignore them and let the processes hang like Linux#footnote[Fact check me on this] does.
