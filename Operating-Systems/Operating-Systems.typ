@@ -1852,3 +1852,27 @@ It is technically not an OS thing and more of a program design, but the OS can p
 When a program calls a function in a dynamic library, a stub#footnote[Small piece of code] is used. If the routine is loaded, the stub replaces itself with the address of the routine and jumps to it. If the routine is not loaded, the stub requests the OS to load the routine into memory, updates itself with the address of the routine, and then jumps to it.
 
 It is particularly useful for system libraries#footnote[Called shared libraries or dynamic link libraries (DLLs)] that are used by multiple programs.
+
+== Contiguous Memory Allocation
+
+It is the simplest memory allocation scheme where each process is allocated a single contiguous block of memory.
+
+The main memory is divided into two partitions:
+- *Resident OS:* This contains the OS code and is usually located at the lower end of memory.
+- *User Processes:* This contains the user processes and is usually located at the higher end of memory.
+Free memory is managed using a free list#footnote[Linked list of all free memory blocks] or a bitmap#footnote[Each bit represents a block of memory, 0 for free and 1 for allocated].
+
+However, this leads to external fragmentation#footnote[More later], which can be solved using compaction#footnote[Shifting all processes to one end of memory to create a large block of free memory].
+
+So, clearly this is a shit solution in terms of scalability since it requires memory to be shuffled around which causes latency and also updating the free list is too much.
+
+== Variable Partition
+
+It is another simple memory allocation scheme used by old operating systems.
+
+It divides the memory into partitions of variable size that are sized to the requirements of each incoming process (rather than being fixed sized). When a new process arrives a free block of memory, called a hole (which is large enough) is found and allocated to the process. After termination, adjacent free blocks are merged together. This dynamic reallocation aims to minimize wasted memory.
+
+There are multiple algorithms that can be used to request an arbitrary sized hole from a list of free holes:
+- *First-Fit*: Allocate the first hole large enough for the request
+- *Best-Fit*: Allocate the smallest hole that is still big enough
+- *Worst-Fit*: Allocate the largest available hole
