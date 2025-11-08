@@ -1666,3 +1666,24 @@ This involves temporarily taking resources away from one or more processes invol
 - *Restart the victim process:* This involves restarting the victim process after it has been rolled back to a safe state.
 
 So, the thing is that deadlocks realistically don't occur that often in practice, so most systems just ignore them and let the processes hang like Linux#footnote[Fact check me on this] does.
+
+= Memory Management
+
+It involves organising and controlling computer memory, allocating space to processes, and managing the movement of data between main memory and storage. It makes sure that processes#footnote[which must be loaded from the disk into memory for execution] can only access its assigned memory locations, provides protection between processes, and optimises memory usage to improve system performance.
+
+== Protection
+
+The authorised memory region of a program is defined by the base register and the limit register. The $("base", "limit")$ register pairs define the logical address space of a process.
+
+#grid(
+	columns: (1fr, 2fr),
+	gutter: 10pt,
+	figure(
+		image("imgs/Hardware-Address-Protection.png"),
+		caption: [Hardware Address Protection],
+	),
+	[
+		When a process generates a logical address, the base register is added to the logical address to produce the physical address. The limit register is used to check if the logical address is within the authorised memory region of the process. If the logical address is greater than or equal to the limit register, a memory protection violation occurs, and the process is terminated.
+	]
+)
+The actual instructions to load the base and limit registers are privileged instructions#footnote[accessible only by the OS kernel].
