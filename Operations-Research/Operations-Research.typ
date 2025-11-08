@@ -149,7 +149,12 @@ If a tree has $n$ nodes, then it will have $n-1$ links.
   #figure(
     diagram(
       node-stroke: .1em,
-      node-fill: gradient.radial(blue.lighten(80%), blue, center: (30%, 20%), radius: 80%),
+      node-fill: gradient.radial(
+        blue.lighten(80%),
+        blue,
+        center: (30%, 20%),
+        radius: 80%,
+      ),
       spacing: 2em,
       node((0, 0), "1", radius: 2em),
       edge((0, 0), (1, -1), 2, "|->"),
@@ -185,7 +190,7 @@ If a tree has $n$ nodes, then it will have $n-1$ links.
     columns: 8,
     table.header(
       [*Iteration\
-        (Node Finalized)*],
+      (Node Finalized)*],
       [*1*],
       [*2*],
       [*3*],
@@ -194,7 +199,15 @@ If a tree has $n$ nodes, then it will have $n-1$ links.
       [*6*],
       [*7*],
     ),
-    [0], [$infinity$], [$infinity$], [$infinity$], [$infinity$], [$infinity$], [$infinity$], [$infinity$],
+    [0],
+    [$infinity$],
+    [$infinity$],
+    [$infinity$],
+    [$infinity$],
+    [$infinity$],
+    [$infinity$],
+    [$infinity$],
+
     [1 (1)], [0], [2], [4], [10], [$infinity$], [$infinity$], [$infinity$],
     [2 (2)], [0], [2], [4], [10], [7], [$infinity$], [$infinity$],
     [3 (3)], [0], [2], [4], [7], [7], [5], [$infinity$],
@@ -585,15 +598,15 @@ $
 
 The probabilities are in the same ratio as before, but now we have the constraint that the maximum number of customers in the system is $L$. Thus,
 $
-  sum_(n = 0)^(n = L) P_n &= 1 \
-  => P_0 &= (1 - rho)/(1 - rho^(L + 1)) \
+  sum_(n = 0)^(n = L) P_n & = 1 \
+                   => P_0 & = (1 - rho)/(1 - rho^(L + 1)) \
 $
 Moreover, there is no constraint on $rho$ here. Thus, if $rho = 1$, $P_0 = 1/(L + 1)$.
 
 The other characteristics are,
 $
   L_s & = sum_(n = 0)^(n = L) n P_n = rho/(1 - rho) - ((L + 1) rho^(L + 1))/(1 - rho^(L + 1)) \
-  L_q & = L_s - lambda_"eff"/mu  quad (lambda_"eff" = lambda (1 - P_L))\
+  L_q & = L_s - lambda_"eff"/mu quad (lambda_"eff" = lambda (1 - P_L))\
 $
 
 == M/M/C: $infinity$/FCFS

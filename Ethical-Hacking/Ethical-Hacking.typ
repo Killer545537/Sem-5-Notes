@@ -1,7 +1,7 @@
 #import "@preview/ilm:1.4.1": *
 #import "@preview/physica:0.9.5": *
 #import "@preview/thmbox:0.2.0": *
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 #show: thmbox-init(counter-level: 2)
 #set text(lang: "en")
@@ -101,7 +101,7 @@ The following is an introduction to each layer:
   image("imgs/Data-Flow.png"),
   caption: [
     Stack like flow of data
-  ]
+  ],
 )
 Some inter-networking devices are:
 - *Hub* is a basic networking device that connects multiple computers in a network and transmits data to all connected devices. It is used to extend the span of a single LAN
@@ -112,7 +112,7 @@ Some inter-networking devices are:
   image("imgs/Internetworking-Structure.png"),
   caption: [
     Typical Inter-Networking Structure
-  ]
+  ],
 )
 
 == TCP/IP Protocol Stack
@@ -123,7 +123,7 @@ Instead of a 7-layer OSI model, it uses a simplified 4-layer model,
   image("imgs/TCP:IP-Layers.png", height: 20%, fit: "contain"),
   caption: [
     Simplified 4-layer TCP/IP Model
-  ]
+  ],
 )
 - *Application Layer* handles high-level protocols, representation, encoding, and dialog control (e.g., HTTP, FTP, SMTP)
 - *Transport Layer* manages end-to-end communication and data flow (mainly TCP and UDP)
@@ -153,7 +153,7 @@ Encapsulation is the process of adding headers/trailers to data as it moves down
   image("imgs/Encapsulation-TFTP.png", height: 20%),
   caption: [
     Encapsulation in TFTP
-  ]
+  ],
 )
 
 *IP Layer* provides a connectionless, unreliable delivery system for packets, where each packet is independent#footnote[Each packet contains the address of the source and destination] of each other. It does not maintain history. This layer receives a data chunk from a higher layer (TCP or UDP) and prepends a header of at least 20 bytes containing information regarding route handling and flow control.
@@ -162,7 +162,7 @@ Encapsulation is the process of adding headers/trailers to data as it moves down
   image("imgs/Format-IP-Datagram.png"),
   caption: [
     Format of an IP Datagram
-  ]
+  ],
 )
 - *VER* specifies the IP protocol version (typically 4)
 - *HLEN* indicates the length of the IP header in 32-bit words ($[5, 15]$)
@@ -200,7 +200,7 @@ There are two strategies for managing fragmented packets as they traverse multip
 #thmbox(
   variant: "Explanation",
   color: green,
-  numbering: none
+  numbering: none,
 )[
   - *Step 1:* When 1000 bytes flow into $N_1$, since the MTU is 620 bytes, each fragment has 20 bytes of header data, so only 600 bytes of actual data can be sent, thus, we need to divide into 2 fragments, say $F_1$ with 600 bytes,0 offset and $M = 1$, since one more fragment follows and $F_2$ with $1000-600=400$ bytes of data, $600/8=75$ offset and $M=0$ since no fragments follow.
   - *Step 2:* Now the packets flow into $N_2$. Since the MTU is 400 bytes, each fragment can have only 380 bytes of actual data. We divide $F_1$ into two fragments say $F_(11)$ with 376 bytes#footnote[We cannot transfer 380 bytes of data since the data transferred must be a multiple of 8], 0 offset and $M=1$ and $F_(12)$ with $600-376=224$ bytes, $376/8=47$ offset.
@@ -212,7 +212,7 @@ There are two strategies for managing fragmented packets as they traverse multip
       [$F_(11)$], [376], [0], [1],
       [$F_(12)$], [224], [47], [0],
       [$F_(21)$], [376], [75], [1],
-      [$F_(22)$], [24], [122], [0]
+      [$F_(22)$], [24], [122], [0],
     )
   ]
 ]
@@ -258,7 +258,7 @@ Applications interact with the TCP/IP protocol suite by sending/receiving TCP or
     node((0, 3), [Datalink and Hardware Layer]),
     node((1.7, 1), [Port Address (16 bit)]),
     node((1.7, 2), [IP Address (32 bit)]),
-    node((1.7, 3), [Physical Address (48 bit)])
+    node((1.7, 3), [Physical Address (48 bit)]),
   ),
 )
 
@@ -272,12 +272,12 @@ Now, to describe a unique process-to-process connection a 5-tuple called *associ
 
 #figure(
   image("imgs/Detailed-TCP.png"),
-  caption: [Detailed View of TCP]
+  caption: [Detailed View of TCP],
 )
 
 #figure(
   image("imgs/TCP-Format.png"),
-  caption: [Format of TCP Segment]
+  caption: [Format of TCP Segment],
 )
 
 - *Source/Destination Ports* are 16 bits each
@@ -298,7 +298,7 @@ Now, to describe a unique process-to-process connection a 5-tuple called *associ
 A TCP connection is established using a 3-way handshake.
 #figure(
   image("imgs/TCP-Connection.png", height: 25%),
-  caption: [TCP Connection Establishment]
+  caption: [TCP Connection Establishment],
 )
 However, a half-open (incomplete) connection can result in possible attack scenarios like:
 - Create many half-open connections to target
@@ -308,12 +308,12 @@ However, a half-open (incomplete) connection can result in possible attack scena
 A TCP connection is terminated using a 4-way handshake.
 #figure(
   image("imgs/TCP-Termination.png", height: 30%),
-  caption: [TCP Connection Termination]
+  caption: [TCP Connection Termination],
 )
 
 #figure(
   image("imgs/Format-UDP-Datagram.png", height: 10%),
-  caption: [Format of UDP Segment]
+  caption: [Format of UDP Segment],
 )
 
 - *Checksum* is an optional field which is set to zero if not used (16 bits)
@@ -383,7 +383,7 @@ In the steady state, _Hello_ packets are periodically (default 10s) to neighbour
 
 #figure(
   image("imgs/OSPF-Header-Format.png", height: 15%),
-  caption: [OSPF Header Format]
+  caption: [OSPF Header Format],
 )
 
 The different packet types are:
@@ -416,13 +416,13 @@ The functional procedures in BGP are:
 
 == IP Version 6
 
-IPv6 is also called the next generation of IP addressing (IPng). IPv4 has limited address space, no support for complex addressing and routing capacities and cannot provide real-time response. 
+IPv6 is also called the next generation of IP addressing (IPng). IPv4 has limited address space, no support for complex addressing and routing capacities and cannot provide real-time response.
 
 Like IPv4, IPv6 is also connectionless, the header contains the maximum number of hops a datagram can make before being discarded and other general characteristics are retained, however, it now uses 128-bit addresses ($2^(128)$ total addresses meaning $6 times 10^(23)$ unique addresses per square meter of the Earth's surface), uses a series of fixed-length headers to handle optional information which includes a base header followed by 0 or more extension headers. It allows for real-time traffic (i.e. allows a pair of stations to establish a high quality path between them and all datagrams must pass through this path), increased flexibility#footnote[Addresses do not have defined classes. A prefix length is associated with each address] in addressing (by allowing the concept of `anycast` address where a packet is sent to one of a set of nodes and dynamic assignment of IP addresses).
 
 #figure(
   image("imgs/IPv6-Datagram-Format.png"),
-  caption: [IPv6 Datagram Format]
+  caption: [IPv6 Datagram Format],
 )
 - *Version:* contains the value 6 (4 bits)
 - *Priority:* specifies the routing priority class (8 bits)
@@ -451,7 +451,7 @@ Since an IPv6 address is too long, we use a colon-hexadecimal notation where eac
 An Aggregate Global Unicast Address is the standard type of IPv6 address used for communication across the global internet. These addresses are designed to be unique worldwide and are structured to enable efficient routing and aggregation#footnote[much like how CIDR (Classless Inter-Domain Routing) works in IPv4].
 #figure(
   image("imgs/Aggregate-Global-Unicast-Address-Format.png"),
-  caption: [Aggregate Global Unicast Address Format]
+  caption: [Aggregate Global Unicast Address Format],
 )
 
 IPv4-compatible IPv6 addresses allow IPv6 nodes to communicate over IPv4 networks by embedding an IPv4 address within an IPv6 address. These addresses embed an IPv4 address into the lower 32 bits of an IPv6 address, with the upper 96 bits set to zero. The address is given by `::w.x.y.z` where `w.x.y.z` is the IPv4 address. To send IPv6 packets when the router does not support it, we use *Tunnelling* which is done automatically by the OS kernel IPv4‐compatible IPv6 addresses are used, it uses a IPv4 network for packet delivery.

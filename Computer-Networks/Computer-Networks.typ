@@ -134,7 +134,7 @@ We analyse a topology on the basis of its _degree_, _diameter_, _redundancy_, _s
 
     // Tree
     [*Tree\
-      (Hierarchical)*],
+    (Hierarchical)*],
     [Star networks arranged in hierarchy],
     [Scalable],
     [Failure of root affects large part],

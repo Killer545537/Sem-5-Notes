@@ -1050,7 +1050,7 @@ It is a preemptive scheduling algorithm designed for time-sharing systems. Each 
 The waiting time for each process can be calculated as:
 $
   "Waiting Time" & = "Turnaround Time" - "Burst Time" \
-                 & = "Last Start Time" - "Arrival Time" - ("Preemption" times "Quantum")
+  & = "Last Start Time" - "Arrival Time" - ("Preemption" times "Quantum")
 $
 
 === Multilevel Queue Scheduling
@@ -1159,23 +1159,23 @@ do {
 ]
 Consider,
 #columns(3)[
-    Shared Data,
-    ```c
-    boolen flag = false;
-    int x = 0;
-    ```
-    #colbreak()
-    Process P1,
-    ```c
-    while (!flag); // Busy wait
-    printf("%d", x);
-    ```
-    #colbreak()
-    Process P2,
-    ```c
-    x = 100;
-    flag = true;
-    ```
+  Shared Data,
+  ```c
+  boolen flag = false;
+  int x = 0;
+  ```
+  #colbreak()
+  Process P1,
+  ```c
+  while (!flag); // Busy wait
+  printf("%d", x);
+  ```
+  #colbreak()
+  Process P2,
+  ```c
+  x = 100;
+  flag = true;
+  ```
 ]
 The expected output is `100` (looking at the obvious order), however, if the instructions are reordered, `flag = true` may execute before `x = 100`, leading to the output being `0`. Because of this, Peterson's solution may allow both processes to enter their critical sections simultaneously, violating mutual exclusion.
 
@@ -1298,25 +1298,25 @@ It is a synchronization primitive used to control access to a shared resource by
 - *Signal (V) Operation:* Increments the semaphore value. If there are processes blocked on the semaphore, one of them is unblocked.
 
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    [
-        #codly(header: [Wait (P) Operation])
-        ```c
-        wait(semaphore *S) {
-            while (S <= 0); // Busy wait
-            S--;
-        }
-        ```
-    ],
-    [
-        #codly(header: [Signal (V) Operation])
-        ```c
-        signal(semaphore *S) {
-            S++;
-        }
-        ```
-    ]
+  columns: 2,
+  gutter: 10pt,
+  [
+    #codly(header: [Wait (P) Operation])
+    ```c
+    wait(semaphore *S) {
+        while (S <= 0); // Busy wait
+        S--;
+    }
+    ```
+  ],
+  [
+    #codly(header: [Signal (V) Operation])
+    ```c
+    signal(semaphore *S) {
+        S++;
+    }
+    ```
+  ],
 )
 
 #codly(header: [Memory Barrier using Semaphores])
@@ -1343,32 +1343,32 @@ typedef struct {
 } semaphore;
 ```
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    [
-        #codly(header: [Wait (P) Operation])
-        ```c
-        wait(semaphore *S) {
-            S->value--;
-            if (S->value < 0) {
-                // Add process to S->queue
-                block(); // Block the process
-            }
+  columns: 2,
+  gutter: 10pt,
+  [
+    #codly(header: [Wait (P) Operation])
+    ```c
+    wait(semaphore *S) {
+        S->value--;
+        if (S->value < 0) {
+            // Add process to S->queue
+            block(); // Block the process
         }
-        ```
-    ],
-    [
-        #codly(header: [Signal (V) Operation])
-        ```c
-        signal(semaphore *S) {
-            S->value++;
-            if (S->value <= 0) {
-                // Remove a process from S->queue
-                wakeup(); // Wake up the process
-            }
+    }
+    ```
+  ],
+  [
+    #codly(header: [Signal (V) Operation])
+    ```c
+    signal(semaphore *S) {
+        S->value++;
+        if (S->value <= 0) {
+            // Remove a process from S->queue
+            wakeup(); // Wake up the process
         }
-        ```
-    ]
+    }
+    ```
+  ],
 )
 
 Since semaphores are pretty low level we can run into some problems like:
@@ -1430,28 +1430,28 @@ This is caused by the following four conditions:
 
 Consider the following example with two processes and two resources:
 #grid(
-    columns: 2,
-    gutter: 10pt,
-    [
-        #codly(header: [Process P1])
-        ```c
-        wait(S); // Acquire resource R1
-        wait(Q); // Wait for resource R2
-        // Critical Section
-        signal(Q); // Release resource R2
-        signal(S); // Release resource R1
-        ```
-    ],
-    [
-        #codly(header: [Process P2])
-        ```c
-        wait(Q); // Acquire resource R2
-        wait(S); // Wait for resource R1
-        // Critical Section
-        signal(S); // Release resource R1
-        signal(Q); // Release resource R2
-        ```
-    ]
+  columns: 2,
+  gutter: 10pt,
+  [
+    #codly(header: [Process P1])
+    ```c
+    wait(S); // Acquire resource R1
+    wait(Q); // Wait for resource R2
+    // Critical Section
+    signal(Q); // Release resource R2
+    signal(S); // Release resource R1
+    ```
+  ],
+  [
+    #codly(header: [Process P2])
+    ```c
+    wait(Q); // Acquire resource R2
+    wait(S); // Wait for resource R1
+    // Critical Section
+    signal(S); // Release resource R1
+    signal(Q); // Release resource R2
+    ```
+  ],
 )
 Here, if process P1 acquires resource R1 and process P2 acquires resource R2, both processes will be waiting for each other to release the resources they need, leading to a deadlock.
 
@@ -1474,50 +1474,53 @@ Consider a set of vertices $V$ and edges $E$, where $V = T union R$, where $T = 
 Now, if the graph contains no cycles, then no thread in the system is deadlocked. If the graph contains a cycle and each resource type has only one instance, then a deadlock exists. If the graph contains a cycle and at least one resource type has multiple instances, then a deadlock may exist.
 
 #grid(
-	columns: (1fr, 2fr),
-	gutter: 10pt,
-	figure(
-		image("imgs/Resource-Allocation.png"),
-		caption: [Resource Allocation Graph],
-	),
-	[
-		We have:
-		- One instance of $R_1$
-		- One instance of $R_3$
-		- Two instance of $R_2$
-		- Four instance of $R_4$
-		- $T_1$ holds one instance of $R_1$ and waits for one instance of $R_2$
-		- $T_2$ holds one instance of $R_1$, one instance of $R_2$ and waits for one instance of $R_3$
-		- $T_3$ holds one instance of $R_3$
-	]
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Resource-Allocation.png"),
+    caption: [Resource Allocation Graph],
+  ),
+  [
+    We have:
+    - One instance of $R_1$
+    - One instance of $R_3$
+    - Two instance of $R_2$
+    - Four instance of $R_4$
+    - $T_1$ holds one instance of $R_1$ and waits for one instance of $R_2$
+    - $T_2$ holds one instance of $R_1$, one instance of $R_2$ and waits for one instance of $R_3$
+    - $T_3$ holds one instance of $R_3$
+  ],
 )
 
 #example[Deadlock Detection][
-	#grid(
-		columns: (1fr, 2fr),
-		gutter: 10pt,
-		figure(
-			image("imgs/Resource-Allocation-EX-1.png"),
-		),
-		[
-			Check if the following system is in a deadlock state.
-		]
-	)
+  #grid(
+    columns: (1fr, 2fr),
+    gutter: 10pt,
+    figure(
+      image("imgs/Resource-Allocation-EX-1.png"),
+    ),
+    [
+      Check if the following system is in a deadlock state.
+    ],
+  )
 ]
 #solution[
-	We solve these questions using the following table and writing the processes that can get completed one after the other:
-	#table(
-		columns: 7,
-		align: center,
-		table.header(
-			[], table.cell(colspan: 2)[Allocations], table.cell(colspan: 2)[Request], table.cell(colspan: 2)[Available]
-		),
-		[], [$R_1$], [$R_2$], [$R_1$], [$R_2$], [$R_1$], [$R_2$],
-		$P_1$, [0], [1], [1], [0], [0], [0],
-		$P_2$, [1], [0], [0], [0], [1], [0],
-		$P_3$, [1], [0], [0], [1], [1], [1]
-	)
-	Thus, the correct order will be $P_2 -> P_1 -> P_3$.
+  We solve these questions using the following table and writing the processes that can get completed one after the other:
+  #table(
+    columns: 7,
+    align: center,
+    table.header(
+      [],
+      table.cell(colspan: 2)[Allocations],
+      table.cell(colspan: 2)[Request],
+      table.cell(colspan: 2)[Available],
+    ),
+    [], [$R_1$], [$R_2$], [$R_1$], [$R_2$], [$R_1$], [$R_2$],
+    $P_1$, [0], [1], [1], [0], [0], [0],
+    $P_2$, [1], [0], [0], [0], [1], [0],
+    $P_3$, [1], [0], [0], [1], [1], [1],
+  )
+  Thus, the correct order will be $P_2 -> P_1 -> P_3$.
 ]
 
 == Handling Deadlocks
@@ -1541,17 +1544,17 @@ This requires that the system has some additional a priori information about how
 The simplest (also the most useful) model requires each thread to declare the maximum number of resources of each type that it _may_ need. Then, the deadlock-avoidance-algorithm dynamically examines the resource-allocation state#footnote[It is defined by the number of available and allocated resources and the maximum demands of the process] to ensure that there can never be a circular-wait condition.
 
 #grid(
-	columns: (2fr, 3fr),
-	gutter: 10pt,
-	figure(
-		image("imgs/Safe-Unsafe-Deadlock.png")
-	),
-	definition[Safe State][
-		A system is in a safe state, if $space exists <T_1, T_2, dots.h, T_n>$ of all threads such that $forall T_i$ the resources that $T_i$ can still request can be satisfied by the currently available resources and the resources held by all $T_j$, where $j < i$.
-		- If $T_i$ is not immediately satisfied, then it can wait until all $T_j$ have finished and released their resources
-		- When $T_j$ is finished, $T_i$ can obtain all the resources it needs, execute, and return its allocated resources to the system
-		- When $T_i$ terminates, $T_(i + 1)$ can obtain its needed resources, and so on
-	]
+  columns: (2fr, 3fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Safe-Unsafe-Deadlock.png"),
+  ),
+  definition[Safe State][
+    A system is in a safe state, if $space exists <T_1, T_2, dots.h, T_n>$ of all threads such that $forall T_i$ the resources that $T_i$ can still request can be satisfied by the currently available resources and the resources held by all $T_j$, where $j < i$.
+    - If $T_i$ is not immediately satisfied, then it can wait until all $T_j$ have finished and released their resources
+    - When $T_j$ is finished, $T_i$ can obtain all the resources it needs, execute, and return its allocated resources to the system
+    - When $T_i$ terminates, $T_(i + 1)$ can obtain its needed resources, and so on
+  ],
 )
 
 ==== Resource Allocation Graph Algorithm
@@ -1576,48 +1579,153 @@ Let $n$ be the number of processes and $m$ be the number of resource types. We d
 - *Need*: It is an $n times m$ matrix that indicates the remaining resource needs of each process. It is defined as $"need"[i][j] = "max"[i][j] - "allocation"[i][j]$.
 
 #example[
-	Given the following data structures, find if the system is in a safe state:
-	$
-		"Allocation" &= mat(
-			0, 0, 1, 2;
-			1, 0, 0, 0;
-			1, 3, 5, 4;
-			0, 6, 3, 2;
-			0, 0, 1, 4
-		) \
-		"Max" &= mat(
-			0, 0, 1, 2;
-			1, 7, 5, 0;
-			2, 3, 5, 6;
-			0, 6, 5, 2;
-			0, 6, 5, 6
-		) \
-		"Available" &= [1, 5, 2, 0]
-	$
+  Given the following data structures, find if the system is in a safe state:
+  $
+    "Allocation" & = mat(
+                     0, 0, 1, 2;
+                     1, 0, 0, 0;
+                     1, 3, 5, 4;
+                     0, 6, 3, 2;
+                     0, 0, 1, 4
+                   ) \
+           "Max" & = mat(
+                     0, 0, 1, 2;
+                     1, 7, 5, 0;
+                     2, 3, 5, 6;
+                     0, 6, 5, 2;
+                     0, 6, 5, 6
+                   ) \
+     "Available" & = [1, 5, 2, 0]
+  $
 ]
 #solution[
-	Need to fix this
-	#table(
-		columns: 4*4 + 1,
-		align: center,
-		table.header(
-			[], table.cell(colspan: 4)[*Allocation*], table.cell(colspan: 4)[*Max*], table.cell(colspan: 4)[*Available*], table.cell(colspan: 4)[*Need*]
-		),
-		[], [A], [B], [C], [D], [A], [B], [C], [D], [A], [B], [C], [D], [A], [B], [C], [D],
-		$P_0$, [0], [0], [1], [2], [0], [0], [1], [2], [1], [5], [2], [0], [0], [0], [0], [0],
-		$P_1$, [1], [0], [0], [0], [1], [7], [5], [0], [1], [5], [2], [0], [0], [7], [5], [0],
-		$P_2$, [1], [3], [5], [4], [2], [3], [5], [6], [1], [5], [2], [0], [1], [0], [0], [2],
-		$P_3$, [0], [6], [3], [2], [0], [6], [5], [2], [1], [5], [2], [0], [0], [0], [2], [0],
-		$P_4$, [0], [0], [1], [4], [0], [6], [5], [6], [1], [5], [2], [0], [0], [6], [4], [2]
-	)
-	Thus, we can see that the safe sequence is $P_0 -> P_2 -> P_3 -> P_4 -> P_1$.
+  Need to fix this
+  #table(
+    columns: 4 * 4 + 1,
+    align: center,
+    table.header(
+      [],
+      table.cell(colspan: 4)[*Allocation*],
+      table.cell(colspan: 4)[*Max*],
+      table.cell(colspan: 4)[*Available*],
+      table.cell(colspan: 4)[*Need*],
+    ),
+    [],
+    [A],
+    [B],
+    [C],
+    [D],
+    [A],
+    [B],
+    [C],
+    [D],
+    [A],
+    [B],
+    [C],
+    [D],
+    [A],
+    [B],
+    [C],
+    [D],
+
+    $P_0$,
+    [0],
+    [0],
+    [1],
+    [2],
+    [0],
+    [0],
+    [1],
+    [2],
+    [1],
+    [5],
+    [2],
+    [0],
+    [0],
+    [0],
+    [0],
+    [0],
+
+    $P_1$,
+    [1],
+    [0],
+    [0],
+    [0],
+    [1],
+    [7],
+    [5],
+    [0],
+    [1],
+    [5],
+    [2],
+    [0],
+    [0],
+    [7],
+    [5],
+    [0],
+
+    $P_2$,
+    [1],
+    [3],
+    [5],
+    [4],
+    [2],
+    [3],
+    [5],
+    [6],
+    [1],
+    [5],
+    [2],
+    [0],
+    [1],
+    [0],
+    [0],
+    [2],
+
+    $P_3$,
+    [0],
+    [6],
+    [3],
+    [2],
+    [0],
+    [6],
+    [5],
+    [2],
+    [1],
+    [5],
+    [2],
+    [0],
+    [0],
+    [0],
+    [2],
+    [0],
+
+    $P_4$,
+    [0],
+    [0],
+    [1],
+    [4],
+    [0],
+    [6],
+    [5],
+    [6],
+    [1],
+    [5],
+    [2],
+    [0],
+    [0],
+    [6],
+    [4],
+    [2],
+  )
+  Thus, we can see that the safe sequence is $P_0 -> P_2 -> P_3 -> P_4 -> P_1$.
 ]
 
 The safe state algorithm works as follows:
 + Let Work and Finish be vectors of length m and n respectively. Initialize Work = Available and Finish[i] = false for all i.
 + Find an index i such that both: (go to step 3 if no such i exists)
-   - Finish[i] == false
-   - Need[i] <= Work
+  - Finish[i] == false
+  - Need[i] <= Work
 + Work = Work + Allocation[i]; Finish[i] = true; go to step 2.
 + If Finish[i] == true for all i, then the system is in a safe state.
 
@@ -1643,11 +1751,11 @@ Here, we use a similar approach to the banker's algorithm. We maintain the follo
 The deadlock detection algorithm works as follows:
 + Let Work and Finish be vectors of length m and n respectively. Initialize Work = Available and Finish[i] = false for all i.
 + Find an index i such that both: (go to step 3 if no such i exists)
-   - Finish[i] == false
-   - Request[i] <= Work
+  - Finish[i] == false
+  - Request[i] <= Work
 + Work = Work + Allocation[i]; Finish[i] = true; go to step 2.
 + If Finish[i] == false for some i, then process $P_i$ is deadlocked.
-The time complexity of this algorithm is $O(m  n^2)$ since each process may need to be examined multiple times.
+The time complexity of this algorithm is $O(m n^2)$ since each process may need to be examined multiple times.
 
 === Deadlock Recovery
 
@@ -1676,14 +1784,71 @@ It involves organising and controlling computer memory, allocating space to proc
 The authorised memory region of a program is defined by the base register and the limit register. The $("base", "limit")$ register pairs define the logical address space of a process.
 
 #grid(
-	columns: (1fr, 2fr),
-	gutter: 10pt,
-	figure(
-		image("imgs/Hardware-Address-Protection.png"),
-		caption: [Hardware Address Protection],
-	),
-	[
-		When a process generates a logical address, the base register is added to the logical address to produce the physical address. The limit register is used to check if the logical address is within the authorised memory region of the process. If the logical address is greater than or equal to the limit register, a memory protection violation occurs, and the process is terminated.
-	]
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Hardware-Address-Protection.png"),
+    caption: [Hardware Address Protection],
+  ),
+  [
+    When a process generates a logical address, the base register is added to the logical address to produce the physical address. The limit register is used to check if the logical address is within the authorised memory region of the process. If the logical address is greater than or equal to the limit register, a memory protection violation occurs, and the process is terminated.
+  ],
 )
 The actual instructions to load the base and limit registers are privileged instructions#footnote[accessible only by the OS kernel].
+
+== Address Binding
+
+#grid(
+  columns: (1fr, 2.5fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Address-Binding.png"),
+  ),
+  [
+    It is the process of mapping logical addresses generated by a program to physical addresses in main memory. There are three main stages of address binding:
+    - *Compile Time Binding:* If the memory location where the process will reside is known at compile time, then the compiler can generate absolute code. The disadvantage is that the process cannot be moved in memory during execution.
+    - *Load Time Binding:* If the memory location is not known at compile time, then the compiler generates relocatable code. The final binding is delayed until load time when the process is loaded into memory. The disadvantage is that the process cannot be moved in memory during execution.
+    - *Execution Time Binding:* If the process can be moved during its execution from one memory segment to another, then binding must be delayed until run time. This requires hardware support for address mapping, typically through the use of a memory management unit (MMU)#footnote[More later].
+  ],
+)
+
+== Virtual Memory
+
+It is a concept that allows programs to use more memory than is physically available in the system. It creates an illusion for users of a very large (main) memory.
+
+This is done by mapping logical/virtual addresses to physical addresses by the OS. These are the exact same in compile-time and load-time execution time address binding schemes, but differ in execution-time binding scheme.
+
+== Memory Management Unit (MMU)
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/MMU.png"),
+  ),
+  [
+    It is a hardware device that maps virtual addresses to physical addresses at run time. It is typically implemented as a part of the CPU and works in conjunction with the operating system to provide memory protection and address translation.
+  ],
+)
+
+A very simple address mapping scheme is to use a single base register#footnote[This is generally called the relocation register, obviously] that holds the starting physical address of the process in memory. The virtual address generated by the process is added to the base register to produce the physical address.
+$
+  "Physical Address" = "Base Register" + "Virtual Address"
+$
+
+
+== Dynamic Loading and Linking
+
+#definition[Dynamic Loading][
+  It is a technique where a program is loaded into memory only when it is needed during execution, rather than loading the entire program at once. This allows for more efficient use of memory and can reduce the initial load time of a program.
+]
+The OS loads the routine#footnote[Kept in a reloacatable load format on disk] from disk into memory when it is called for the first time.
+
+It is technically not an OS thing and more of a program design, but the OS can provide support for it.
+
+#definition[Dynamic Linking][
+  It is a technique where a program is linked to shared libraries at runtime rather than at compile time. This allows for more efficient use of memory and can reduce the size of the executable file.
+]
+When a program calls a function in a dynamic library, a stub#footnote[Small piece of code] is used. If the routine is loaded, the stub replaces itself with the address of the routine and jumps to it. If the routine is not loaded, the stub requests the OS to load the routine into memory, updates itself with the address of the routine, and then jumps to it.
+
+It is particularly useful for system libraries#footnote[Called shared libraries or dynamic link libraries (DLLs)] that are used by multiple programs.

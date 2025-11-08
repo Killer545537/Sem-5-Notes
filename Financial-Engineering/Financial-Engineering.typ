@@ -196,7 +196,9 @@ $ "Present value of cash received at t" = P_t $
 thus the duration is given as,
 $ D = (sum P_t t)/(sum P_t) in [t_0, t_n] $
 If we find the present values $P_t$ via the yield (for bonds), then this duration is called the Macaulay Duration,
-$ D_M = (sum_(t=0)^n t (c_t)/(1+y')^t + (n F)/(1+ y')^t)/(sum c_t/(1+y')^t + F/(1+y')^n) quad (y'=y/n) $
+$
+  D_M = (sum_(t=0)^n t (c_t)/(1+y')^t + (n F)/(1+ y')^t)/(sum c_t/(1+y')^t + F/(1+y')^n) quad (y'=y/n)
+$
 Obviously#footnote[Actually magic] this simplifies to,
 $ D_M = (1 + y)/(n y) - (1 + y + n ( c - y))/(m c[(1 + y)^n - 1] + m y) $
 
@@ -354,10 +356,10 @@ Thus, the futures price at time $n$ is the same as the forward price at time $n$
         [$f(n, T)$],
         [*Cash Flow*],
         [*Margin - 1\
-          (Beginning of Day)*],
+        (Beginning of Day)*],
         [*Payment*],
         [*Margin - 2\
-          (End of Day)*],
+        (End of Day)*],
       ),
       [0], [140], [], [], [-14], [14],
       [1], [138], [-2], [12], [0], [12],
@@ -558,8 +560,8 @@ $
 Since the future value of the portfolio must equal the future value of the option, we have
 
 $
-                                                V_p(T) & = C(T) \
-                       a R B(0) + b u S(0) = C_u space & and space a R B(0) + b d S(0) = C_d \
+  V_p(T) & = C(T) \
+  a R B(0) + b u S(0) = C_u space & and space a R B(0) + b d S(0) = C_d \
   therefore a = (u C_d - d C_u)/(R (u - d) B(0)) space & and space b = (C_u - C_d)/(S(0) (u - d))
 $
 
@@ -671,30 +673,30 @@ $
 #proof[
   Let $R >= u > d$, then we construct a portfolio, $p = (a = -1/(S(0)), b = 1/(B(0)))$.
   $
-    V_p(0) & = a B(0) + b S(0) = 0 \
-    V_p(T) & = cases(
-      -u/(S(0)) S(0) + R/(B(0)) B(0) = R - u >= 0 "with" p,
-      -d/(S(0)) S(0) + R/(B(0)) B(0) = R - d >= 0 "with" 1 - p,
-    ) \
-    & = cases(
-      R - u > 0 "with" p,
-      R - d >= 0 "with" 1 - p,
-    ) \
+              V_p(0) & = a B(0) + b S(0) = 0 \
+              V_p(T) & = cases(
+                         -u/(S(0)) S(0) + R/(B(0)) B(0) = R - u >= 0 "with" p,
+                         -d/(S(0)) S(0) + R/(B(0)) B(0) = R - d >= 0 "with" 1 - p,
+                       ) \
+                     & = cases(
+                         R - u > 0 "with" p,
+                         R - d >= 0 "with" 1 - p,
+                       ) \
     therefore V_p(T) & >= 0 "with absolute certainty"
   $
   Thus, we have an arbitrage opportunity which violates the no arbitrage principle.
 
   Let $u > d >= R$, then we construct a portfolio, $p = (a = 1/(S(0)), b = -1/(B(0)))$.
   $
-    V_p(0) & = a B(0) + b S(0) = 0 \
-    V_p(T) & = cases(
-      u/(S(0)) S(0) - R/(B(0)) B(0) = u - R >= 0 "with" p,
-      d/(S(0)) S(0) - R/(B(0)) B(0) = d - R >= 0 "with" 1 - p,
-    ) \
-    & = cases(
-      u - R >= 0 "with" p,
-      d - R > 0 "with" 1 - p,
-    ) \
+              V_p(0) & = a B(0) + b S(0) = 0 \
+              V_p(T) & = cases(
+                         u/(S(0)) S(0) - R/(B(0)) B(0) = u - R >= 0 "with" p,
+                         d/(S(0)) S(0) - R/(B(0)) B(0) = d - R >= 0 "with" 1 - p,
+                       ) \
+                     & = cases(
+                         u - R >= 0 "with" p,
+                         d - R > 0 "with" 1 - p,
+                       ) \
     therefore V_p(T) & >= 0 "with absolute certainty"
   $
   Thus, we have an arbitrage opportunity which violates the no arbitrage principle.
@@ -743,14 +745,14 @@ Where $k in [1, n]$ and $E_k$ follows the Bernoulli distribution#footnote[We rem
 
 The stock price at $T$ is given by,
 $
-  S(T) &= S(0) product_(k=1)^n E_k \
-  => ln S(T) &= ln S(0) + H quad (H = sum_(k=1)^n ln E_k)
+        S(T) & = S(0) product_(k=1)^n E_k \
+  => ln S(T) & = ln S(0) + H quad (H = sum_(k=1)^n ln E_k)
 $
 
 #thmbox(numbering: none, title: "Useful Results", variant: "")[
   $
-    E[ln E_k] &= p ln u + (1 - p) ln d \
-    "Var"(ln E_k) &= p (1 - p) (ln u - ln d)^2 \
+        E[ln E_k] & = p ln u + (1 - p) ln d \
+    "Var"(ln E_k) & = p (1 - p) (ln u - ln d)^2 \
   $
   Thus we see that $ln E_k$ follows,
   $
@@ -768,7 +770,7 @@ $
 $
 Thus, we also see that,
 $
-  ln E_k &= sigma sqrt(Delta t) Z_k + mu Delta t \
+         ln E_k & = sigma sqrt(Delta t) Z_k + mu Delta t \
   => sum ln E_k & = sigma sqrt(Delta t) Y_k + mu T quad (Y_k = sum Z_k)
 $
 Here, $Y_k$ is a simple random walk.
@@ -810,26 +812,26 @@ Since, we were pretty stupid back then, we used $R(T) = (S(T) - S(T-1))/S(T-1)$ 
 
 Using,
 $
-  E[ln E_k] = p ln u + (1 - p) ln d &= mu Delta t \
-  "Var"(ln E_k) = p (1 - p) (ln u - ln d)^2 &= sigma^2 Delta t \
+          E[ln E_k] = p ln u + (1 - p) ln d & = mu Delta t \
+  "Var"(ln E_k) = p (1 - p) (ln u - ln d)^2 & = sigma^2 Delta t \
 $
 
 Assume#footnote[*This is a pretty big assumption*],
 $
-  u d &= 1 \
-  => ln u + ln d &= 0 \
-  therefore U + D &= 0 \
+              u d & = 1 \
+   => ln u + ln d & = 0 \
+  therefore U + D & = 0 \
 $
 
 Using the above assumption, we get,
 $
-  U^2 &= (mu Delta t)^2 + sigma^2 Delta t \
-  p &= 1/2 ((mu Delta t)/U + 1)
+  U^2 & = (mu Delta t)^2 + sigma^2 Delta t \
+    p & = 1/2 ((mu Delta t)/U + 1)
 $
 For sufficiently large $n$, we can use $(Delta t)^2 approx 0$, thus,
 $
-  U &= sigma sqrt(Delta t) \
-  p &= 1/2 (mu/sigma sqrt(Delta t) + 1)
+  U & = sigma sqrt(Delta t) \
+  p & = 1/2 (mu/sigma sqrt(Delta t) + 1)
 $
 #footnote[It is to be noted that the above $p$ is not the RNPM but the actual probability of going up]
 Thus, we can see that the CRR Model is a multi-period binomial lattice model with the up and down factors $u$ and $d$ respectively.
@@ -855,14 +857,14 @@ $
 $
 Clearly, $E[Y_k] = p$ and $"Var"[Y_k] = p (1 - p)$, hence#footnote[Pretty obvious tbh, just put $n -> infinity$ for variance],
 $
-  E[ln S(T)/S(0)] &= mu T \
-  "Var"[ln S(T)/S(0)] &= sigma^2 T \
+      E[ln S(T)/S(0)] & = mu T \
+  "Var"[ln S(T)/S(0)] & = sigma^2 T \
 $
 Thus, we see that $ln S(T)/S(0) tilde N(mu T, sigma^2 T)$ under market probability measure $p$.
 
 However, this is not the risk-neutral probability measure we need to price this shit. The RNPM is given by,
 $
-  hat(p) &= (R - d)/(u - d)
+  hat(p) & = (R - d)/(u - d)
 $
 where $u = e^(sigma sqrt(Delta t)$, $d = u^(-1)$ and $R = e^(r Delta t)$. Plugging the first order approximations, we get,
 $
@@ -870,8 +872,8 @@ $
 $
 Again, finding the mean and variance of the log return using RNPM we have,
 $
-  E[ln S(T)/S(0)] &= (r - sigma^2/2) T \
-  "Var"[ln S(T)/S(0)] &= sigma^2 T \
+      E[ln S(T)/S(0)] & = (r - sigma^2/2) T \
+  "Var"[ln S(T)/S(0)] & = sigma^2 T \
 $
 Thus, we see that $ln S(T)/S(0) tilde N((r - sigma^2/2) T, sigma^2 T)$ under risk neutral probability measure $hat(p)$.
 
@@ -921,10 +923,10 @@ This however, does not work for American options. But, does work for European op
 
 Now, like the good boys we are, we will try to maximize the return of our portfolio while minimizing the risk. Portfolio optimization is a way to construct a portfolio using optimization techniques to achieve specific investment goals, such as maximizing returns or minimizing risk. Thus, simply speaking it is an optimisation problem of the type,
 $
-  &"Minimize Risk of Portfolio"\
-  &"Maximize Return of Portfolio"\
-  &"subject to"\
-  &"  Limited Resources and other goals"
+  & "Minimize Risk of Portfolio" \
+  & "Maximize Return of Portfolio" \
+  & "subject to" \
+  & "  Limited Resources and other goals"
 $
 
 #definition[Risk][
@@ -933,7 +935,7 @@ $
 
 The return is defined as,
 $
-  "Absolute Return" = X_1 - X_0 med or med  "Relative Return" = X_1/X_0 med or med "Rate of Return" = (X_1 - X_0)/X_0
+  "Absolute Return" = X_1 - X_0 med or med "Relative Return" = X_1/X_0 med or med "Rate of Return" = (X_1 - X_0)/X_0
 $
 
 #definition[Portfolio][
@@ -977,13 +979,13 @@ $
 
 The return of a portfolio is given by $E[R]$ or $E[r]$,
 $
-  E[r] &= E[sum w_i r_i] \
-  &= sum w_i E[r_i] \
-  &= sum w_i mu_i quad (E[r_i] = mu_i)
+  E[r] & = E[sum w_i r_i] \
+       & = sum w_i E[r_i] \
+       & = sum w_i mu_i quad (E[r_i] = mu_i)
 $
 The risk of a portfolio is given by its variance,
 $
-  "Var"[sum w_i r_i] &= sum w_i^2 sigma_i ^2 + 2 sum_(i < j) w_i w_j sigma_(i j) quad ("Var"[X_i] = sigma_i ^2 and "Cov"[X_i, X_j] = sigma_(i j) ^2)
+  "Var"[sum w_i r_i] &= sum w_i^2 sigma_i^2 + 2 sum_(i < j) w_i w_j sigma_(i j) quad ("Var"[X_i] = sigma_i^2 and "Cov"[X_i, X_j] = sigma_(i j)^2)
 $
 
 == Diversification
@@ -1000,8 +1002,8 @@ Clearly, from experience we can say that diversification can reduce the risk of 
 
 Consider assets that are uncorrelated#footnote[If $X_i$ and $X_j$ are uncorrelated, then $"Cov"[X_i, X_j] = 0$, however, the converse is not true] in nature, i.e. $"Cov"[X_i, X_j] = 0 space forall i, j$. Say#footnote[This is said to be a naive portfolio with equal weights to all assets] $w_i = 1/n$, $sigma_i^2 = sigma^2$ and $mu_i = mu$ for all $i$. Thus,
 $
-  E[r] &= mu \
-  "Var"[r] &= sigma^2/n => lim_(n -> infinity) "Var"[r] = 0
+      E[r] & = mu \
+  "Var"[r] & = sigma^2/n => lim_(n -> infinity) "Var"[r] = 0
 $
 And thus, we can see that diversification reduces the risk of the portfolio.
 
@@ -1036,7 +1038,7 @@ Looking at the extremeties of $rho$, we see that,
   $
 #figure(
   image("imgs/Portfolio-Diagram.png", height: 20%),
-  caption: [Digram of Portfolio with Two Assets]
+  caption: [Digram of Portfolio with Two Assets],
 )
 
 We can extend this to multiple assets and plot the efficient frontier.
@@ -1045,9 +1047,9 @@ We can extend this to multiple assets and plot the efficient frontier.
 
 This model basically asks the question,
 $
-    "Min" & "Var"[sum w_i r_i] = sum_(i > j) w_i w_j sigma_(i j) \
-    "subject to" & E[sum w_i r_i] = sum w_i mu_i = R^* \
-    & sum w_i = 1
+         "Min" & "Var"[sum w_i r_i] = sum_(i > j) w_i w_j sigma_(i j) \
+  "subject to" & E[sum w_i r_i] = sum w_i mu_i = R^* \
+               & sum w_i = 1
 $
 If short selling is allowed, $w_i in bb(R)$, otherwise $w_i in [0, 1]$.
 
@@ -1055,50 +1057,54 @@ If short selling is allowed, $w_i in bb(R)$, otherwise $w_i in [0, 1]$.
 
 Consider an $n$ asset portfolio,
 $
-    "Var"[sum w_i r_i] = bold(w)^T Sigma bold(w) quad (bold(w) = mat(delim: "[",w_1; w_2; dots.v; w_n))
+  "Var"[sum w_i r_i] = bold(w)^T Sigma bold(w) quad (bold(w) = mat(delim: "[", w_1; w_2; dots.v; w_n))
 $
 where, $Sigma$ is the variance-covariance matrix, $Sigma = mat(delim: "[", sigma_(i j))_(n times n)$. By definition#footnote[A matrix is said to be positive definite if $forall x$, $bold(x)^T A bold(x) >= 0$], $Sigma$ is a symmetric positive definite square matrix in the quadratic form#footnote[This is also an interesting fact].
 
-#thmbox(numbering: none, title: "Interesting Facts about Markowitz Model ✨", variant: "")[
-    - It is a quadratic programming problem thus, it has a unique global minimum
-    - It has linear constraints
-    - It has two input vectors, $bold(mu)$ and $Sigma$
+#thmbox(
+  numbering: none,
+  title: "Interesting Facts about Markowitz Model ✨",
+  variant: "",
+)[
+  - It is a quadratic programming problem thus, it has a unique global minimum
+  - It has linear constraints
+  - It has two input vectors, $bold(mu)$ and $Sigma$
 ]
 
 ==== Two Asset Portfolio
 $
-    "Min" & 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) \
-    "subject to" & mu_1 w_1 + mu_2 w_2 = R^* \
-    & w_1 + w_2 = 1
+         "Min" & 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) \
+  "subject to" & mu_1 w_1 + mu_2 w_2 = R^* \
+               & w_1 + w_2 = 1
 $
 Using Lagrange multipliers, we have,
 $
-    L(w_1, w_2; lambda_1, lambda_2) = 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) - lambda_1 (mu_1 w_1 + mu_2 w_2 - R^*) - lambda_2 (w_1 + w_2 - 1)
+  L(w_1, w_2; lambda_1, lambda_2) = 1/2 (sigma_1^2 w_1 + sigma_2^2 w_2 + 2 sigma_(1 2) w_1 w_2) - lambda_1 (mu_1 w_1 + mu_2 w_2 - R^*) - lambda_2 (w_1 + w_2 - 1)
 $
 Solving the following system of equations gives us a unique optimal solution,
 #columns(2)[
-    $
-        pdv(L, w_1) &= 0 \
-        pdv(L, w_2) &= 0
-    $
-    #colbreak()
-    $
-        pdv(L, lambda_1) &= 0 \
-        pdv(L, lambda_2) &= 0
-    $
+  $
+    pdv(L, w_1) & = 0 \
+    pdv(L, w_2) & = 0
+  $
+  #colbreak()
+  $
+    pdv(L, lambda_1) & = 0 \
+    pdv(L, lambda_2) & = 0
+  $
 ]
 $
-    mu_1 w_1 + mu_2 w_2 &= R^* \
-    w_1 + w_2 &= 1
+  mu_1 w_1 + mu_2 w_2 & = R^* \
+            w_1 + w_2 & = 1
 $
 
 ==== N Asset Portfolio
 
 Consider the general $n$ asset portfolio with weights $bold(w)_(n times 1)$ and the two lagrange multipliers $lambda_1$ and $lambda_2$ having mean return $R^*$. Thus,
 $
-    sum_(j = 1)^n sigma_(i j) w_j - lambda_1 mu_i - lambda_2 &= 0 quad forall i in [1, n] \
-    sum w_i mu_i &= R^* \
-    sum w_i &= 1 \
+  sum_(j = 1)^n sigma_(i j) w_j - lambda_1 mu_i - lambda_2 &= 0 quad forall i in [1, n] \
+  sum w_i mu_i &= R^* \
+  sum w_i &= 1 \
 $
 i.e., $n + 2$ equations with $n + 2$ variables which can be solved to get a unique optimal solution trivially.
 
@@ -1106,10 +1112,10 @@ i.e., $n + 2$ equations with $n + 2$ variables which can be solved to get a uniq
 
 This simply adds one simple constraint to the problem#footnote[Which kinda makes it impossible to solve by hand],
 $
-    "Min" & 1/2 sum sigma_(i j) w_i w_j\
-    "subject to" & sum mu_i w_i = R^* \
-    & sum w_i = 1 \
-    & w_i >= 0
+         "Min" & 1/2 sum sigma_(i j) w_i w_j \
+  "subject to" & sum mu_i w_i = R^* \
+               & sum w_i = 1 \
+               & w_i >= 0
 $
 
 == The Capital Asset Pricing Model (CAPM)
@@ -1119,8 +1125,8 @@ $
 ]
 If the market portfolio $M$ is efficient, the expected return $overline(r_i)$ of any asset $i$ satisfies,
 $
-    overline(r_i) - r_f &= beta_i (overline(r_M) - r_f) \
-    r_i - r_f &= beta_i (r_M - r_f) + epsilon_i
+  overline(r_i) - r_f & = beta_i (overline(r_M) - r_f) \
+            r_i - r_f & = beta_i (r_M - r_f) + epsilon_i
 $
 where,
 - $r_f$ is the risk-free rate of return
@@ -1130,16 +1136,16 @@ where,
 This formula indicates how the return of an asset is related to the overall market return, adjusted for the asset's sensitivity to market movements (beta) and the risk-free rate.
 
 #definition[$beta$ of a Portfolio][
-    If $beta_i$ is the $beta$ of the $i^"th"$ asset, then the $beta$ of the portfolio is,
-    $
-        beta = sum w_i beta_i
-    $
+  If $beta_i$ is the $beta$ of the $i^"th"$ asset, then the $beta$ of the portfolio is,
+  $
+    beta = sum w_i beta_i
+  $
 ]
 
 Looking at the variance in the error term, we see that,
 $
-    "Var"[r_i] &= "Var"[r_f + beta_i (r_M - r_f) + epsilon_i]
-    &= beta_i^2 sigma_M^2 + sigma_(epsilon_i)^2
+  "Var"[r_i] &= "Var"[r_f + beta_i (r_M - r_f) + epsilon_i]
+  &= beta_i^2 sigma_M^2 + sigma_(epsilon_i)^2
 $
 Thus, it clear that there are two types of risks associated with an asset:
 - Systematic Risk#footnote[Also called market risk, it is the inherent risk that affects the entire market or a particular segment of the market. It is non-diversifiable], which is represented by $beta_i^2 sigma_M^2$
@@ -1152,37 +1158,37 @@ Variance is the most popular optimisation criterion, but not the only one. We wi
 The Mean Absolute Deviation (MAD) Model#footnote[It is also called the $bold(L_1)$ Model, since it uses the $L_1$ norm] aims to minimize the mean absolute deviation of portfolio returns.
 The MAD is given by,
 $
-	E[abs(r - E[r])] &= E[abs(sum w_i r_i - sum w_i mu_i)] = E[abs(sum w_i (r_i - mu_i))] \
-	&= sum_t abs(sum w_i (r_(i t) - mu_i)) P_t quad (P_t = "Pr"(sum r_i w_i = sum r_(i t)w_i))
+  E[abs(r - E[r])] &= E[abs(sum w_i r_i - sum w_i mu_i)] = E[abs(sum w_i (r_i - mu_i))] \
+  &= sum_t abs(sum w_i (r_(i t) - mu_i)) P_t quad (P_t = "Pr"(sum r_i w_i = sum r_(i t)w_i))
 $
 The optimization problem is formulated as,
 $
-	"Min" & E[abs(r - E[r])] \
-	"subject to" & E[r] = R^* \
-	& sum w_i = 1 \
+         "Min" & E[abs(r - E[r])] \
+  "subject to" & E[r] = R^* \
+               & sum w_i = 1 \
 $
 But, this is kinda terrible as it is not linear#footnote[Due to the $abs(x)$ which is non-linear, but convex which is nice since it assures us that there is a global minima]. However, we can linearize it by introducing auxiliary variables.
 
 #thmbox(numbering: none, title: "Good to Know ✨", variant: "")[
-	To linearize the absolute value function $abs(x)$, we can introduce an auxiliary variable $d$ such that,
-	$
-		abs(x) &= "max"{x, -x} = d \
-		=> d >= x thin &and thin d >= -x
-	$
-	Thus, we can replace $abs(x)$ with $d$ and add the constraints $d >= x$ and $d >= -x$ to the optimization problem, i.e.,
-	$
-		"Min" abs(x) => "Min" d\
-		"subject to" & d >= x\
-		& d >= -x
-	$
+  To linearize the absolute value function $abs(x)$, we can introduce an auxiliary variable $d$ such that,
+  $
+            abs(x) & = "max"{x, -x} = d \
+    => d >= x thin & and thin d >= -x
+  $
+  Thus, we can replace $abs(x)$ with $d$ and add the constraints $d >= x$ and $d >= -x$ to the optimization problem, i.e.,
+  $
+    "Min" abs(x) => "Min" d \
+               "subject to" & d >= x \
+                            & d >= -x
+  $
 ]
 Thus, the MAD optimization problem can be reformulated as,
 $
-	"Min" & sum_t d_t P_t \
-	"subject to" & sum w_i mu_i = R^* \
-	& sum w_i = 1 \
-	& d_t >= sum w_i (r_(i t) - mu_i) thin forall t \
-	& d_t >= -sum w_i (r_(i t) - mu_i) thin forall t \
+         "Min" & sum_t d_t P_t \
+  "subject to" & sum w_i mu_i = R^* \
+               & sum w_i = 1 \
+               & d_t >= sum w_i (r_(i t) - mu_i) thin forall t \
+               & d_t >= -sum w_i (r_(i t) - mu_i) thin forall t \
 $
 And voila, we have a linear optimization problem with $2 T + 2$ constraints and $n + T$ variables.
 
@@ -1192,38 +1198,38 @@ This is better than the Markowitz model#footnote[$"MAD" arrow "Var"$ for normal 
 
 The Minimax Model#footnote[It is also called the $bold(L_infinity)$ Model, since it uses the $L_infinity$ norm] aims to minimize the maximum possible loss of the portfolio. The optimization problem is formulated as,
 $
-	"Max" & "Min" y_t \
-	"subject to" & E[r] = R^* \
-	& sum w_i = 1 \
+         "Max" & "Min" y_t \
+  "subject to" & E[r] = R^* \
+               & sum w_i = 1 \
 $
 Where, $y_t$ is the return of the portfolio in the $t^"th"$ scenario. The problem can also be stated with $"Min" "Max" "Loss"$ since $"Loss" = -"Return"$.
 
 Again, this is kinda terrible as it is not linear#footnote[Due to the $"Min"(x)$ which is non-linear, but convex which is nice since it assures us that there is a global minima]. However, we can linearize it by introducing an auxiliary variable.
 
 $
-	y = min_t y_t => y <= y_t thin forall t \
+  y = min_t y_t => y <= y_t thin forall t \
 $
 Thus, the Minimax optimization problem can be reformulated as,
 $
-	"Max" & y \
-	"subject to" & sum w_i mu_i = R^* \
-	& sum w_i = 1 \
-	& y <= sum w_i r_(i t) thin forall t \
+         "Max" & y \
+  "subject to" & sum w_i mu_i = R^* \
+               & sum w_i = 1 \
+               & y <= sum w_i r_(i t) thin forall t \
 $
 Yay! We have a linear optimization problem with $T + 2$ constraints and $n + 1$ variables.#footnote[The Minimax Model, the MAD Model and the Variance Model are equivalent for a normal distribution]
 
 == Value at Risk Model
 
 #definition[Value at Risk (VaR)][
-	Value at Risk (VaR) is a statistical measure used to assess the potential loss in value of a portfolio over a defined period for a given confidence interval. It provides an estimate of the maximum expected loss that an investor might face under normal market conditions.
+  Value at Risk (VaR) is a statistical measure used to assess the potential loss in value of a portfolio over a defined period for a given confidence interval. It provides an estimate of the maximum expected loss that an investor might face under normal market conditions.
 
-	$
-		"Pr"(l <= "VaR"_alpha) >= alpha
-	$
-	where l is the loss over the specified time period and $alpha in [0, 1]$.
-	It is also given by,
-	$
-		"VaR"_alpha = min {l in bb(R) | "Pr"(l_x <= l) >= alpha}
-	$
+  $
+    "Pr"(l <= "VaR"_alpha) >= alpha
+  $
+  where l is the loss over the specified time period and $alpha in [0, 1]$.
+  It is also given by,
+  $
+    "VaR"_alpha = min {l in bb(R) | "Pr"(l_x <= l) >= alpha}
+  $
 ]
 VaR at $95 percent$ is the value that every bank needs to keep as a buffer against potential losses.

@@ -29,7 +29,7 @@ Soft computing#footnote[Hard computing on the other hand uses precise, determini
   [*Input Data*], [Precise], [Inexact],
   [*Problem Type*], [Structured], [Complex],
   [*Tolerance to \
-    Uncertainty*],
+  Uncertainty*],
   [Low],
   [High],
 
@@ -122,9 +122,14 @@ The rough set boundary region is $overline(R)(X) - underline(R)(X)$ which contai
   columns: 3,
   align: center,
   table.header([*Feature*], [*Rough Sets*], [*Fuzzy Sets*]),
-  [*Uncertainty Type*], [Vagueness from _indiscernibility_], [Vagueness via _partial truth_],
+  [*Uncertainty Type*],
+  [Vagueness from _indiscernibility_],
+  [Vagueness via _partial truth_],
+
   [*Membership*], [Only set boundaries], [Degree of membership $in [0, 1]$],
-  [*Data Dependency*], [Based on _data relations_], [Based on _membership functions_],
+  [*Data Dependency*],
+  [Based on _data relations_],
+  [Based on _membership functions_],
 )
 
 Rough sets are used in data mining for feature selection and rule generation. #footnote[We also use optimization techniques like PSO, GA in soft computing but since I am not a bitch I won't write this here]
