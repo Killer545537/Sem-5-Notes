@@ -1144,3 +1144,86 @@ $
 Thus, it clear that there are two types of risks associated with an asset:
 - Systematic Risk#footnote[Also called market risk, it is the inherent risk that affects the entire market or a particular segment of the market. It is non-diversifiable], which is represented by $beta_i^2 sigma_M^2$
 - Unsystematic Risk#footnote[Also called specific risk, it is the risk that is specific to a particular company or industry. It is diversifiable], which is represented by $sigma_(epsilon_i)^2$
+
+Variance is the most popular optimisation criterion, but not the only one. We will now look at some other criteria.
+
+== MAD Model
+
+The Mean Absolute Deviation (MAD) Model#footnote[It is also called the $bold(L_1)$ Model, since it uses the $L_1$ norm] aims to minimize the mean absolute deviation of portfolio returns.
+The MAD is given by,
+$
+	E[abs(r - E[r])] &= E[abs(sum w_i r_i - sum w_i mu_i)] = E[abs(sum w_i (r_i - mu_i))] \
+	&= sum_t abs(sum w_i (r_(i t) - mu_i)) P_t quad (P_t = "Pr"(sum r_i w_i = sum r_(i t)w_i))
+$
+The optimization problem is formulated as,
+$
+	"Min" & E[abs(r - E[r])] \
+	"subject to" & E[r] = R^* \
+	& sum w_i = 1 \
+$
+But, this is kinda terrible as it is not linear#footnote[Due to the $abs(x)$ which is non-linear, but convex which is nice since it assures us that there is a global minima]. However, we can linearize it by introducing auxiliary variables.
+
+#thmbox(numbering: none, title: "Good to Know ✨", variant: "")[
+	To linearize the absolute value function $abs(x)$, we can introduce an auxiliary variable $d$ such that,
+	$
+		abs(x) &= "max"{x, -x} = d \
+		=> d >= x thin &and thin d >= -x
+	$
+	Thus, we can replace $abs(x)$ with $d$ and add the constraints $d >= x$ and $d >= -x$ to the optimization problem, i.e.,
+	$
+		"Min" abs(x) => "Min" d\
+		"subject to" & d >= x\
+		& d >= -x
+	$
+]
+Thus, the MAD optimization problem can be reformulated as,
+$
+	"Min" & sum_t d_t P_t \
+	"subject to" & sum w_i mu_i = R^* \
+	& sum w_i = 1 \
+	& d_t >= sum w_i (r_(i t) - mu_i) thin forall t \
+	& d_t >= -sum w_i (r_(i t) - mu_i) thin forall t \
+$
+And voila, we have a linear optimization problem with $2 T + 2$ constraints and $n + T$ variables.
+
+This is better than the Markowitz model#footnote[$"MAD" arrow "Var"$ for normal distribution] in terms of computational efficiency, as it is linear, has less inputs and does not need to calculate $Sigma$, but it is not as popular as the Markowitz model.
+
+== Minimax Model
+
+The Minimax Model#footnote[It is also called the $bold(L_infinity)$ Model, since it uses the $L_infinity$ norm] aims to minimize the maximum possible loss of the portfolio. The optimization problem is formulated as,
+$
+	"Max" & "Min" y_t \
+	"subject to" & E[r] = R^* \
+	& sum w_i = 1 \
+$
+Where, $y_t$ is the return of the portfolio in the $t^"th"$ scenario. The problem can also be stated with $"Min" "Max" "Loss"$ since $"Loss" = -"Return"$.
+
+Again, this is kinda terrible as it is not linear#footnote[Due to the $"Min"(x)$ which is non-linear, but convex which is nice since it assures us that there is a global minima]. However, we can linearize it by introducing an auxiliary variable.
+
+$
+	y = min_t y_t => y <= y_t thin forall t \
+$
+Thus, the Minimax optimization problem can be reformulated as,
+$
+	"Max" & y \
+	"subject to" & sum w_i mu_i = R^* \
+	& sum w_i = 1 \
+	& y <= sum w_i r_(i t) thin forall t \
+$
+Yay! We have a linear optimization problem with $T + 2$ constraints and $n + 1$ variables.#footnote[The Minimax Model, the MAD Model and the Variance Model are equivalent for a normal distribution]
+
+== Value at Risk Model
+
+#definition[Value at Risk (VaR)][
+	Value at Risk (VaR) is a statistical measure used to assess the potential loss in value of a portfolio over a defined period for a given confidence interval. It provides an estimate of the maximum expected loss that an investor might face under normal market conditions.
+
+	$
+		"Pr"(l <= "VaR"_alpha) >= alpha
+	$
+	where l is the loss over the specified time period and $alpha in [0, 1]$.
+	It is also given by,
+	$
+		"VaR"_alpha = min {l in bb(R) | "Pr"(l_x <= l) >= alpha}
+	$
+]
+VaR at $95 percent$ is the value that every bank needs to keep as a buffer against potential losses.
