@@ -611,4 +611,27 @@ $
 
 == M/M/C: $infinity$/FCFS
 
+Let $mu_n$ denote the total service rate when there are $n$ customers in the system. Thus,
+$
+  mu_n = cases(
+    n mu "if" n < c,
+    c mu "if" n >= c
+  )
+$
+
+Thus, the probability of having $n$ customers in the system is,
+$
+	P_n &= P_0 product_(k = 1)^n lambda/mu_k \
+	&= cases(
+		P_0 rho^n/n! "if" n < c,
+		P_0 rho^n/(c! c^(n - c)) "if" n >= c
+	)
+$
+Normalizing,
+$
+	1 &= sum P_n \
+	1 &= P_0 [sum_(n = 0)^(c - 1) rho^n/n! + sum_(n = c)^infinity rho^n/(c! c^(n - c))]  \
+	therefore P_0 &= (sum_(n = 0)^(c - 1) rho^n/n! + rho^c/((c-1)! (c + rho)))^(-1)
+$
+
 = Simulation
