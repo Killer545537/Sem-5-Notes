@@ -2041,3 +2041,79 @@ It is a swapping technique where processes can be swapped out of main memory eve
 Realistically, swapping is not used in modern systems since virtual memory techniques provide better performance and flexibility but still may be enabled by the OS when running low-memory situations.
 
 = Virtual Memory
+
+Virtual Memory is an abstraction separating a program's logical view of the memory from the actual physical memory. Since all of the program doesn't need to be in memory at the same time, the OS gives the illusion of a very large, continuous (main) memory and thus, the programs are not constrained by actual memory size, allowing more processes to be run concurrently.
+
+The virtual address space usually starts at address 0 and is continuous up to a maximum address determined by the number of bits used for addressing. The physical memory, on the other hand, may be fragmented and non-contiguous. It is generally implemented using _demand paging_ or _demand segmentation_.
+
+The stack grows downwards from high memory addresses, while the heap grows upwards from low memory addresses. This allows for efficient use of memory and helps prevent fragmentation. This has the following benefits:
+- Maximises address space use
+- No physical memmory is needed until the heap or stack grows to a given new page
+- Enables sparse memory spaces with holes (gap between the stack and heap) left for growth, dynamically linked libraries, etc
+
+== Demand Paging
+
+It is a memory management technique where pages are loaded into memory only when they are needed, rather than loading the entire process into memory at once. This allows for more efficient use of memory and can reduce the initial load time of a process.#footnote[The reason this shit works well is called locality of reference which is some COA stuff]
+
+When a process tries to access a page that is not currently in memory, a page fault occurs, and the OS must bring the required page from secondary storage into main memory. The OS uses a page replacement algorithm to determine which page to evict from memory if there is no free frame available.
+
+There is also a *lazy swapper* or *pager* that brings a page into memory only when it is needed, rather than preloading pages in anticipation of future requests. This reduces the amount of memory required for a process and can improve system performance.
+
+We use the valid-invalid bit to see whether a page is currently loaded in a frame or not currently in the memory (or not even mapped by the process). If a reference to an invalid page occurs, the MMU generates a page fault.
+
+=== Handling a Page Fault
+
+#grid(
+	columns: (2fr, 1fr),
+	gutter: 10pt,
+	figure(
+		image("imgs/Handling-Page-Fault.png")
+	),
+	[
+		Too many page faults is very bad, leading to *thrashing* where the system spends more time handling page faults than executing processes.
+	]
+)
+
++ *Trap to OS*: The MMU detects a page table entry marked invalid and triggers a trap (interrupt) to the operating system
++ *Save State*: The OS saves user registers and process context
++ *Check Reference*: The OS checks whether the page reference is valid (belongs to the process's address space). If not, it terminates the process
++ *Locate on Disk*: If valid but not resident, the OS locates the required page on disk
++ *Find Free Frame*: Search for a free frame in memory. If none is available, use a page replacement algorithm to select a victim frame (and write to disk if necessary)
++ *Swap Page*:  Read the needed page from disk into the chosen frame (using scheduled I/O operations)
++ *Update Table*:  Set page table and frame table entries to indicate that the page is now in memory (set the valid bit)
++ *Restart Instruction*: Resume the instruction that caused the page fault, now that the data/code is present
+
+Most OS maintain a _free-frame list_ containing all available frames. When a page needs to be loaded, a frame is taken from this list. If the list is empty, a page replacement algorithm is used to select a victim frame. The free frames are allocated using *zero-fill-on demand* where the content of the frame is filled with zeros when allocated to a process.
+
+The time taken to service a page fault is significantly higher than a normal memory access due to the need to access secondary storage. The effective access time (EAT) can be calculated as:
+$
+	"EAT" = (1 - p) * "memory access time" + p * ("page fault service time" + "swap page in" + "swap page out")
+$
+
+Realistically, even with $p = 1/1000$, the slow down is by a factor of 40, so $p = 1/400000$ is required for a lesser 10% slowdown!
+
+== Copy on Write (CoW)
+
+It is an optimization technique used in memory management where multiple processes can share the same physical memory pages until one of them attempts to modify the page. When a process tries to write to a shared page, a copy of the page is created for that process, allowing it to modify its own copy without affecting the other processes.
+
+This technique is particularly useful in scenarios where processes create copies of data structures, such as during process forking. Instead of duplicating the entire memory space of the parent process, the child process can share the same pages until it needs to modify them. (`vfork()` in Unix systems uses this technique)
+
+== Page Replacement
+
+When a page fault occurs and there are no free frames available, the OS must select a victim page to evict from memory. The choice of which page to replace can significantly impact system performance.
+
+This completes the separation of logical memory from physical memory, allowing the OS to use physical memory more efficiently.
+
+The modify/dirty bit is used to track whether a page has been modified since it was loaded into memory. If the dirty bit is set, the page must be written back to disk before being evicted; otherwise, it can be discarded.
+
+Page replacement basically works as:
++ Find the location of the desired page on disk
++ Find a free frame:
+  - If there is a free frame, use it
+  - If there is no free frame, use a page replacement algorithm to select a victim frame
++ If the victim frame is dirty, write it back to disk
++ Read the desired page into the selected frame
++ Update the page table and frame table to reflect the changes
++ Continue the process (restart the instruction that caused the page fault)
+
+Clearly, this may cause two page faults in succession if the victim page is dirty, thus increasing the EAT.
