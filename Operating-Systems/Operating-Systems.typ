@@ -2064,14 +2064,14 @@ We use the valid-invalid bit to see whether a page is currently loaded in a fram
 === Handling a Page Fault
 
 #grid(
-	columns: (2fr, 1fr),
-	gutter: 10pt,
-	figure(
-		image("imgs/Handling-Page-Fault.png")
-	),
-	[
-		Too many page faults is very bad, leading to *thrashing* where the system spends more time handling page faults than executing processes.
-	]
+  columns: (2fr, 1fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Handling-Page-Fault.png"),
+  ),
+  [
+    Too many page faults is very bad, leading to *thrashing* where the system spends more time handling page faults than executing processes.
+  ],
 )
 
 + *Trap to OS*: The MMU detects a page table entry marked invalid and triggers a trap (interrupt) to the operating system
@@ -2087,7 +2087,7 @@ Most OS maintain a _free-frame list_ containing all available frames. When a pag
 
 The time taken to service a page fault is significantly higher than a normal memory access due to the need to access secondary storage. The effective access time (EAT) can be calculated as:
 $
-	"EAT" = (1 - p) * "memory access time" + p * ("page fault service time" + "swap page in" + "swap page out")
+  "EAT" = (1 - p) * "memory access time" + p * ("page fault service time" + "swap page in" + "swap page out")
 $
 
 Realistically, even with $p = 1/1000$, the slow down is by a factor of 40, so $p = 1/400000$ is required for a lesser 10% slowdown!
@@ -2106,6 +2106,10 @@ This completes the separation of logical memory from physical memory, allowing t
 
 The modify/dirty bit is used to track whether a page has been modified since it was loaded into memory. If the dirty bit is set, the page must be written back to disk before being evicted; otherwise, it can be discarded.
 
+#figure(
+  image("imgs/Page-Replacement.png", width: 300pt),
+)
+
 Page replacement basically works as:
 + Find the location of the desired page on disk
 + Find a free frame:
@@ -2117,3 +2121,40 @@ Page replacement basically works as:
 + Continue the process (restart the instruction that caused the page fault)
 
 Clearly, this may cause two page faults in succession if the victim page is dirty, thus increasing the EAT.
+
+=== Page Replacement Algorithms
+
+The goal of page replacement algorithms is to minimize the number of page faults. We use a reference string to represent the sequence of page references made by a process. For example, the reference string $7,0,1,2,0,3,0,4,2,3,0,3,0,3,2,1,2,0,1,7,0,1$ represents a sequence of page references made by a process. The better an algorithm is at minimizing page faults, the better it is.
+
+==== First-In First-Out (FIFO)
+
+#figure(
+	image("imgs/FIFO-Page-Replacement.png"),
+	caption: [FIFO Page Replacement Example]
+)
+
+It is the simplest page replacement algorithm where the oldest page in memory is replaced when a new page needs to be loaded. It uses a queue to keep track of the order in which pages were loaded into memory.
+
+Also, obviously increasing the number of frames should reduce the number of page faults? Not really, as shown by Belady's Anomaly where increasing the number of frames can actually increase the number of page faults for some reference strings and non-stack algorithms like this one.
+
+==== Optimal Page Replacement
+
+#figure(
+	image("imgs/Optimal-Page-Replacement.png"),
+	caption: [Optimal Page Replacement Example]
+)
+
+It is a theoretical page replacement algorithm that replaces the page that will not be used for the longest period of time in the future. It is optimal in the sense that it minimizes the number of page faults for a given reference string. However, it is not implementable in practice since it requires knowledge of the future.
+
+It is mainly used as a benchmark to compare the performance of other page replacement algorithms.
+
+==== Least Recently Used (LRU)
+
+#figure(
+	image("imgs/LRU-Page-Replacement.png"),
+	caption: [LRU Page Replacement Example]
+)
+
+It is a practical page replacement algorithm that replaces the page that has not been used for the longest period of time. It uses a stack or a counter to keep track of the order in which pages were accessed. When a page is accessed, it is moved to the top of the stack or its counter is updated. When a page needs to be replaced, the page at the bottom of the stack or with the lowest counter value is selected for replacement.
+
+Rather than using the future like Optimal, it uses the past to make decisions. It is more effective than FIFO and does not suffer from Belady's Anomaly.
