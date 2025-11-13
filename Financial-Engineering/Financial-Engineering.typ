@@ -1233,3 +1233,41 @@ Yay! We have a linear optimization problem with $T + 2$ constraints and $n + 1$ 
   $
 ]
 VaR at $95 percent$ is the value that every bank needs to keep as a buffer against potential losses.
+
+#example[
+  Assume that the stock price follows a log-normal distribution with mean $12 percent$ and standard deviation $30%$. Let the interest rate be $8 percent$ and the stock value at $t = 0$ be $rupee 100$. Find the VaR at $95 percent$.
+]
+#solution[
+  We are given that,
+  $
+    ln S(T)/S(0) tilde N(.12, .3)
+  $
+  We need to find,
+  $
+                                          "Pr"("loss" <= "VaR"_alpha) & = 0.95 \
+                                    => "Pr"(S(0) e^r - S(1) <= "VaR") & = 0.95 \
+                  "Pr"(ln [(S(0)e^r - "VaR")/(S(0))] <= ln S(1)/S(0)) & = 0.95 \
+    therefore "Pr"((ln [(S(0)e^r - "VaR")/(S(0))] - mu)/(sigma) <= Z) & = 0.95 \
+    "VaR" & = S(0)e^r - S(0) e^(mu + sigma Phi^(-1)(0.95)) \
+		   & = 100 e^(0.08) - 100 e^(0.12 + 0.3 (1.645)) \
+		   & approx rupee 29.14 \
+  $
+]
+
+== Conditional Value at Risk Model
+
+#definition[Conditional Value at Risk (CVaR)][
+  Conditional Value at Risk (CVaR), also known as Expected Shortfall, is a risk assessment measure that quantifies the expected loss of a portfolio in the worst-case scenarios beyond a specified Value at Risk (VaR) threshold. It provides insight into the tail risk of a portfolio by estimating the average loss that could occur in extreme market conditions.
+
+  $
+    "CVaR"_alpha = E["loss" | "loss" >= "VaR"_alpha]
+  $
+  For discrete values, it is given by,
+  $
+    "CVaR"_alpha = 1/(1 - alpha) sum_(l_i >= "VaR"_alpha) l_i p_i
+  $
+  For continuous values, it is given by,
+  $
+    "CVaR"_alpha = 1/(1 - alpha) integral_(l >= "VaR"_alpha) l f_l (l) dd(l)
+  $
+]
