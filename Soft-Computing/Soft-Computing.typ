@@ -321,3 +321,106 @@ Here, fuzzy sets are used for the antecedent, but the consequent is a crisp func
 + *Defuzzification* is not needed as the output is already a crisp number.
 
 This is great for systems where interpretability is important, as the rules are easy to understand and explain.
+
+= Rough Sets
+
+Rough Set Theory (RST) is a mathematical approach to deal with uncertainty and vagueness in data analysis and knowledge discovery. It was introduced by Zdzisław Pawlak in the early 1980s. The main idea behind RST is to approximate a set using two precise sets called the lower and upper approximations.
+
+#definition[Lower Approximation][
+  The lower approximation of a set $X$ is the set of all objects that definitely belong to $X$ based on the available information. It is denoted by $underline(R)(X)$.
+]
+
+#definition[Upper Approximation][
+  The upper approximation of a set $X$ is the set of all objects that possibly belong to $X$ based on the available information. It is denoted by $overline(R)(X)$.
+]
+
+#grid(
+  columns: 2,
+  gutter: 10pt,
+  figure(
+    image("imgs/Rough-Set-Boundary.png"),
+  ),
+  [
+    The region between the lower and upper approximations is called the boundary region, which contains objects that cannot be classified with certainty. It is given by,
+    $
+      "BND"_R (X) = overline(R)(X) - underline(R)(X)
+    $
+  ],
+)
+
+Moreover, if the boundary region is empty, then the set $X$ is considered a crisp set. If the boundary region is non-empty, then $X$ is considered a rough set.
+
+Simply speaking, a rough set is just a tuple of two crisp sets $<underline(R)(X), overline(R)(X)>$.
+
+== Information System/Table
+
+It is a structured way to represent knowledge about objects, basically a spreadsheet where rows are objects and columns are attributes and the values can be categorical or numerical. Formally,
+$
+  S = (U, A, V)
+$
+where, $U$ is the finite set of objects called the universe#footnote[Just like her (200 IQ reference)], $A$ is the finite set of attributes and $V$ is the set of values that attributes can take. Each attribute $a in A$ maps each object $x in U$ to a value $v in V$.
+
+#align(center)[
+  #table(
+    columns: 4,
+    table.header([*Object*], [*Height*], [*Weight*], [*Disease*]),
+    [$x_1$], [170 cm], [60 kg], [Yes],
+    [$x_2$], [160 cm], [55 kg], [No],
+    [$x_3$], [170 cm], [55 kg], [Yes],
+  )
+]
+== Indiscernibility Relation
+
+It tells us which pair of objects are indistinguishable based on the available attributes. Formally, for a subset of attributes $P subset.eq A$, the indiscernibility relation $tilde_P$ is defined as,
+$
+  p tilde_P q & <=> forall a in P (a(p) = a(q)) \
+     "IND"(P) & = {(p, q) in U times U | p tilde_P q} \
+$
+
+For the above example, the indiscernibility relations are:
+$
+            "IND"("Height") & = {{x_1, x_3}, {x_2}} \
+            "IND"("Weight") & = {{x_2, x_3}, {x_1}} \
+  "IND"("Height", "Weight") & = {{x_1}, {x_2}, {x_3}} \
+$
+
+#definition[Equivalence Class][
+  For an object $x in U$ and a subset of attributes $P subset.eq A$, the equivalence class of $x$ under the indiscernibility relation $tilde_P$ is defined as,
+  $
+    [x]_P = {y in U | x tilde_P y}
+  $
+]
+
+For the above example, the equivalence classes are:
+#columns(2)[
+  $
+    [x_1]_"Height" & = {x_1, x_3} \
+    [x_2]_"Height" & = {x_2} \
+    [x_3]_"Height" & = {x_1, x_3} \
+  $
+  #colbreak()
+  $
+    [x_1]_"Weight" & = {x_1} \
+    [x_2]_"Weight" & = {x_2, x_3} \
+    [x_3]_"Weight" & = {x_2, x_3} \
+  $
+]
+
+== Reducts and Core
+
+#definition[Reduct][
+  A reduct is a minimal subset of attributes that can be used to represent the same indiscernibility relation as the full set of attributes. Formally, a subset $R subset.eq A$ is a reduct if,
+  $
+	"IND"(R) = "IND"(A) \
+	forall S subset R ("IND"(S) != "IND"(A)) \
+  $
+]
+This is basically the smallest _feature set_ that acheieves the same grouping as we get with all attributes.
+
+#definition[Core][
+  The core is the intersection of all reducts. It contains the most essential attributes that cannot be removed without losing information. Formally,
+  $
+	"CORE"(A) = inter.big {R | R "is a reduct of" A} \
+  $
+]
+The core attributes are those that are present in every reduct, meaning they are absolutely necessary for maintaining the indiscernibility relation.
