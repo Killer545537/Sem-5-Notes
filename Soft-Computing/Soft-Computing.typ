@@ -424,3 +424,34 @@ This is basically the smallest _feature set_ that acheieves the same grouping as
   $
 ]
 The core attributes are those that are present in every reduct, meaning they are absolutely necessary for maintaining the indiscernibility relation.
+
+== Applications of Rough Sets
+
+=== Feature Selection
+
+Several attributes are pointless and slow down the machine from learning. Rough sets help us identify and eliminate such attributes while preserving the essential information. This is done by calculating reducts and core, thus removing the need for any assumptions about the data or probability distributions.
+
+This is used in:
+- Medical Diagnosis to identify key symptoms
+- Customer Segmentation to find important demographic features
+- Fraud Detection to focus on critical transaction attributes
+- Image Recognition to select relevant pixel features
+
+=== Data Mining
+
+Rough sets can extract interpretable rules from data, helping us understand patterns and relationships without prior knowledge. This is widely used in Knowledge Discovery in Datasets.
++ *Rule Extraction*: Derive the "IF-THEN" rules from data
++ *Data Reduction*: Reduce dataset size while preserving essential information
++ *Pattern Discovery*: Find hidden patterns in data without any prior statistical model
++ *Handling Uncertainty*: Manage incomplete or imprecise data effectively
+
+This is used in:
+- Medical data analysis to find disease patterns
+- Financial Market Analysis to identify investment trends
+- Intrusion Detection to spot unusual activities
+
+=== Machine Learning
+
+Well actually 🤓, the above two are also a part of ML but whatever. Rough sets play an important role in _rule-based learning_, _classification_ and _model simplification_.
+
+Rough sets are combined with Neural Networks (to reduce input features), Fuzzy Logic (to handle vagueness and indiscernibility) and Genetic Algorithms (to optimize reducts) to create hybrid models that leverage the strengths of each approach.
