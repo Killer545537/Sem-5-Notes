@@ -17,6 +17,8 @@
   abstract: [],
 )
 
+#set quote(block: true)
+
 = Introduction to Soft Computing
 
 Soft computing#footnote[Hard computing on the other hand uses precise, deterministic and logical algorithms to produce exact solutions. It works on binary logic and requires structured input] is an approach to computing that deals with imprecision, uncertainty, partial truth and approximate reasoning inspired by the way humans solve problems. It has high tolerance for imprecision and noise, ability to learn and adapt and is inspired by biological systems and nature. It is used to solve problems where hard rules can't be defined, it reduces computation costs by approximating results, enables real-time adaptive systems and deals well with non-linear and dynamic systems.
@@ -411,8 +413,8 @@ For the above example, the equivalence classes are:
 #definition[Reduct][
   A reduct is a minimal subset of attributes that can be used to represent the same indiscernibility relation as the full set of attributes. Formally, a subset $R subset.eq A$ is a reduct if,
   $
-	"IND"(R) = "IND"(A) \
-	forall S subset R ("IND"(S) != "IND"(A)) \
+    "IND"(R) = "IND"(A) \
+    forall S subset R ("IND"(S) != "IND"(A)) \
   $
 ]
 This is basically the smallest _feature set_ that acheieves the same grouping as we get with all attributes.
@@ -420,7 +422,7 @@ This is basically the smallest _feature set_ that acheieves the same grouping as
 #definition[Core][
   The core is the intersection of all reducts. It contains the most essential attributes that cannot be removed without losing information. Formally,
   $
-	"CORE"(A) = inter.big {R | R "is a reduct of" A} \
+    "CORE"(A) = inter.big {R | R "is a reduct of" A} \
   $
 ]
 The core attributes are those that are present in every reduct, meaning they are absolutely necessary for maintaining the indiscernibility relation.
@@ -455,3 +457,101 @@ This is used in:
 Well actually 🤓, the above two are also a part of ML but whatever. Rough sets play an important role in _rule-based learning_, _classification_ and _model simplification_.
 
 Rough sets are combined with Neural Networks (to reduce input features), Fuzzy Logic (to handle vagueness and indiscernibility) and Genetic Algorithms (to optimize reducts) to create hybrid models that leverage the strengths of each approach.
+
+= Artifical Neural Networks
+
+An Artificial Neural Network (ANN) is a computational model inspired by the structure and functioning of biological neural networks in the human brain. It consists of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This is basically like the NNs we learned in ML but we have some more bs here.
+
+== Biological Neuro-System
+
+The human brain is like a non-artifical neural network made up of billions of neurons. We will look at the important parts of both.
+
+=== Neuron
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Real-vs-Fake.png"),
+  ),
+  [
+
+    It is a specialized cell that transmits information through electrical and chemical signals. The main parts are:
+    - *Dendrites*: These are tree-like branches that receive signals from other neurons and carry the signal towards the cell body
+    - *Cell Body (Soma)*: This processes incoming signals and decides whether to fire an output signal kinda like the processing unit in ANNs
+    - *Axon*: This is the long fiber that carries output signal away from the cell body to other neurons connecting to other neurons using axon terminals
+  ],
+)
+
+
+=== Synapse
+
+It is the junction between the axon of one neuron and the dendrite of another neuron. It allows the transmission of signals between neurons using chemical messengers called neurotransmitters. The synaptic strength determines how strongly the signal is transmitted kinda like the weights in ANNs.
+
+Learning occurs when synaptic strengths change with experience unlike rn.
+
+=== Information Transmission
+
+There are two phases of communication:
+- *Electrical Transmission (within neuron)*: It occurs along the axon as an action potential and is an all-or-nothing event
+- *Chemical Transmission (between neurons)*: At the synapse, chemicals carry signals across the gap which can either be _excitatory_ (increase likelihood of firing) or _inhibitory_ (decrease likelihood of firing)
+
+The combination of these transmissions allows complex information processing in the brain.
+
+=== Neural Networks in the Brain
+
+An average human brain as *86 billion* neurons#footnote[Not us] each connected to about *10,000* other neurons, forming a vast and intricate network. These networks are organized into specialized regions responsible for different functions like sensory processing, motor control, memory, and decision-making.
+
+This biological neural network is capable of learning, adapting, and performing complex tasks through processes like synaptic plasticity and neurogenesis that are the motivation behind ANNs.
+
+=== Learning
+
+#quote(attribution: [Hebbian Learing as well])[
+  Neurons that fire together, wire together.
+]
+
+This is the basis of Hebbian Learning and Backpropagation in ANNs.
+
+== Artificial Neuron Model
+
+It is a simplified mathematical abstraction of a biological neuron. The net input of the neuron is calculated as,
+$
+  v = vb(w)^T vb(x) + b
+$
+where, $vb(x)$ is the input vector, $vb(w)$ is the weight vector, $b$ is the bias and $v$ is the net input. The output of the neuron is then computed using an activation function $phi(v)$.
+
+A neuron computes a hyperplane in $n$-dimensional space:
+$
+  vb(w)^T vb(x) + b = 0 \
+$
+This hyperplane divides the input space into two regions, one where the neuron outputs a high value and another where it outputs a low value.
+
+There are a lot of activation functions and all of them have their pros and cons but they are pretty easy so look them up.
+
+== Neural Network Architecture
+
+The architecture of an ANN defines how neurons are organized and connected. There are three major dimensions:
+- *Connectivity:* How neurons are connected to each other, e.g. feedforward (unidirectional) or feedback (with loops)
+- *Layering*: How neurons are grouped into layers, e.g. single-layer or multi-layer
+- *Signal Flow*: How information flows through the network, e.g. static (fixed connections) or dynamic (changing connections)
+
+=== Feedforward Neural Network
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Feedforward-NN.png"),
+  ),
+  [
+    It is the simplest type of ANN where information flows in one direction from input to output without any cycles or loops. It consists of an input layer, one or more hidden layers, and an output layer. Each neuron in a layer is connected to every neuron in the next layer.
+  ],
+)
+
+It is simply a function, $F: bb(R)^n -> bb(R)^n$, where each layer is given by,
+$
+	vb(z)^((l)) &= W^((l)) vb(a)^((l - 1)) + vb(b)^((l)) \
+	vb(a)^((l)) &= f^((l)) (vb(z)^((l))) \
+	F(vb(x)) &= vb(a)^((l)) quad (vb(a)^((0)) = vb(x))
+$
+where $W^((l))$ is the weight matrix, $vb(b)^((l))$ is the bias vector and $f^((l))$ is the activation function for layer $l$. $vb(z^((l)))$ is the pre-activation output and $vb(a^((l)))$ is the post-activation output.
