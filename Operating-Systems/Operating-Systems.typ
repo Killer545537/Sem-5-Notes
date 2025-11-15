@@ -2061,6 +2061,12 @@ There is also a *lazy swapper* or *pager* that brings a page into memory only wh
 
 We use the valid-invalid bit to see whether a page is currently loaded in a frame or not currently in the memory (or not even mapped by the process). If a reference to an invalid page occurs, the MMU generates a page fault.
 
+== Prepaging
+
+It is a virtual memory optimization technique where the OS loads mutliple pages into memory in advance instead of waiting for a page fault to occur. This is based on the assumption that if a process accesses a particular page, it is likely to access nearby pages in the near future (locality of reference).
+
+While it can reduce the number of page faults and improve system performance, it can also lead to increased memory usage and overhead if the prepaged pages are not actually needed by the process.
+
 === Handling a Page Fault
 
 #grid(
@@ -2168,9 +2174,37 @@ It helps with:
 - *Handling Modified Pages*: If the page being evicted is dirty, instead of writing immediately (which is slow), it is placed in a modified page list to be written back later, allowing the system to continue processing other pages in the meantime.
 - *Quickly Undoing Wrong Replacements*: Sometimes, we have some regrets, like the replacement regret where a replaced page is needed again soon after eviction. If the page is still in the buffer, the OS can quickly restore it without needing to read from disk again.
 
-=== Allocation of Frames
+== Segmentation
 
-==== Fixed Allocation
+It is a memory management scheme that divides the logical address space of a process into variable-sized segments based on the logical divisions of the program, such as functions, data structures, etc. Each segment has a unique segment number and an offset within that segment.
+
+When a process is loaded into memory, its segments are mapped to available frames in physical memory. The mapping is maintained in a data structure called the segment table, which is used by the MMU to translate virtual addresses to physical addresses.
+
+Each segment has a base address and a limit. The base address indicates the starting physical address of the segment in memory, while the limit indicates the length of the segment. The MMU uses these values to ensure that a process does not access memory outside its allocated segments. Thus, the logical address in segmentation is:
+$
+	<"segment number", "offset">
+$
+
+=== Simple Segmentation
+
+Here, the logical memory is divided into variable-sized segments, the physical memory also uses variable-sized memory chunks and the OS maps each segment to a continuous physical block using a segment table. However, this leads to external fragmentation and requires compaction to solve it, also the allocation is slower than paging.
+
+=== Multilevel Segmentation
+
+This is similar to hierarchical paging where the segment table is divided into multiple levels. The first level segment table contains pointers to second level segment tables, which in turn contain pointers to third level segment tables, and so on. The last level segment table contains the actual frame numbers.
+
+This is pretty rare in practice since segmentation itself is rare.
+
+=== Segmentation with Paging
+
+This is the method used in real systems like the Intel x86 architecture. Since segmentation alone suffers from external fragmentation and paging along gives fixed-size pages but loses the logical divisions of a program, combining both gives the benefits of both. Here, a segment is divided into fixed-size pages, and each segment is mapped to a set of frames in physical memory using a segment table and page tables.
+$
+	<"segment number", "page number", "offset">
+$
+
+== Frame Allocation
+
+=== Fixed Allocation
 
 Here, the naive approach is to allocate equal number of frames to each process. However, this may not be optimal since different processes may have different memory requirements.
 
@@ -2180,7 +2214,7 @@ $
 $
 where $m$ is the total number of frames available.
 
-==== Global vs Local Allocation
+=== Global vs Local Allocation
 
 When the allocated frames are full, the frame chosen to be replaced can be selected from either the entire set of frames (global allocation) or only from the frames allocated to that process (local allocation).
 
