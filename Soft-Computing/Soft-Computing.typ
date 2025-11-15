@@ -550,8 +550,50 @@ The architecture of an ANN defines how neurons are organized and connected. Ther
 
 It is simply a function, $F: bb(R)^n -> bb(R)^n$, where each layer is given by,
 $
-	vb(z)^((l)) &= W^((l)) vb(a)^((l - 1)) + vb(b)^((l)) \
-	vb(a)^((l)) &= f^((l)) (vb(z)^((l))) \
-	F(vb(x)) &= vb(a)^((l)) quad (vb(a)^((0)) = vb(x))
+  vb(z)^((l)) & = W^((l)) vb(a)^((l - 1)) + vb(b)^((l)) \
+  vb(a)^((l)) & = f^((l)) (vb(z)^((l))) \
+     F(vb(x)) & = vb(a)^((l)) quad (vb(a)^((0)) = vb(x))
 $
 where $W^((l))$ is the weight matrix, $vb(b)^((l))$ is the bias vector and $f^((l))$ is the activation function for layer $l$. $vb(z^((l)))$ is the pre-activation output and $vb(a^((l)))$ is the post-activation output.
+
+=== Single Layer Own Feedback
+
+This is just a single layer NN with feedback connections from the output back to the input. It allows the network to maintain a state and exhibit dynamic behavior over time.
+$
+  vb(a(t + 1)) & = f(W vb(a(t)) + vb(b)) \
+   a_i (t + 1) & = f (w_(i i) a_i (t) + sum_(i != j) w_(i j) a_j(t) + b_i)
+$
+Here, the $w_(i j) a_j (t)$ is literally the _own feedback_ term.
+
+=== Multilayer Recurrent Neural Network
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Multilayer-RNN.png"),
+  ),
+  [
+    This is a more complex architecture where multiple layers of neurons are connected in a recurrent manner. It allows the network to capture temporal dependencies and learn from sequential data. This is also a dynamic system which evolves over time.
+    $
+      vb(a(t + 1))^((l)) = f^((l)) (W^((l)) vb(a(t))^((l - 1)) + U^((l)) vb(a(t))^((l)) + vb(b)^((l)))
+    $
+  ],
+)
+
+=== Maxnet Neural Network
+
+It is a type of recurrent neural network used for pattern recognition and classification. It consists of a layer of neurons with lateral inhibitory connections that suppress the activity of other neurons when one neuron is activated. The dynamics of the Maxnet are given by,
+$
+  vb(x)(t + 1) = f(W vb(x)(t)) \
+$
+where $W = mat(
+  1, -epsilon, dots, -epsilon;
+  -epsilon, 1, dots, -epsilon;
+  dots.v, dots.v, dots.down, dots.v;
+  -epsilon, -epsilon, dots, 1;
+)$. It basically performs a "winner-takes-all" operation, where the neuron with the highest activation suppresses the others.
+
+== Learning in Neural Networks
+
+Learning for an ANN is the process of automatically adjusting its weights and biases so that the network performs a desired task effectively. It can be thought of as an optimisation problem where we want to minimize a loss function that measures the difference between the network's output and the desired output.
