@@ -2129,8 +2129,8 @@ The goal of page replacement algorithms is to minimize the number of page faults
 ==== First-In First-Out (FIFO)
 
 #figure(
-	image("imgs/FIFO-Page-Replacement.png"),
-	caption: [FIFO Page Replacement Example]
+  image("imgs/FIFO-Page-Replacement.png"),
+  caption: [FIFO Page Replacement Example],
 )
 
 It is the simplest page replacement algorithm where the oldest page in memory is replaced when a new page needs to be loaded. It uses a queue to keep track of the order in which pages were loaded into memory.
@@ -2140,8 +2140,8 @@ Also, obviously increasing the number of frames should reduce the number of page
 ==== Optimal Page Replacement
 
 #figure(
-	image("imgs/Optimal-Page-Replacement.png"),
-	caption: [Optimal Page Replacement Example]
+  image("imgs/Optimal-Page-Replacement.png"),
+  caption: [Optimal Page Replacement Example],
 )
 
 It is a theoretical page replacement algorithm that replaces the page that will not be used for the longest period of time in the future. It is optimal in the sense that it minimizes the number of page faults for a given reference string. However, it is not implementable in practice since it requires knowledge of the future.
@@ -2151,10 +2151,86 @@ It is mainly used as a benchmark to compare the performance of other page replac
 ==== Least Recently Used (LRU)
 
 #figure(
-	image("imgs/LRU-Page-Replacement.png"),
-	caption: [LRU Page Replacement Example]
+  image("imgs/LRU-Page-Replacement.png"),
+  caption: [LRU Page Replacement Example],
 )
 
 It is a practical page replacement algorithm that replaces the page that has not been used for the longest period of time. It uses a stack or a counter to keep track of the order in which pages were accessed. When a page is accessed, it is moved to the top of the stack or its counter is updated. When a page needs to be replaced, the page at the bottom of the stack or with the lowest counter value is selected for replacement.
 
 Rather than using the future like Optimal, it uses the past to make decisions. It is more effective than FIFO and does not suffer from Belady's Anomaly.
+
+=== Page Buffering Algorithm
+
+It is an OS technique that is used to improve the performance of page replacement algorithms. When a page is replaced, instead of immediately writing it back to disk, it is placed in a buffer called the free list. If the page is needed again before it is written back to disk, it can be quickly retrieved from the buffer, reducing the number of disk accesses.
+
+It helps with:
+- *Fast Reuse of Freed Frames*: The evicted page is kept in a buffer, allowing for quick retrieval if it is needed again soon
+- *Handling Modified Pages*: If the page being evicted is dirty, instead of writing immediately (which is slow), it is placed in a modified page list to be written back later, allowing the system to continue processing other pages in the meantime.
+- *Quickly Undoing Wrong Replacements*: Sometimes, we have some regrets, like the replacement regret where a replaced page is needed again soon after eviction. If the page is still in the buffer, the OS can quickly restore it without needing to read from disk again.
+
+=== Allocation of Frames
+
+==== Fixed Allocation
+
+Here, the naive approach is to allocate equal number of frames to each process. However, this may not be optimal since different processes may have different memory requirements.
+
+Thus, we have proportional allocation, where each process is allocated a number of frames proportional to its size. If a process of size $s_i$ is allocated $f_i$ frames, then:
+$
+  f_i = s_i / (sum s_j) * m
+$
+where $m$ is the total number of frames available.
+
+==== Global vs Local Allocation
+
+When the allocated frames are full, the frame chosen to be replaced can be selected from either the entire set of frames (global allocation) or only from the frames allocated to that process (local allocation).
+
+In global allocation, a process can replace a frame allocated to another process, even if it belongs to another process. Thus, it allows processes to steal frames from others and the total memory is treated as one shared pool. It has a higher overall throughput#footnote[Since the OS chooses the best possible victim frame globally] and better memory utilisation. However, it can lead to unpredictable execution times and harder to provide fairness or guarantees to individual processes.
+
+In local allocation, a process can only choose a replacement frame from its own allocated frames. Thus, it provides more predictable execution times and fairness among processes. However, it can lead to lower overall throughput and poor memory utilisation since some processes may have unused frames while others are starved for frames.
+
+#thmbox(
+  variant: "Non-Uniform Memory Access",
+  title: "",
+  numbering: none,
+)[
+  The assumption that all frames are equally accessible is not valid in modern multi-processor systems with Non-Uniform Memory Access (NUMA) architectures. In NUMA systems, memory is divided into multiple regions, each associated with a specific processor. Accessing memory within the same region is faster than accessing memory in other regions. Thus, frame allocation strategies must consider the locality of memory access to optimize performance.
+]
+
+== Thrashing
+
+#grid(
+  columns: (2fr, 3fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Thrashing.png"),
+  ),
+  [
+    It is a performance problem in a virtual memory system where the CPU spends most of its time swapping pages in and out of memory instead of executing actual process instructions. It happens when the working set of processes exceeds the available physical memory, leading to a high rate of page faults.
+  ],
+)
+
+Now, this can also be caused by the CPU scheduler, i.e. it tries to allocate too many processes to the CPU, leading to each process getting too little time to execute before being swapped out again.
+
+=== Working Set Model
+
+It is a technique used by the OS to determine the minimum number of pages needed by each process to avoid excessive page faults. It is based on the concept of _locality of reference_, which states that processes tend to access a small set of pages repeatedly over a short period of time.
+
+For a given process, its working set at some time $t$ is given by,
+$
+	"WS"(t, Delta) = "the set of pages referenced during the last" Delta "time units"
+$
+Here, $Delta$ is the working-set window which is a fixed number of page references. The $"WSS"_i$ is the size of the working set of process $P_i$. The total demand for frames is given by,
+$
+  "D" = sum "WSS"_i
+$
+We compare $D$ with the total number of available frames $m$. If $D > m$, then thrashing occurs otherwise there are enough frames to allow all processes to run.
+
+Choosing the window size is also pretty important. If $Delta$ is too small, meaning too few pages in the working set causing, not capturing the entire locality of reference, leading to more page faults. If $Delta$ is too large, meaning too many pages in the working set causing, it may include pages that are not currently needed, leading to inefficient memory usage.
+
+=== Page Fault Frequency (PFF)
+
+It is a dynamic, feedback-based approach to control the degree of multiprogramming in a system. The OS monitors the page fault rate of each process and adjusts the number of frames allocated to it based on its page fault frequency.
+
+Unlike the working set model, it does not require tracking the entire working set of each process, making it easier to implement. However, it may not capture the full locality of reference of a process, leading to suboptimal frame allocation.
+
+The OS sets upper and lower bounds on the acceptable page fault rate. If a process's page fault rate exceeds the upper bound, the OS allocates more frames to it. If the page fault rate falls below the lower bound, the OS deallocates some frames from it. Moreover, if the system cannot allocate more frames to a process, it may suspend the process until enough frames become available.
