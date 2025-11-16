@@ -597,3 +597,122 @@ where $W = mat(
 == Learning in Neural Networks
 
 Learning for an ANN is the process of automatically adjusting its weights and biases so that the network performs a desired task effectively. It can be thought of as an optimisation problem where we want to minimize a loss function that measures the difference between the network's output and the desired output.
+
+A learning rule is basically a mathematical procedure that tells a NN how to update its weights and biases based on the input data and the desired output. In general,
+$
+  w_(i j)(t + 1) = w_(i j)(t) + Delta w_(i j)(t) \
+$
+where $Delta w_(i j)(t)$ is the change in weight from neuron $j$ to neuron $i$ at time $t$ that is computed using a specific learning rule.
+
+Changing weights is not the only way to learn, we can also change the architecture#footnote[Structure Learning], activation functions and more but weight updation#footnote[Parameter Learning] is the most common.
+
+=== Learning Paradigms
+
+==== Supervised Learning
+
+It is a type of learning where the NN is trained using a labeled dataset, meaning each input has a corresponding desired output. The network learns to map inputs to outputs by minimizing the error between its predictions and the actual labels.
+
+The goal is to learn a mapping:
+$ F: vb(x) -> vb(y) $
+so that predicted output $hat(vb(y))$ is close to the actual output $vb(y)$ for all training examples.
+
++ Input $vb(x)$ is given
++ Network produces $hat(vb(y))$
++ Compute error using $E = l(vb(y), vb(hat(y)))$
++ Apply a learning rule (commonly gradient descent or backpropagation)
++ Repeat for multiple epochs until convergence
+
+This is used in classification, regression, speech recognition, medical diagnosis and more.
+
+==== Unsupervised Learning
+
+It is a type of learning where the NN is trained using an unlabeled dataset, meaning there are no corresponding desired outputs. The network learns to find patterns and structures in the input data on its own.
+
+The goal is to learn the underlying structure or grouping of the data:
+$ F: x -> "clusters" $
+
++ The network observes raw inputs
++ Neurons compete or cooperate to learn features
++ The network self-organizes based on input patterns
+
+This is used in clustering, pattern discovery, dimensionality reduction, feature extraction and more.
+
+==== Reinforcement Learning
+
+It is a type of learning where the NN learns to make decisions by interacting with an environment. The network receives feedback in the form of rewards or penalties based on its actions and learns to maximize cumulative rewards over time. Here, there is no wrong answer, the agent just learns from the consequences of its actions.
+
+The goal is to learn a policy:
+$ pi (a | s) $
+that chooses the best action in each state to maximise cumulative reward.
+
++ The agent observes the current state $s_t$
++ Takes an action $a_t$
++ Receives a reward $r_t$ and new state $s_(t + 1)$
++ Agent updates its policy based on the reward feedback
+
+It is used in robotics, game playing#footnote[AlphaZero and AlphaGo were insane], autonomous vehicles and more.
+
+=== Training Algorithms
+
+==== General Concept
+
+There are some general principles followed by most training algorithms:
+$
+  Delta w_(i j)(t) & = eta delta_i (t) x_j (t) quad ("Hebbian Learning") \
+  Delta w_(i j)(t) & = eta (t_i - y_i) a_j quad ("Error-Correction Learning") \
+  Delta w_(i j)(t) & = cases(
+                       eta (vb(x) - vb(w_i)) "if neuron" i "wins",
+                       0 "otherwise"
+                     ) quad ("Competitive Learning")
+$
+
+==== Perceptron Learning Algorithm
+
+This is the simplest learning algorithm for single-layer NNs. It is used for binary classification tasks where the goal is to find a linear decision boundary that separates two classes.
+
+The weight update rule is given by,
+$
+  w_(i j)(t + 1) = w_(i j)(t) + eta (t_i - y_i) x_j \
+$
+where $eta$ is the learning rate, $t_i$ is the target output, $y_i$ is the actual output and $x_j$ is the input.
+
++ First we initialise the weights randomly
++ For each training example:
+  - Compute output
+  - Compare with target
+  - Adjust weights using the above rule
++ Repeat until classification error is minimized
+
+This only works for linearly separable data but converges in finite steps#footnote[This is known as the Perceptron Convergence Theorem].
+
+==== Delta Rule
+
+This is generally used for Adeline networks (single-layer NNs with continuous activation functions). It minimizes the mean squared error between the network's output and the desired output.
+
+The weight update rule is given by,
+$
+  Delta w_(i j)(t) = eta (t_i - y_i) x_j
+$
+And the error term is $ E = 1/2 (t - y)^2 $
+
+==== Backpropagation Algorithm
+
+This is the single most popular algorithm for training multi-layer feedforward NNs. It uses the chain rule of calculus to compute gradients of the loss function with respect to each weight in the network.
+
+It uses gradient descent and computes the gradients using the Chen Lu. The goal here is to minimise a loss function (generally MSE or cross-entropy).
+
+The first step is the *Forward Pass*, where the outputs are computed layer by layer.
+$
+  vb(a)^((l)) & = f^((l)) (W^((l)) vb(a)^((l - 1)) + vb(b)^((l))) \
+$
+Now, we compute the error signals and perform the *Backward Pass*.
+$
+  delta^((L)) & = (vb(y) - vb(hat(y))) o f'^((L)) (vb(z)^((L))) \
+  delta^((l)) & = (W^((l + 1))^T delta^((l + 1))) o f'^((l)) (vb(z)^((l))) \
+$
+Finally, the weights are updated as,
+$
+  Delta W^((l)) & = eta delta^((l)) (vb(a)^((l - 1)))^T \
+$
+
+This algorithm handles non-linear, non-separable data and is widely used in various applications like image recognition, natural language processing and more.
