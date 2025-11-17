@@ -2182,7 +2182,7 @@ When a process is loaded into memory, its segments are mapped to available frame
 
 Each segment has a base address and a limit. The base address indicates the starting physical address of the segment in memory, while the limit indicates the length of the segment. The MMU uses these values to ensure that a process does not access memory outside its allocated segments. Thus, the logical address in segmentation is:
 $
-	<"segment number", "offset">
+  <"segment number", "offset">
 $
 
 === Simple Segmentation
@@ -2199,7 +2199,7 @@ This is pretty rare in practice since segmentation itself is rare.
 
 This is the method used in real systems like the Intel x86 architecture. Since segmentation alone suffers from external fragmentation and paging along gives fixed-size pages but loses the logical divisions of a program, combining both gives the benefits of both. Here, a segment is divided into fixed-size pages, and each segment is mapped to a set of frames in physical memory using a segment table and page tables.
 $
-	<"segment number", "page number", "offset">
+  <"segment number", "page number", "offset">
 $
 
 == Frame Allocation
@@ -2251,7 +2251,7 @@ It is a technique used by the OS to determine the minimum number of pages needed
 
 For a given process, its working set at some time $t$ is given by,
 $
-	"WS"(t, Delta) = "the set of pages referenced during the last" Delta "time units"
+  "WS"(t, Delta) = "the set of pages referenced during the last" Delta "time units"
 $
 Here, $Delta$ is the working-set window which is a fixed number of page references. The $"WSS"_i$ is the size of the working set of process $P_i$. The total demand for frames is given by,
 $
@@ -2268,3 +2268,51 @@ It is a dynamic, feedback-based approach to control the degree of multiprogrammi
 Unlike the working set model, it does not require tracking the entire working set of each process, making it easier to implement. However, it may not capture the full locality of reference of a process, leading to suboptimal frame allocation.
 
 The OS sets upper and lower bounds on the acceptable page fault rate. If a process's page fault rate exceeds the upper bound, the OS allocates more frames to it. If the page fault rate falls below the lower bound, the OS deallocates some frames from it. Moreover, if the system cannot allocate more frames to a process, it may suspend the process until enough frames become available.
+
+= Mass-Storage Structure
+
+Mass-Storage Structure refers to the architecture, hardware components, and management techniques used by an OS to organise, access, and control _large non-volatile storage devices_ like magnetic disks, SSDs and other secondary storage media.
+
+== Hard Disk Drives (HDDs)
+
+Physically, a HDD is composed of multiple platters made of a non-magnetic substrate coated with a magnetic material. Each *platter* has two surfaces, each with its own *read/write head* mounted on an *actuator arm*. The platters are stacked vertically on a *spindle* that rotates at high speeds#footnote[Faster rotation speeds imply faster transfer rates] (typically 5400 to 15000 RPM). The read-write head "flies" just above the platter surface on an extremely thin#footnote[In microns] cushion of gas#footnote[Typically Helium]#footnote[A crash between the platter and the head is a head crash, fucking creative]. The head can move radially across the platter surface to access different *tracks*.
+
+The surface of a platter is logically divided into concentric circles called *tracks*. Each track is further divided into smaller units called *sectors*, which are the smallest addressable units of storage on a disk. A sector typically holds 512 bytes or 4096 bytes (4 KB) of data.
+
+=== Performance
+
+#definition[Transfer Rate][
+  The transfer rate of an HDD is the rate at which data flows between the drive and the computer.
+]
+
+#definition[Positioning/Random-Access Time][
+  It is the sum of the seek time and rotational latency.
+
+  The seek time is the time taken for the read/write head to move to the desired track, while the rotational latency is the time taken for the desired sector to rotate under the read/write head.
+]
+
+=== Non-Volatile Memory Devices
+
+Non-Volatile Memory Devices (NVMDs) are storage devices that retain data even when power is removed. They are used as secondary storage in computers and other electronic devices. Common types of NVMDs include Solid-State Drives#footnote[If in a disk-drive-like container then SSD otherwise flash drives or DRAM stick] (SSDs), USB flash drives, and memory cards.
+
+These devices are more reliable than HDDs since they have no moving parts, making them less susceptible to mechanical failure. They also offer faster data access times and higher transfer rates compared to HDDs. However, they are generally more expensive per unit of storage compared to HDDs.
+
+These have their own things little problems which are not generally the concern of the OS but are typically implemented in the NVM controller. The most common is that NAND semiconductors can be read and written to but to overwrite they have to be erased first which is slow and wears them out. This is the reason for the *Drive Writes Per Day* metric.
+
+==== NAND Flash Controller Algoithms
+
+Since NAND semiconductors cannot be overwritten, there are pages containing invalid data, thus containing pages with old data which is invalid.
+
+Hence, a *Flash Translation Layer* is maintained by the controller to track which logical blocks contain valid data. A _garbage collector_ is also implemented to free invalid page space. Now, the good question is, "where does the GC store the good data?", to solve this problem and improve write performance, the NVM uses over-provisioning#footnote[The device keeps a set of pages (20% of the total) as an area always available to write to]. The over-provisioning space can also help with *wear leveling*#footnote[The controller uses various algorithms to try to write to places with less-erased blocks].
+
+== Volatile Memory
+
+RAM is the main memory used by the CPU to store data and instructions that are currently being used. It is volatile, meaning that it loses its contents when power is removed. RAM is typically implemented using dynamic RAM (DRAM) or static RAM (SRAM) technologies.
+
+It is used as a high speed temporary storage area for data and instructions that are frequently accessed by the CPU. The OS manages the allocation and deallocation of RAM to processes, ensuring that each process has enough memory to execute its instructions.
+
+==== Secondary Storage Connection Methods
+
+The connection between the main memory and secondary storage devices is typically done using a bus architecture#footnote[Either a system bus or an I/O bus]. There are several types of buses like ATA, SATA (Serial Advanced Technology Attachment) (most common), eSATA, SAS, etc. Since NVM devices are much faster than HDDs, newer connection methods like NVMe#footnote[This connects the device to the system PCI bus, increasing throughput] (Non-Volatile Memory Express) over PCIe (Peripheral Component Interconnect Express) are used to take advantage of the high-speed capabilities of NVM devices.
+
+The data transfers on a bus are carried out by special electronic processors called controllers (aka host-bus adapters). The host controller is the controller at the computer end while the device controller is at the storage device end. The controller manages the data transfer between the main memory and the secondary storage device, ensuring that data is transferred correctly and efficiently. The data between the device and computer DRAM is typically transferred using Direct Memory Access (DMA) to offload the CPU from being involved in every data transfer.
