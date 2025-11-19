@@ -2364,3 +2364,44 @@ The disk scheduling algorithms focus on minimizing the movement of the disk head
 The Linux *NOOP scheduler* uses an FCFS policy but modifies it to merge adjacent requests. Observations show us that time to service reads is uniform while the write service time is not.
 
 Random access I/O is much faster in NVM devices and is measured in IOPS (Input/Output Operations Per Second) rather than throughput however, _write amplification_#footnote[Writing a small amount of data may require reading, modifying and writing a larger block due to the erase-before-write nature of NAND flash] is a concern. Thus, the NOOP scheduler merges adjacent write requests to reduce the number of write operations, improving overall performance and reducing wear on the device.
+
+== RAID Structure
+
+RAID (Redundant Array of Independent/Inexpensive Disks) is a data storage technology that combines multiple physical disk drives into a single logical unit to improve performance, reliability, and/or capacity. It uses various techniques like striping, mirroring, and parity to achieve these goals.
+
+=== Improvement of Reliability via Redundancy
+
+#definition[Mean Time Between Failures][
+  It is the predicted elapsed time between inherent failures of a system during operation. It is typically measured in hours and is used to assess the reliability of a system.
+]
+
+The simplest solution to having a reliable storage system is to introduce redundancy, meaning we store extra information that is usually not needed but can be used to recover lost data in case of a disk failure.
+
+The simplest but most expensive way to introduce redundancy is mirroring, where a logical drive consists of two physical drives and every write is carried out on both#footnote[The result is called a mirrored volume]. If one drive fails, the other can continue to operate normally. With this approach the MTBF depends on the MTBF of the individual drives and the mean time to repair.
+
+There are other methods such as:
+- Write one copy first and then copy it to the other drive later (less reliable)
+- Add a solid-state non-volatile cache to temporarily store writes before writing to both drives (improves performance)
+
+=== Improvement of Performance via Parallelism
+
+Another goal of RAID is to improve performance by distributing data across multiple disks, allowing for parallel access to data. This is typically achieved through striping, where data is divided into blocks and distributed across multiple disks. This allows multiple disks to be accessed simultaneously, improving overall throughput and reducing latency.
+
+=== RAID Levels
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/RAID-Levels.png"),
+  ),
+  [
+    A RAID level defines the specific configuration and techniques used to achieve redundancy and performance improvements. Common RAID levels include:
+    - RAID 0: Striping without redundancy, improves performance but offers no fault tolerance.
+    - RAID 1: Mirroring, provides redundancy by duplicating data on two disks.
+    - RAID 5: Striping with distributed parity, offers a balance between performance and fault tolerance.
+    - RAID 6: Similar to RAID 5 but with double distributed parity, allowing for the failure of two disks.
+    - RAID 10: A combination of mirroring and striping, providing high performance and fault tolerance.
+    The choice of RAID level depends on the specific requirements for performance, capacity, and reliability.
+  ],
+)
