@@ -2311,8 +2311,56 @@ RAM is the main memory used by the CPU to store data and instructions that are c
 
 It is used as a high speed temporary storage area for data and instructions that are frequently accessed by the CPU. The OS manages the allocation and deallocation of RAM to processes, ensuring that each process has enough memory to execute its instructions.
 
-==== Secondary Storage Connection Methods
+=== Secondary Storage Connection Methods
 
 The connection between the main memory and secondary storage devices is typically done using a bus architecture#footnote[Either a system bus or an I/O bus]. There are several types of buses like ATA, SATA (Serial Advanced Technology Attachment) (most common), eSATA, SAS, etc. Since NVM devices are much faster than HDDs, newer connection methods like NVMe#footnote[This connects the device to the system PCI bus, increasing throughput] (Non-Volatile Memory Express) over PCIe (Peripheral Component Interconnect Express) are used to take advantage of the high-speed capabilities of NVM devices.
 
 The data transfers on a bus are carried out by special electronic processors called controllers (aka host-bus adapters). The host controller is the controller at the computer end while the device controller is at the storage device end. The controller manages the data transfer between the main memory and the secondary storage device, ensuring that data is transferred correctly and efficiently. The data between the device and computer DRAM is typically transferred using Direct Memory Access (DMA) to offload the CPU from being involved in every data transfer.
+
+== Address Mapping
+
+It is the process of converting a logical block address (LBA) used by the operating system into the actual physical location on a storage device. Each storage device is essentially viewed as a one dimensional array of logical blocks#footnote[A block is the smallest unit of transfer (mentioned above) of either 512 B or 4 KB].
+
+For an HDD, sector 0 could be the first sector of the first track on the outermost cylinder and mapping proceeds in order through that track, then through the rest of the tracks on that cylinder and then through the rest of the cylinders. For an NVM, the mapping is from a tuple of chip, block and page to an array of logical blocks.
+
+However, it is difficult to do this in practice since:
+- *Defective Sectors*: Modern disk firmware automatically remap a bad sector to a spare one, meaning the physical sector may be anywhere.
+- *Sectors Per Track*: Since the outer tracks are longer, they can store more data. There are two policies here:
+  - *Constant Linear Velocity (CLV)*: The bit density is constant across tracks while only the rotational speed varies. This is used in CD/DVD
+  - *Constant Angular Velocity (CAV)*: The rotational speed is constant while the bit density varies across tracks. This is used in HDDs.
+  - Modern HDDs use a hybrid approach called *Zone Bit Recording* where each disk is divided into zones and each zone has a different number of sectors per track.
+- *Hidden Geometry*: Modern HDD/SDD firmware completely manages the address mapping to account for wear leveling, bad block management, performance optimisation and caching strategies. Thus, the OS only sees a linear array of logical blocks.
+
+== Disk Scheduling
+
+It refers to the methods the OS uses to decide which disk I/O request to service next when multiple read/write requests are waiting. The access time is dominated by the seek time, rotational latency and transfer time which needs to be minimised to maximise throughput. Without scheduling the arm will zig-zag around mostly doing nothing.
+
+The OS maintains a queue of pending I/O requests, each with a LBA and the order of service is decided by the disk scheduler.
+
+=== FCFS Scheduling
+
+This is the simplest form of disk scheduling where requests are serviced in the order they arrive. It is easy to implement but can lead to long wait times for some requests, especially if they are located far apart on the disk.
+
+=== SCAN Scheduling
+
+The disk arm moves in one direction, servicing all requests in that direction until it reaches the end of the disk. It then reverses direction and services requests on the return trip. This reduces the overall seek time compared to FCFS. However, it can lead to longer wait times for requests located at the ends of the disk.
+
+=== C-SCAN Scheduling
+
+The disk arm moves in one direction, servicing all requests in that direction until it reaches the end of the disk. It then jumps back to the beginning of the disk and services requests in the same direction again. This provides a more uniform wait time for requests compared to SCAN. It basically treats the disk as a circular list.
+
+=== Shortest Seek Time First (SSTF) Scheduling
+
+This algorithm selects the request that is closest to the current position of the disk arm. This reduces the overall seek time compared to FCFS and SCAN. However, it can lead to starvation for requests located far from the current arm position.
+
+Now the question is to choose the right algorithm. SSTF is generally better than FCFS but can lead to starvation. SCAN and C-SCAN provide a good balance between wait times and seek times. The choice of algorithm depends on the specific workload and performance requirements of the system.
+
+Linux implements a deadline scheduler maintaining four queues, two read queues (one sorted by LBA for C-SCAN style ordering and one sorted by arrival time for FCFS) and two write queues (similarly sorted). The scheduler services requests from the read queue first to ensure low latency for read operations, while write requests are serviced when there are no pending read requests or when their deadlines are approaching. This approach balances the need for low-latency reads with the efficiency of write operations, optimizing overall disk performance.
+
+== NVM Scheduling
+
+The disk scheduling algorithms focus on minimizing the movement of the disk head which is not a problem for NVM devices since they have no moving parts. Thus, we can simply use FCFS scheduling.
+
+The Linux *NOOP scheduler* uses an FCFS policy but modifies it to merge adjacent requests. Observations show us that time to service reads is uniform while the write service time is not.
+
+Random access I/O is much faster in NVM devices and is measured in IOPS (Input/Output Operations Per Second) rather than throughput however, _write amplification_#footnote[Writing a small amount of data may require reading, modifying and writing a larger block due to the erase-before-write nature of NAND flash] is a concern. Thus, the NOOP scheduler merges adjacent write requests to reduce the number of write operations, improving overall performance and reducing wear on the device.
