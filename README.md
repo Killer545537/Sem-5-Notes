@@ -14,3 +14,7 @@ Two shell scripts are included:
 - [gum](https://github.com/charmbracelet/gum)
 
 ---
+
+## Contributing
+
+Feel free to send me money, any amount helps especially large amounts and especially for the OS notes.

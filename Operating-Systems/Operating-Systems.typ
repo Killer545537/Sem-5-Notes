@@ -2405,3 +2405,101 @@ Another goal of RAID is to improve performance by distributing data across multi
     The choice of RAID level depends on the specific requirements for performance, capacity, and reliability.
   ],
 )
+
+= File System Interface
+
+The file system interface is what the OS provides to the users and programs for working with files and directories. It is a layer of abstraction that hides the complexities of the underlying storage devices and provides a simple and consistent way to access and manipulate files.
+
+== File
+
+A file is defined as a contiguous logical address space that stores information created by the user or program like text, binary, images, executables, etc.
+
+=== File Attributes
+
+The common attributes of a file are:
+- *Name*: The symbolic file name (only kept for us 🥰)
+- *Identifier*: The unique tag that identifies a file within the file system
+- *Type*: The type of file (text, binary, executable, etc)
+- *Location*: It is a pointer to a device and to the location of the file on that device
+- *Size*: The current size of the file (may also include the maximum size)
+- *Protection*: Includes access-control information
+- *Timestamps and User Identification*: Includes creation time, last access time, last modification time, and user/group ownership information (useful for protection, security, usage monitoring)
+
+This metadata is kept in directory entries.
+
+=== File Operations
+
+Since a file is an abstract data type, we define some operations that can be performed on files:
+- *Creating a File*: To create a file, space is allocated and a directory entry is created
+- *Opening a File*: The OS checks the access permissions, if successful, the open call returns a file descriptor (an integer) that is used to refer to the file#footnote[The OS keeps a table mapping file descriptors to open files called open-file table]
+- *Writing a File*: A system call (takes file handle and data to be written) is made, then a write pointer is maintained
+- *Reading a File*: A system call (takes file handle and buffer to store data) is made, then the read pointer is maintained#footnote[Since a process only either reads or writes at a time, a single pointer current-file-position pointer is sufficient]
+- *Repositioning within a File*: The read/write pointer can be moved to a specific location using a seek operation
+- *Deleting a File*: The directory entry and the space occupied by the file are freed
+- *Truncating a File*: The file size is changed to zero or to a specified size
+
+These are just the bare minimum operations, real systems provide many more like appending data, renaming files, copying files, etc. Also, note that these operations are provided by the OS via system calls, and the actual implementation may vary between different operating systems. Like the `open()` call looks simple but in reality, it does a lot of stuff like checking permissions, allocating resources, updating data structures, etc.
+
+An open file attribute is maintained by the OS for each open file, which includes:
+- *File Pointer*: Indicates the current position in the file for reading/writing
+- *File-Open Count*: It is the number of processes that have the file open and when zero, the OS can free the resources associated with the open file
+- *Location of File*: The information needed to locate the file is kept in memory for quick access
+- *Access Rights*: The access permissions for the file are also kept in memory for quick checking
+
+=== File Locking
+
+Files can also be locked which is a feature provided by some OS and file systems. It is pretty similar to reader-writer locks and can be:
+- *Shared Lock*: Kinda like reader lock, multiple processes can read the file simultaneously but no process can write to it
+- *Exclusive Lock*: Kinda like writer lock, only one process can read/write the file at a time
+
+There are also two models:
+- *Advisory Locking*: The OS does not enforce the locks, it is up to the processes to check and respect the locks
+- *Mandatory Locking*: The OS enforces the locks, if a process tries to access a locked file, it is blocked until the lock is released
+
+== File Types
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Common-File-Types.png"),
+  ),
+  [
+    The UNIX system uses _magic numbers_#footnote[These are stored at the beginning to indicate the file type] for some but not all. Also the file extensions are basically useless for the OS and just there help us mere mortals.
+
+    These extensions may or may not even be used by the applications that create or read these files.
+  ],
+)
+
+== File Structure
+
+It defines how contents of a file are logically organized so that the OS and applications can interpret and manipulate the data correctly.
+
+However, each file type has its own internal structure defined by the application that creates it. For example, a text file is a sequence of characters, while a binary file may have a complex structure with headers, data sections, etc. The OS can't handle all that complexity. So some OS impose a minimal number of file structures and consider each file to be a sequence of bytes with no interpretation by the OS. This provides high flexibility with little support allowing each application to define its own file structure.
+
+=== Internal File Structure
+
+Disk I/O is always done in fized-size physical blocks while files are made of logical blocks of varying sizes so it makes it hard to find the offset within a file. Thus, the mapping of logical record to a physical block is a software job done by the application or the file system.
+
+Now, this always suffers from internal fragmentation since the last block may not be completely filled and there is not a lot we can do 😔.
+
+== Access Methods
+
+#quote(attribution: "Wise Man")[
+  Information written must be accessed and read into computer memory
+]
+
+=== Sequential Access
+
+This is the simplest access method#footnote[This is the way used by editors and compilers] where the file is processed from the beginning to the end, one record after another. It is suitable for files that are processed in a linear fashion, such as text files or log files.
+
+Since read and writes are most of the actual operations, there are two operations:
+- `read_next()`: This reads the next portion of the file, advances the file pointer
+- `write_next()`: This appends data at the current file pointer position, advances the file pointer
+There may be a way to reset the file pointer to the beginning of the file and skip by some records.
+
+=== Direct/Relative Access
+
+This is used when a file#footnote[This is commonly used for databases] is made up of fixed-size logical records that allow programs to read/write recors in any order. Here, each record has a unique record number (or relative byte address) that is used to access it directly.
+
+It has `read(n)` and `write(n, data)` operations to read/write the nth record directly. Or it could keep the previous `read()` and `write()` functions with a `position_file(n)` function to set the file pointer to the nth record.
