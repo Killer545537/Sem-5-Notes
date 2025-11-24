@@ -2465,7 +2465,7 @@ There are also two models:
     image("imgs/Common-File-Types.png"),
   ),
   [
-    The UNIX system uses _magic numbers_#footnote[These are stored at the beginning to indicate the file type] for some but not all. Also the file extensions are basically useless for the OS and just there help us mere mortals.
+    The Unix system uses _magic numbers_#footnote[These are stored at the beginning to indicate the file type] for some but not all. Also the file extensions are basically useless for the OS and just there help us mere mortals.
 
     These extensions may or may not even be used by the applications that create or read these files.
   ],
@@ -2503,3 +2503,195 @@ There may be a way to reset the file pointer to the beginning of the file and sk
 This is used when a file#footnote[This is commonly used for databases] is made up of fixed-size logical records that allow programs to read/write recors in any order. Here, each record has a unique record number (or relative byte address) that is used to access it directly.
 
 It has `read(n)` and `write(n, data)` operations to read/write the nth record directly. Or it could keep the previous `read()` and `write()` functions with a `position_file(n)` function to set the file pointer to the nth record.
+
+=== Other Access Methods
+
+These are generally built on top of the direct access method and involve something like an index which contains pointers to various records in the file. The index is searched to find the location of the desired record, and then direct access is used to read/write it.
+
+IBM's ISAM (Indexed Sequential Access Method) is a popular method that combines sequential and direct access. It maintains a small master index that points to disk blocks of a secondary index which points to the actual records. This allows for efficient sequential access while also providing direct access to individual records.
+
+== Directory Structure
+
+A directory is a symbol table#footnote[Basically a special file] that translates file names into their file control blocks (which contain the metadata and location of the file on disk).
+
+A directory must allow the following operations:
+- *Search for a File*: Given a file name, return the corresponding file control block. We should also be able to find similar names
+- *Create a File*: Add a new file name and its file control block to the directory
+- *Delete a File*: Remove a file name and its file control block from the directory
+- *List a Directory*: Return a list of all file names in the directory
+- *Rename a File*: Change the name of a file in the directory
+- *Traverse the File System*: Access files in different directories by specifying the path
+
+=== Single Level Directory
+
+This is the simplest directory structure where all files are stored in a single directory. It is easy to implement and understand but suffers from the naming problem#footnote[Two users cannot have files with the same name] and the grouping problem#footnote[Related files cannot be grouped together, hehe not the other type of grouping].
+
+=== Two Level Directory
+
+Here, each user has their own directory#footnote[Called a User File Directoy (UFD)], allowing files with the same name to exist in different user directories#footnote[When user logs in, the Master File Directory (MFD) is searched which is indexed by username/account number]. This solves the naming problem but still suffers from the grouping problem since related files of a user cannot be grouped together.
+
+Moreover, this causes isolation which is good and bad. It is good since users cannot access each other's files but bad since sharing files between users is hard.
+
+=== Hierarchical/Tree-Structured Directory
+
+Obviously, after a 1-level and 2-level directory, the next step is to have a tree structure. This solves both the naming and grouping problems.
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Tree-Structured-Directory.png"),
+  ),
+  [
+    Here, each directory can contain files and other directories (subdirectories). The root directory is at the top of the hierarchy, and each user has their own home directory under the root. The full path to a file is specified by traversing the tree from the root to the file, using directory names separated by slashes (e.g., `/home/user/documents/file.txt`).
+
+    This structure allows for efficient organization and access to files, as related files can be grouped together in directories. It also allows for easier sharing of files between users by placing them in shared directories.
+  ],
+)
+In most implemenatations, a file and directory differ by only a single attribute in their file control block, making them similar in structure. However, they still implement special system calls to create/delete directories#footnote[The deletion is a touchy topic, whether to delete all files inside or don't delete till empty, Unix just gives us an option like mommy] and to traverse the directory tree.
+
+#definition[Path Name][
+  It is a string that specifies the location of a file or directory in the file system hierarchy. It can be an absolute path (starting from the root directory) or a relative path (starting from the current working directory).
+]
+
+=== Acyclic-Graph Directory
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Acyclic-Graph-Directory.png"),
+  ),
+  [
+    Here, directories can have multiple parent directories, unlike a tree which allows for only one parent, allowing for more flexible organization of files and directories. This structure allows for the creation of links or shortcuts to files and directories in multiple locations within the directory hierarchy.
+
+    To prevent cycles in the graph, special care must be taken when creating links to ensure that they do not create circular references. This can be done by checking the ancestry of the target directory before creating a link.
+  ],
+)
+Again, deletion is tricky here since deleting a file may not free its space if there are other links to it. Thus, a reference count is maintained in the file control block to keep track of the number of links to a file. When the reference count reaches zero, the file can be deleted and its space freed.
+
+In Unix, symbolic links are left after a file is deleted and upto the user to realize they messed up.
+
+=== General Graph Directory
+
+The biggest problem with the acyclic-graph directory is inifite loops#footnote[Like a directory linking to itself directly or indirectly]. To solve this, we can use a garbage collector that traverses the entire file system, marks everything that can be accessed, then, collects everything that is not marked, but this takes too much time and is not practical.
+
+The simpler algorithm is to just bypass links when traversing the directory structure. This is done by maintaining a list of visited directories during the traversal. If a directory is encountered that is already in the visited list, it is skipped to prevent infinite loops.
+
+= File System Implementation
+
+The file system implementation is about how the OS stores files on disks, manages metadata, allocates blocks, tracks free space, and retrieves data efficiently. It involves various data structures and algorithms to ensure that files are stored and accessed efficiently while maintaining data integrity and reliability.
+
+== File System Structure
+
+File systems typically reside on the disk since they can be rewritten in-place#footnote[Meaning it is possible to read a block, modify it and write it back to the same block] and randomly accessed#footnote[Making it simpler to access any file either sequentially or randomly]. However, NVMs which are used more for this have a lot of problems which we talked about.
+
+=== Layered File System
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Layered-File-System.png"),
+  ),
+  [
+    - *I/O Control*: This layer consists of the device drivers#footnote[Act as a translater that takes commands like "retrieve block 123" and returns the low-level hardware specific instructions used by the controller] and interrupt handlers that manage the communication between the main memory and the disk system.
+    - *Basic File System*: This layer simply sends generic commands to the device driver to read and write blocks. It also manages the I/O request scheduling, memory buffers and caches holding file systems, directories and data blocks.
+    - *File Organisation Module*: This knows about the logical blocks (numbered from 0 to N). It manages the free-space manager.
+    - *Logical File System*: This manages metadata information and maintains the file structure using the File Control Block#footnote[This is called the _inode_ in Unix file systems which we'll look at].
+  ],
+)
+This layering reduces implementation complexity, allows reuse of lower-level code, is easier to maintain and extend and allows us to support multiple file system formats in one OS. However, it adds extra layers and thus overhead.
+
+Many different OS have their own file systems and use multiple different file systems as well. Unix uses the Unix File System and also supports the Fast File System (FFS).
+
+== File System Operations
+
+A file system needs to keep track of on-storage (disk) file-system structures and in-memory file-system structures.
+
+=== On-Storage File System Structures
+
+These are the data structures that are stored permanently on the disk to manage files and directories.
+- *Boot Control Block (per volume)*: This contains information needed to boot the OS#footnote[If the block does not contain an OS, this block can be empty] like the location of the file system, size of the file system, etc and is generally the first block. It is called the boot block in UFS.
+- *Volume Control Block (per volume)*: This contains the metadata about the file system itself like the number of blocks, block size, free block count and pointers, free FCB count and pointers, etc. It is called the superblock in UFS.
+- *Directory Structure (per file system)*: It stores the file names and their corresponding FCB/inode numbers (in UFS).
+- *FCB (per file)*: This stores all the metadata. In UFS, it is stored as rows in the Master File Table (MFT).
+
+=== In-Memory File System Structures
+
+These are the data structures that are kept in memory while the file system is mounted to manage open files and directories. These are used for performance and fast lookups.
+- *Mount Table*: It contains information about each mounted volume.
+- *Directory-Structure Cache*: It caches recently accessed directory entries to speed up file lookups.
+- *System-Wide Open-File Table*: It keeps track of all open files in the system, including their file descriptors, file pointers, and access modes.
+- *Buffers*: It holds the file-system blocks currently being written to. It is required since all disk I/O occurs in block units.
+
+#figure(
+  grid(
+    columns: 2,
+    gutter: 10pt,
+    figure(
+      image("imgs/File-Open.png"),
+      caption: [File Open Structures],
+    ),
+    figure(
+      image("imgs/File-Read.png"),
+      caption: [File Read Structures],
+    ),
+  ),
+  caption: [In-Memory File System Structures],
+)
+
+== Directory Implementation
+
+=== Linear List
+
+This is the simplest structure, pretty easy to implement and to insert or delete entries but is obviously pretty slow. Essentially, it is a linear list of directory entries where each entry contains the file name and its corresponding FCB/inode pointer. To search for a file, we have to traverse the list sequentially until we find the desired file name.
+
+We can try to sort this list to make things slightly better, but it does not work that way since lookups become efficient at the cost of insertions and deletions which become slow.
+
+=== Hash Table
+
+A hash table is a more efficient directory structure that uses a hash function to map file names to directory entries. This allows for faster lookups, as we can directly compute the index of the desired entry using the hash function.
+
+Now, this is not all roses since collisions can occur when two file names hash to the same index. To handle collisions, we can use techniques like chaining (where each entry in the hash table points to a linked list of entries that hash to the same index) or open addressing (where we probe for the next available slot in the table). It is also a pain to implement dynamic resizing of the hash table when the number of entries exceeds a certain threshold.
+
+== Allocation Methods
+
+=== Contiguous Allocation
+
+Here, each file occupies a set of contiguous blocks (done by imposing a linear ordering), making it extremely fast since the head (usually implemented on HDDs) only has to be positioned once and then the blocks can be read/written sequentially. It also supports direct access since we can easily compute the block address using the starting block and the offset.
+
+However, it suffers from external fragmentation#footnote[Free space is broken into small pieces making it hard to find contiguous blocks for new files] and the need to know the file size in advance#footnote[To allocate enough contiguous blocks]. To solve these problems, we can use compaction#footnote[Periodically move files around to create larger contiguous free spaces] and pre-allocation#footnote[Allocate more blocks than needed initially to accommodate future growth], but these add overhead and complexity.
+
+=== Linked Allocation
+
+This solves all the issues of contiguous allocation by using a linked list to store the file blocks. Each block contains a pointer to the next block in the file, allowing for dynamic file sizes and no external fragmentation.
+
+However, the storage of pointers causing overhead is something we can solve using clusters. We collect blocks into clusters (group of blocks) and store a single pointer to the next cluster, reducing the overhead, keeps the logical-to-physical mapping simple while improving HDD throughput! This does result in some internal fragmentation. Another issue is reliability, the loss of a single pointer can make the entire file inaccessible. To mitigate this, we can use a doubly linked list or store redundant pointers, but this adds overhead.
+
+#thmbox(variant: "FAT", numbering: none)[
+  This is a popular linked allocation method called File Allocation Table (FAT). Instead of pointers, we maintain a table at the start of the volume where each entry corresponds to a block on the disk. Each entry contains the index of the next block in the file or a special value indicating the end of the file.
+
+  This is faster as it can be cached while still being flexible and simple to implement. However, it still suffers from the pointer reliability issue and requires extra space for the table.
+]
+
+=== Indexed Allocation
+
+This method uses an index block to store all the pointers to the file blocks. The index block contains an array of block addresses, allowing for direct access to any block in the file. This solves the reliability issue, external-fragmentation of linked allocation and size-declaration of contiguous allocation.
+
+Each file has an index block#footnote[Initially set to null] that contains pointers to all the blocks of the file. To read/write a block, we first read the index block to get the block address and then access the block directly.
+
+Now, obviously the index block must be small since every file has one, but making it too small would not be able hold enough pointers for a large file. Thus, for large files we use:
+- *Linked Index Blocks*: We can have multiple index blocks linked together to hold more pointers.
+- *Multi-Level Indexing*: We can have a hierarchy of index blocks where the first-level index block points to second-level index blocks which point to the actual file blocks. This allows for a large number of file blocks to be addressed with a small index block.
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 10pt,
+  figure(
+    image("imgs/Unix-Inode.png"),
+    caption: [Unix Inode Structure],
+  ),
+  [
+    - *Combined Scheme*: In Unix based systems, the first few pointers are kept in the file's inode, out of which some point to direct blocks#footnote[These contain addresses of blocks that contain data of the file], some to single indirect blocks#footnote[This is an index block containing the addresses of blocks that contain data], some to double indirect blocks#footnote[These contain addresses the blocks that contain the addresses of the blocks that caontain pointers to the actial data blocks] and one to a triple indirect block#footnote[Self-explanatory no?]. This allows for efficient access to small files while still supporting large files.
+  ],
+)
